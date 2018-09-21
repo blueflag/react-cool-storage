@@ -1,1 +1,3 @@
-# react-cold-storage
+# react-cool-storage
+
+Not quite cold storage for react.
