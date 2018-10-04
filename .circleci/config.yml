@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/possum-client
+    docker:
+      - image: blueflag/circle-node:0.0.8
+
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "yarn.lock" }}
+            - dependencies-
+      - run: yarn install
+      - save_cache:
+          paths:
+            - node_modules
+          key: dependencies-{{ checksum "yarn.lock" }}
+
+      # run tests!
+      - run: git diff | cat
+      - run: git --no-pager diff && test -z "$(git status --porcelain)"
+      - run: yarn test-all

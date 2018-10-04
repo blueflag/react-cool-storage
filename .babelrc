@@ -1,0 +1,18 @@
+ {
+    "presets": [
+        ["blueflag", {browser: true}]
+    ],
+    "plugins": [
+         ["babel-plugin-relative-import", {
+             "rootPathSuffix": "src"
+         }]
+    ],
+    "ignore": ["./lib"],
+    "env": {
+        "production": {
+            "plugins": [
+                ["proto-babel-plugin-extract-flow-types", {"outDir": "lib"}]
+            ]
+        }
+    }
+}
