@@ -1,48 +1,39 @@
 {
-  "main": "lib/index.js",
-  "name": "react-cool-storage",
-  "version": "0.0.0",
-  "description": "React hocs with a common API for storing data outside of React. Query string, local storage etc.",
-  "license": "UNLICENSED",
-  "author": "Damien Clarke",
-  "files": [
-    "lib"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:blueflag/react-cool-storage.git"
-  },
-  "bugs": {
-    "url": "https://github.com/blueflag/react-cool-storage/issues"
-  },
+  "private": true,
   "scripts": {
-    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib --ignore **/*-test.js",
-    "build-all": "yarn build",
-    "prepublish": "yarn build-all",
     "preversion": "yarn build-all",
+    "bootstrap": "yarn lerna bootstrap",
+    "build": "lerna run build --parallel --",
+    "build-all": "lerna run build-all --parallel --",
+    "build-docs": "cp README.md packages/react-cool-storage/README.md && lerna run build-docs --parallel --",
     "flow": "blueflag-test flow",
-    "flow-coverage": "blueflag-test flow-coverage",
-    "lint": "blueflag-test lint",
+    "flow-coverage": "blueflag-test flow-coverage -M",
+    "lint": "blueflag-test lint --monorepo",
     "test": "yarn jest",
     "test-all": "yarn lint && yarn flow && yarn test && yarn flow-coverage",
+    "deploy-docs": "yarn lerna --scope react-cool-storage-docs run deploy",
     "view-coverage": "yarn run coverage; open ./coverage/lcov-report/index.html",
-    "watch": "yarn run build -w"
+    "watch": "lerna run watch --parallel --"
   },
-  "dependencies": {},
-  "peerDependencies": {
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1"
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/gatsby*",
+      "**/gatsby*/**"
+    ]
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
     "babel-core": "^6.23.0",
-    "babel-plugin-flow-react-proptypes": "^24.1.1",
-    "babel-plugin-relative-import": "^1.0.3",
     "babel-preset-blueflag": "^0.6.0",
-    "blueflag-test": "^0.20.0",
-    "json-loader": "^0.5.4",
-    "proto-babel-plugin-extract-flow-types": "git+ssh://git@github.com/blueflag/proto-babel-plugin-extract-flow-types.git#v0.1.1",
+    "blueflag-test": "^0.21.0",
+    "lerna": "^2.9.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1"
+  },
+  "dependencies": {
+    "babel-plugin-extract-flow-types": "^1.0.0"
   }
 }

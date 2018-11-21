@@ -4,9 +4,7 @@
         "eslint-config-blueflag/react",
         "eslint-config-blueflag/flow"
     ],
-    "settings": {
-        "react": {
-            "version": "16.4.1"
-        }
+    "rules": {
+        "newline-per-chained-call": "off"
     }
 }

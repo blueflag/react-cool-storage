@@ -1,23 +1,26 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/possum-client
+    working_directory: ~/react-cool-storage
     docker:
-      - image: blueflag/circle-node:0.0.8
+      - image: circleci/node:8
 
     steps:
       - checkout
       - restore_cache:
           keys:
-            - dependencies-{{ checksum "yarn.lock" }}
-            - dependencies-
+            - v1-dependencies-{{ checksum "yarn.lock" }}
+            - v1-dependencies-
       - run: yarn install
+      - run: yarn build
+      - run: yarn build-docs
       - save_cache:
           paths:
             - node_modules
-          key: dependencies-{{ checksum "yarn.lock" }}
+            - example/node_modules
+          key: v1-dependencies-{{ checksum "yarn.lock" }}
 
       # run tests!
       - run: git diff | cat
-      - run: git --no-pager diff && test -z "$(git status --porcelain)"
+      - run: test -z "$(git status --porcelain)"
       - run: yarn test-all

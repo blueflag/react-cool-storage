@@ -1,17 +1,14 @@
- {
+{
     "presets": [
-        ["blueflag", {browser: true}]
+        ["blueflag", {"browser": true, "library": true}]
     ],
-    "plugins": [
-         ["babel-plugin-relative-import", {
-             "rootPathSuffix": "src"
-         }]
+    "ignore": [
+        "./lib"
     ],
-    "ignore": ["./lib"],
     "env": {
         "production": {
             "plugins": [
-                ["proto-babel-plugin-extract-flow-types", {"outDir": "lib"}]
+                ["babel-plugin-extract-flow-types", {"outDir": "lib"}]
             ]
         }
     }

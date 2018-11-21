@@ -2,7 +2,7 @@
 module.exports = {
     preset: 'blueflag-test',
     collectCoverageFrom: [
-        "**/*.{js,jsx}",
+        "packages/**/*.{js,jsx}",
         "!**/lib/**",
         "!**/node_modules/**"
     ],
