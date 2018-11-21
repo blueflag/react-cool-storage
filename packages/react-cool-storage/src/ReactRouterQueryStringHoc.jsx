@@ -32,6 +32,10 @@ export default (config: Config): Function => {
         silent = false
     } = config;
 
+    if(typeof name !== "string") {
+        throw new Error(`ReactRouterQueryStringHoc() expects param "config.name" to be a string, but got undefined`);
+    }
+
     return (Component: ComponentType<ChildProps>) => class ReactRouterQueryStringHoc extends React.Component<Props> {
 
         checkAvailable = () => {
