@@ -12,7 +12,6 @@ import identity from 'unmutable/lib/identity';
 import isKeyed from 'unmutable/lib/isKeyed';
 import merge from 'unmutable/lib/merge';
 import omit from 'unmutable/lib/omit';
-import pick from 'unmutable/lib/pick';
 import pipe from 'unmutable/lib/pipe';
 import pipeWith from 'unmutable/lib/pipeWith';
 
