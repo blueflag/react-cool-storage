@@ -13,6 +13,22 @@ yarn add react-cool-storage 😎
 
 ## Hocs
 
+All hocs give you a `ReactCoolStorageMessage`:
+
+```js
+{
+    value: any,
+    onChange: (newValue: any) => void,
+    available: boolean,
+    valid: boolean
+}
+```
+
+- `value` - The current value. Defaults to an object with keys and values.
+- `onChange` - A callback to change the value. Defaults to requiring an object with keys and values. Values are merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
+- `available` - Indicates whether the chosen storage mechanism is available to use.
+- `valid` - Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
+
 ### ReactRouterQueryStringHoc
 
 `ReactRouterQueryStringHoc` gives you an easy to use binding for working with React Router v4's query string.
@@ -62,24 +78,6 @@ ReactRouterQueryStringHoc requires these props to be passed to it:
 #### Child Props
 
 ReactRouterQueryStringHoc passes down a `ReactCoolStorageMessage` as a prop with a name of `name`.
-
-## Data types
-
-### ReactCoolStorageMessage
-
-```js
-{
-    value: any,
-    onChange: (newValue: any) => void,
-    available: boolean,
-    valid: boolean
-}
-```
-
-- `value` - The current value. Defaults to an object with keys and values.
-- `onChange` - A callback to change the value. Defaults to requiring an object with keys and values. Values are merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
-- `available` - Indicates whether the chosen storage mechanism is available to use.
-- `valid` - Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
 
 ## The future
 
