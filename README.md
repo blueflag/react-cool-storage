@@ -13,6 +13,9 @@ yarn add react-cool-storage 😎
 
 ## Hocs
 
+- [ReactRouterQueryStringHoc](#reactrouterquerystringhoc)
+- [WebStorageHoc](#webstoragehoc)
+
 All hocs pass down a `ReactCoolStorageMessage` to their child components:
 
 ```js
