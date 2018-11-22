@@ -5,12 +5,12 @@ import forEach from 'unmutable/lib/forEach';
 import pipeWith from 'unmutable/lib/pipeWith';
 
 type Config = {
+    name: string,
+    method?: string,
+    silent?: boolean,
     reconstruct?: Function,
     deconstruct?: Function,
-    method?: string,
-    name: string,
     parse?: (data: string) => any,
-    silent?: boolean,
     stringify?: (data: any) => string
 };
 
@@ -42,13 +42,13 @@ export default (config: Config): Function => {
     return ReactCoolStorageHoc({
         hoc,
         config,
-        checkAvailable: (props: Props) => {
+        checkAvailable: (props: Props): ?string => {
             if(typeof window.URLSearchParams === "undefined") {
-                throw new Error(`${hoc} requires URLSearchParams to be defined`);
+                return `${hoc} requires URLSearchParams to be defined`;
             }
 
             if(!props.history || !props.location) {
-                throw new Error(`${hoc} requires React Router history and location props`);
+                return `${hoc} requires React Router history and location props`;
             }
         },
         getValue: (props: Props): any => {

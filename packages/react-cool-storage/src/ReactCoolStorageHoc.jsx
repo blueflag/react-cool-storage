@@ -22,7 +22,7 @@ type Config = {
         deconstruct?: Function,
         reconstruct?: Function
     },
-    checkAvailable: (props: any) => void,
+    checkAvailable: (props: any) => ?string,
     getValue: (props: any) => any,
     handleChange: (props: any, existingValue: any, newValue: any) => void
 };
@@ -72,9 +72,13 @@ export default (config: Config): Function => {
             let valid = true;
             let value = {};
 
-            try {
-                checkAvailable(this.props);
+            let availabilityError: ?string = checkAvailable(this.props);
+            if(availabilityError) {
+                if(!silent) {
+                    throw new Error(availabilityError);
+                }
 
+            } else {
                 try {
                     value = getValue(this.props);
                 } catch(e) {
@@ -87,11 +91,6 @@ export default (config: Config): Function => {
                     valid,
                     value: reconstruct(value)
                 });
-
-            } catch(e) {
-                if(!silent) {
-                    throw e;
-                }
             }
 
             let childProps = {
