@@ -214,7 +214,12 @@ test('ReactRouterQueryStringHoc should notify of invalid data', () => {
 });
 
 test('ReactRouterQueryStringHoc should pass its value through config.reconstruct', () => {
-    let reconstruct = jest.fn(() => ({ABC: 789}));
+    let date = new Date(0);
+
+    let reconstruct = jest.fn(({date, ...rest}) => ({
+        date: new Date(date),
+        ...rest
+    }));
 
     let childProps = shallowRenderHoc(
         {
@@ -223,7 +228,7 @@ test('ReactRouterQueryStringHoc should pass its value through config.reconstruct
                 replace: () => {}
             },
             location: {
-                search: "?abc=123&def=456"
+                search: "?date=%221970-01-01T00:00:00.000Z%22"
             }
         },
         ReactRouterQueryStringHoc({
@@ -233,13 +238,10 @@ test('ReactRouterQueryStringHoc should pass its value through config.reconstruct
     ).props();
 
     expect(reconstruct.mock.calls[0][0]).toEqual({
-        abc: 123,
-        def: 456
+        date: "1970-01-01T00:00:00.000Z"
     });
 
-    expect(childProps.query.value).toEqual({
-        ABC: 789
-    });
+    expect(childProps.query.value.date.getTime()).toBe(date.getTime());
 });
 
 test('ReactRouterQueryStringHoc should pass each value through config.parse', () => {
@@ -423,9 +425,14 @@ test('ReactRouterQueryStringHoc should error when called with non-keyed data typ
 });
 
 test('ReactRouterQueryStringHoc should pass its changed value through config.deconstruct', () => {
+    let date = new Date(0);
+
     let push = jest.fn();
     let replace = jest.fn();
-    let deconstruct = jest.fn(() => ({abc: 457}));
+    let deconstruct = jest.fn(({date, ...rest}) => ({
+        date: date.toJSON(),
+        ...rest
+    }));
 
     let childProps = shallowRenderHoc(
         {
@@ -434,7 +441,7 @@ test('ReactRouterQueryStringHoc should pass its changed value through config.dec
                 replace
             },
             location: {
-                search: "?abc=123"
+                search: ""
             }
         },
         ReactRouterQueryStringHoc({
@@ -443,12 +450,12 @@ test('ReactRouterQueryStringHoc should pass its changed value through config.dec
         })
     ).props();
 
-    childProps.query.onChange({abc: 456});
+    childProps.query.onChange({date});
 
-    expect(deconstruct.mock.calls[0][0]).toEqual({abc: 456});
+    expect(deconstruct.mock.calls[0][0]).toEqual({date});
     expect(push).toHaveBeenCalled();
     expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?abc=457");
+    expect(push.mock.calls[0][0]).toBe("?date=%221970-01-01T00%3A00%3A00.000Z%22");
 });
 
 test('ReactRouterQueryStringHoc should pass each changed value through config.stringify', () => {
