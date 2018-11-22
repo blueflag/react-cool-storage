@@ -18,6 +18,13 @@ test('ReactRouterQueryStringHoc must be passed a name, and throw an error if it 
     expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc expects param "config.name" to be a string, but got undefined`);
 });
 
+test('ReactRouterQueryStringHoc must throw error if passed an invalid method', () => {
+    // $FlowFixMe - intentional misuse of types
+    expect(() => ReactRouterQueryStringHoc({
+        method: "foo"
+    })).toThrow(`ReactRouterQueryStringHoc expects param "config.method" to be either "push" or "replace"`);
+});
+
 //
 // Resource errors
 //

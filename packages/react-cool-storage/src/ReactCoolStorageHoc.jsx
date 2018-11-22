@@ -52,7 +52,7 @@ export default (config: Config): Function => {
             let value = deconstruct(newValue);
 
             if(!isKeyed(value)) {
-                throw new Error(`ReactRouterQueryStringHoc onChange must be passed an object`);
+                throw new Error(`${hoc} onChange must be passed an object`);
             }
 
             let removedKeys = pipeWith(
