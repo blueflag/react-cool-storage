@@ -3,12 +3,22 @@ import type {ComponentType} from 'react';
 import type {Node} from 'react';
 
 import React from 'react';
-import map from 'unmutable/lib/map';
+
+import ReactCoolStorageMessage from './ReactCoolStorageMessage';
+
+import forEach from 'unmutable/lib/forEach';
+import identity from 'unmutable/lib/identity';
+import isKeyed from 'unmutable/lib/isKeyed';
+import pipeWith from 'unmutable/lib/pipeWith';
 
 type Config = {
-    method: string,
+    afterParse?: Function,
+    beforeStringify?: Function,
+    method?: string,
     name: string,
-    silent: boolean
+    parse?: (data: string) => any,
+    silent?: boolean,
+    stringify?: (data: any) => string
 };
 
 type Props = {
@@ -25,11 +35,22 @@ type ChildProps = {
     // [config.name]?: ReactCoolStorageMessage
 };
 
+const UNAVAILABLE_MESSAGE = new ReactCoolStorageMessage({
+    value: {},
+    onChange: () => {},
+    available: false,
+    valid: false
+});
+
 export default (config: Config): Function => {
     let {
+        afterParse = identity(),
+        beforeStringify = identity(),
         method = "push",
         name,
-        silent = false
+        parse = (data: string): any => JSON.parse(data),
+        silent = false,
+        stringify = (data: any): string => JSON.stringify(data)
     } = config;
 
     if(typeof name !== "string") {
@@ -39,7 +60,7 @@ export default (config: Config): Function => {
     return (Component: ComponentType<ChildProps>) => class ReactRouterQueryStringHoc extends React.Component<Props> {
 
         checkAvailable = () => {
-            if(typeof URLSearchParams === "undefined") {
+            if(typeof window.URLSearchParams === "undefined") {
                 throw new Error(`ReactRouterQueryStringHoc requires URLSearchParams to be defined`);
             }
 
@@ -53,39 +74,58 @@ export default (config: Config): Function => {
             }
         };
 
+        getSearchParams = (): URLSearchParams => {
+            let {location} = this.props;
+            return new window.URLSearchParams(location.search);
+        };
+
         handleChange = (newValue: *) => {
             let {history} = this.props;
-            let searchParams = new URLSearchParams();
+            let searchParams = this.getSearchParams();
 
-            map((value, key) => {
-                searchParams.set(key, value);
-            })(newValue);
+            if(!isKeyed(newValue)) {
+                throw new Error(`ReactRouterQueryStringHoc onChange must be passed an object`);
+            }
+
+            pipeWith(
+                newValue,
+                beforeStringify,
+                forEach((value, key) => {
+                    if(typeof value === "undefined") {
+                        searchParams.delete(key);
+                    } else {
+                        searchParams.set(key, stringify(value));
+                    }
+                })
+            );
 
             history[method]("?" + searchParams.toString());
         }
 
         render(): Node {
 
-            let message = {
-                value: {},
-                onChange: () => {},
-                available: false
-            };
+            let message = UNAVAILABLE_MESSAGE;
+            let valid = true;
 
             try {
                 this.checkAvailable();
 
                 let query = {};
-                let searchParams = new URLSearchParams(location.search);
+                let searchParams = this.getSearchParams();
                 for (let [key, value] of searchParams) {
-                    query[key] = value;
+                    try {
+                        query[key] = parse(value);
+                    } catch(e) {
+                        valid = false;
+                    }
                 }
 
-                message = {
-                    value: query,
+                message = new ReactCoolStorageMessage({
+                    available: true,
                     onChange: this.handleChange,
-                    available: true
-                };
+                    valid,
+                    value: valid ? afterParse(query) : {}
+                });
 
             } catch(e) {
                 if(!silent) {
