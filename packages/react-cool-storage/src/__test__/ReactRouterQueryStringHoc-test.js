@@ -2,6 +2,7 @@
 import React from 'react';
 
 import ReactRouterQueryStringHoc from '../ReactRouterQueryStringHoc';
+import ReactCoolStorageMessage from '../ReactCoolStorageMessage';
 
 let shallowRenderHoc = (props, hock) => {
     let Component = hock((props) => <div />);
@@ -73,11 +74,6 @@ test('ReactRouterQueryStringHoc must throw error if URLSearchParams is not avail
     window.URLSearchParams = temp;
 });
 
-const UNAVAILABLE_MESSAGE = {
-    value: {},
-    available: false
-};
-
 test('ReactRouterQueryStringHoc must silently pass available: false if not passed a history prop and silent: true', () => {
     let childProps = shallowRenderHoc(
         {
@@ -91,8 +87,7 @@ test('ReactRouterQueryStringHoc must silently pass available: false if not passe
         })
     ).props();
 
-    expect(childProps.query.value).toEqual(UNAVAILABLE_MESSAGE.value);
-    expect(childProps.query.available).toEqual(UNAVAILABLE_MESSAGE.available);
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
 
     // for coverage, call noop change function
     childProps.query.onChange();
@@ -112,8 +107,7 @@ test('ReactRouterQueryStringHoc must silently pass available: false if not passe
         })
     ).props();
 
-    expect(childProps.query.value).toEqual(UNAVAILABLE_MESSAGE.value);
-    expect(childProps.query.available).toEqual(UNAVAILABLE_MESSAGE.available);
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
 });
 
 test('ReactRouterQueryStringHoc must silently pass available: false if URLSearchParams is not available and silent: true', () => {
@@ -135,8 +129,7 @@ test('ReactRouterQueryStringHoc must silently pass available: false if URLSearch
 
     window.URLSearchParams = temp;
 
-    expect(childProps.query.value).toEqual(UNAVAILABLE_MESSAGE.value);
-    expect(childProps.query.available).toEqual(UNAVAILABLE_MESSAGE.available);
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
 });
 
 //

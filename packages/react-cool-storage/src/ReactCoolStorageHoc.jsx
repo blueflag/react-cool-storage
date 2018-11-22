@@ -74,7 +74,7 @@ export default (config: Config): Function => {
 
         render(): Node {
 
-            let message = ReactCoolStorageMessage.unavailable();
+            let message = ReactCoolStorageMessage.unavailable;
             let valid = true;
             let value = {};
 

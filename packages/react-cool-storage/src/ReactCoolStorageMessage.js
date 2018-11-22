@@ -23,12 +23,10 @@ export default class ReactCoolStorageMessage {
         this.value = config.value;
     }
 
-    static unavailable() {
-        return new ReactCoolStorageMessage({
-            value: {},
-            onChange: () => {},
-            available: false,
-            valid: false
-        });
-    }
+    static unavailable = new ReactCoolStorageMessage({
+        value: {},
+        onChange: () => {},
+        available: false,
+        valid: false
+    });
 }
