@@ -41,8 +41,8 @@ ReactRouterQueryStringHoc({
     // optional
     method?: string = "push",
     silent?: boolean = false,
-    afterParse?: Function,
-    beforeStringify?: Function,
+    deconstruct?: Function,
+    reconstruct?: Function,
     parse?: (data: string) => any,
     stringify?: (data: any) => string
 })
@@ -51,8 +51,8 @@ ReactRouterQueryStringHoc({
 - `name` - The name of the prop that will be passed to the hoc's child component.
 - `method` - The `history` method to use. Can be "push" or "replace". Defaults to "push".
 - `silent` - When false, errors are thrown if there are any missing resources. When true, no errors are thrown and instead `ReactCoolStorageMessage` will contain `available: false` to indicate that the chosen storage mechanism can't be used.
-- `afterParse` - A function that is called after `ReactRouterQueryStringHoc` has parsed its data. It is given the parsed object. Defaults to a passthrough function.
-- `beforeStringify` - A function that is called before `ReactRouterQueryStringHoc` stringifies data when a change occurs. Defaults to a passthrough function.
+- `deconstruct` - A function that is called before `ReactRouterQueryStringHoc` stringifies data when a change occurs. This provides an opportunity to convert custom data types into simpler ones before stringification takes place. Defaults to a passthrough function.
+- `reconstruct` - A function that is called after `ReactRouterQueryStringHoc` has parsed its data. It is given the parsed object. This provides an opportunity to convert data into custom data types before its is received by the hoc's child component. Defaults to a passthrough function.
 - `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
 - `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
 
