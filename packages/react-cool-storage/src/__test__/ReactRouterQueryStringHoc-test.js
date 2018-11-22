@@ -17,6 +17,10 @@ test('ReactRouterQueryStringHoc must be passed a name, and throw an error if it 
     expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc expects param "config.name" to be a string, but got undefined`);
 });
 
+//
+// Resource errors
+//
+
 test('ReactRouterQueryStringHoc must throw error if not passed a history prop', () => {
     expect(() => {
         shallowRenderHoc(
@@ -31,10 +35,6 @@ test('ReactRouterQueryStringHoc must throw error if not passed a history prop', 
         );
     }).toThrow(`ReactRouterQueryStringHoc requires React Router history and location props`);
 });
-
-//
-// Resource errors
-//
 
 test('ReactRouterQueryStringHoc must throw error if not passed a location prop', () => {
     expect(() => {
@@ -539,4 +539,7 @@ test('ReactRouterQueryStringHoc should cope with various data types', () => {
     expect(setAndRefresh({abc: 123})).toEqual({abc: 123});
     expect(setAndRefresh({abc: true})).toEqual({abc: true});
     expect(setAndRefresh({abc: undefined})).toEqual({});
+    expect(setAndRefresh({abc: [1,2,3]})).toEqual({abc: [1,2,3]});
+    expect(setAndRefresh({abc: [1,2,null]})).toEqual({abc: [1,2,null]});
+    expect(setAndRefresh({abc: [1,2,undefined]})).toEqual({abc: [1,2,null]}); // undefined is cast to null due to json stringification
 });

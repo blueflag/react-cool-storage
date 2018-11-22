@@ -59,7 +59,7 @@ export default (config: Config): Function => {
             }
             return query;
         },
-        handleChange: (props: Props, changedValues: *, removedValues: *) => {
+        handleChange: (props: Props, {changedValues, removedKeys}: *) => {
             let searchParams = getSearchParams(props);
 
             pipeWith(
@@ -70,8 +70,8 @@ export default (config: Config): Function => {
             );
 
             pipeWith(
-                removedValues,
-                forEach((value, key) => {
+                removedKeys,
+                forEach((key) => {
                     searchParams.delete(key);
                 })
             );

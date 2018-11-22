@@ -10,8 +10,10 @@ import filter from 'unmutable/lib/filter';
 import keyArray from 'unmutable/lib/keyArray';
 import identity from 'unmutable/lib/identity';
 import isKeyed from 'unmutable/lib/isKeyed';
+import merge from 'unmutable/lib/merge';
 import omit from 'unmutable/lib/omit';
 import pick from 'unmutable/lib/pick';
+import pipe from 'unmutable/lib/pipe';
 import pipeWith from 'unmutable/lib/pipeWith';
 
 type Config = {
@@ -42,7 +44,7 @@ export default (config: Config): Function => {
     } = config;
 
     if(typeof name !== "string") {
-        throw new Error(`${hoc} expects param "config.name" to be a string, but got undefined`);
+        throw new Error(`${hoc} expects param "config.name" to be a string, but got ${typeof name}`);
     }
 
     return (Component: ComponentType<any>) => class ReactCoolStorageHoc extends React.Component<any> {
@@ -61,9 +63,13 @@ export default (config: Config): Function => {
             );
 
             let changedValues = omit(removedKeys)(value);
-            let removedValues = pick(removedKeys)(value);
 
-            handleChange(this.props, changedValues, removedValues);
+            let update = pipe(
+                merge(changedValues),
+                omit(removedKeys)
+            );
+
+            handleChange(this.props, {update, changedValues, removedKeys});
         }
 
         render(): Node {
