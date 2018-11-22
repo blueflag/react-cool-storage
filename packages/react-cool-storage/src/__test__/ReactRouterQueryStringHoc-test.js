@@ -2,157 +2,544 @@
 import React from 'react';
 
 import ReactRouterQueryStringHoc from '../ReactRouterQueryStringHoc';
+import ReactCoolStorageMessage from '../ReactCoolStorageMessage';
 
-// let shallowRenderHoc = (props, hock) => {
-//     let Component = hock((props) => <div />);
-//     return shallow(<Component {...props}/>);
-// };
+let shallowRenderHoc = (props, hock) => {
+    let Component = hock((props) => <div />);
+    return shallow(<Component {...props}/>);
+};
+
+//
+// Config errors
+//
 
 test('ReactRouterQueryStringHoc must be passed a name, and throw an error if it isnt', () => {
     // $FlowFixMe - intentional misuse of types
-    expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc() expects param "config.name" to be a string, but got undefined`);
+    expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc expects param "config.name" to be a string, but got undefined`);
 });
 
-// test('ParcelHoc config should default initial value to undefined', () => {
-//     let childProps = shallowRenderHoc(
-//         {},
-//         ParcelHoc({
-//             name: "proppy"
-//         })
-//     ).props();
+test('ReactRouterQueryStringHoc must throw error if passed an invalid method', () => {
+    // $FlowFixMe - intentional misuse of types
+    expect(() => ReactRouterQueryStringHoc({
+        method: "foo"
+    })).toThrow(`ReactRouterQueryStringHoc expects param "config.method" to be either "push" or "replace"`);
+});
 
-//     expect(typeof childProps.proppy.value === "undefined").toBe(true);
-// });
+//
+// Resource errors
+//
 
-// test('ParcelHoc changes should be put back into ParcelHoc state', () => {
-//     let Child = () => <div />;
-//     let Hocked = ParcelHoc({
-//         valueFromProps: () => 123,
-//         name: "proppy"
-//     })(Child);
+test('ReactRouterQueryStringHoc must throw error if not passed a history prop', () => {
+    expect(() => {
+        shallowRenderHoc(
+            {
+                location: {
+                    search: "?abc=123&def=456"
+                }
+            },
+            ReactRouterQueryStringHoc({
+                name: "query"
+            })
+        );
+    }).toThrow(`ReactRouterQueryStringHoc requires React Router history and location props`);
+});
 
-//     let wrapper = shallow(<Hocked />);
-//     let {proppy} = wrapper.props();
-//     proppy.onChange(456);
-//     expect(456).toBe(wrapper.update().props().proppy.value);
-// });
+test('ReactRouterQueryStringHoc must throw error if not passed a location prop', () => {
+    expect(() => {
+        shallowRenderHoc(
+            {
+                history: {
+                    push: () => {},
+                    replace: () => {}
+                },
+            },
+            ReactRouterQueryStringHoc({
+                name: "query"
+            })
+        );
+    }).toThrow(`ReactRouterQueryStringHoc requires React Router history and location props`);
+});
 
-// test('ParcelHoc config should accept an onChange function, and call it with the value when changed', () => {
-//     expect.assertions(1);
+test('ReactRouterQueryStringHoc must throw error if URLSearchParams is not available', () => {
+    let temp = window.URLSearchParams;
+    window.URLSearchParams = undefined;
 
-//     let Child = () => <div />;
-//     let Hocked = ParcelHoc({
-//         valueFromProps: () => 123,
-//         onChange: (props) => (value) => props.onChange(value),
-//         name: "proppy"
-//     })(Child);
+    expect(() => {
+        shallowRenderHoc(
+            {
+                history: {
+                    push: () => {},
+                    replace: () => {}
+                },
+            },
+            ReactRouterQueryStringHoc({
+                name: "query"
+            })
+        );
+    }).toThrow(`ReactRouterQueryStringHoc requires URLSearchParams to be defined`);
 
-//     let onChange = jest.fn();
-//     let wrapper = shallow(<Hocked onChange={onChange} />);
-//     let {proppy} = wrapper.props();
-//     proppy.onChange(456);
+    window.URLSearchParams = temp;
+});
 
-//     expect(onChange.mock.calls[0][0]).toBe(456);
-// });
+test('ReactRouterQueryStringHoc must silently pass available: false if not passed a history prop and silent: true', () => {
+    let childProps = shallowRenderHoc(
+        {
+            location: {
+                search: "?abc=123&def=456"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            silent: true
+        })
+    ).props();
 
-// test('ParcelHoc config should accept an delayUntil function, and pass undefined until this evaluates to true', () => {
-//     let Child = () => <div />;
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
 
-//     let Hocked = ParcelHoc({
-//         valueFromProps: () => 123,
-//         delayUntil: (props) => props.go,
-//         name: "proppy"
-//     })(Child);
+    // for coverage, call noop change function
+    childProps.query.onChange();
+});
 
-//     let wrapper = shallow(<Hocked go={false} />);
-//     expect(wrapper.props().proppy).toBe(undefined);
+test('ReactRouterQueryStringHoc must silently pass available: false if not passed a location prop and silent: true', () => {
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            silent: true
+        })
+    ).props();
 
-//     wrapper.setProps({go: true});
-//     expect(wrapper.props().proppy.value).toBe(123);
-// });
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
+});
 
-// test('ParcelHoc config should accept a pipe function', () => {
-//     let childProps = shallowRenderHoc(
-//         {},
-//         ParcelHoc({
-//             valueFromProps: () => 456,
-//             name: "proppy",
-//             pipe: (props) => (parcel) => {
-//                 expect(456).toBe(parcel.value);
-//                 expect({}).toEqual(props);
-//                 return parcel.modifyValue(ii => ii + 1);
-//             }
-//         })
-//     ).props();
+test('ReactRouterQueryStringHoc must silently pass available: false if URLSearchParams is not available and silent: true', () => {
+    let temp = window.URLSearchParams;
+    window.URLSearchParams = undefined;
 
-//     expect(457).toBe(childProps.proppy.value);
-// });
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            silent: true
+        })
+    ).props();
 
-// test('ParcelHoc config should accept a debugRender boolean', () => {
-//     let childProps = shallowRenderHoc(
-//         {},
-//         ParcelHoc({
-//             valueFromProps: () => 456,
-//             name: "proppy",
-//             debugRender: true
-//         })
-//     ).props();
+    window.URLSearchParams = temp;
 
-//     expect(childProps.proppy._treeshare.debugRender).toBe(true);
-// });
+    expect(childProps.query).toBe(ReactCoolStorageMessage.unavailable);
+});
 
-// test('ParcelHoc shouldParcelUpdateFromProps should update value from props when it is returned true', () => {
-//     let valueFromProps = jest.fn((props) => props.abc);
+//
+// Transparency
+//
 
-//     let shouldParcelUpdateFromProps = jest.fn((prevValue: *, nextValue: *) => prevValue !== nextValue);
+test('ReactRouterQueryStringHoc should pass through props', () => {
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+            location: {
+                search: "?abc=123&def=456"
+            },
+            xyz: 789
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
 
-//     let props = {
-//         abc: 123,
-//         def: 456
-//     };
+    expect(childProps.xyz).toBe(789);
+});
 
-//     let wrapper = shallowRenderHoc(
-//         props,
-//         ParcelHoc({
-//             valueFromProps,
-//             name: "proppy",
-//             shouldParcelUpdateFromProps
-//         })
-//     );
+//
+// Child props
+//
 
-//     let childProps = wrapper.props();
+test('ReactRouterQueryStringHoc should accept react router props and pass down its own correct child props (using JSON stringify)', () => {
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+            location: {
+                search: "?abc=123&def=%22456%22&ghi=false"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
 
-//     // valueFromProps should be props
-//     expect(valueFromProps.mock.calls[0][0]).toEqual(props);
+    expect(childProps.query.value).toEqual({
+        abc: 123,
+        def: "456",
+        ghi: false
+    });
+    expect(childProps.query.available).toBe(true);
+    expect(childProps.query.valid).toBe(true);
+});
 
-//     // child parcel should contain result of valueFromProps
-//     expect(childProps.proppy.value).toBe(123);
+test('ReactRouterQueryStringHoc should notify of invalid data', () => {
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+            location: {
+                search: "?abc=123&def=1827L@H#HR*&@))($*$$$"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
 
-//     // set prop that SHOULDN'T cause a controlled update
-//     wrapper.setProps({
-//         def: 789
-//     });
+    expect(childProps.query.value).toEqual({});
+    expect(childProps.query.available).toBe(true);
+    expect(childProps.query.valid).toBe(false);
+});
 
-//     let childProps2 = wrapper.props();
+test('ReactRouterQueryStringHoc should pass its value through config.reconstruct', () => {
+    let date = new Date(0);
 
-//     // shouldParcelUpdateFromProps should have been called with correct prevValue and nextValue
-//     expect(shouldParcelUpdateFromProps.mock.calls[0][0]).toBe(123);
-//     expect(shouldParcelUpdateFromProps.mock.calls[0][1]).toBe(123);
+    let reconstruct = jest.fn(({date, ...rest}) => ({
+        date: new Date(date),
+        ...rest
+    }));
 
-//     // child parcel should still contain original result of valueFromProps
-//     expect(childProps2.proppy.value).toBe(123);
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+            location: {
+                search: "?date=%221970-01-01T00:00:00.000Z%22"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            reconstruct
+        })
+    ).props();
 
-//     // set prop that SHOULD cause a controlled update
-//     wrapper.setProps({
-//         abc: "!!!"
-//     });
+    expect(reconstruct.mock.calls[0][0]).toEqual({
+        date: "1970-01-01T00:00:00.000Z"
+    });
 
-//     let childProps3 = wrapper.props();
+    expect(childProps.query.value.date.getTime()).toBe(date.getTime());
+});
 
-//     // shouldParcelUpdateFromProps should have been called with correct prevValue and nextValue
-//     expect(shouldParcelUpdateFromProps.mock.calls[1][0]).toBe(123);
-//     expect(shouldParcelUpdateFromProps.mock.calls[1][1]).toBe("!!!");
+test('ReactRouterQueryStringHoc should pass each value through config.parse', () => {
+    let parse = (str: string) => JSON.parse(str.slice(1));
 
-//     // child parcel should now contain new result of valueFromProps
-//     expect(childProps3.proppy.value).toBe("!!!");
-// });
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push: () => {},
+                replace: () => {}
+            },
+            location: {
+                search: "?abc=A123&def=A456"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            parse
+        })
+    ).props();
+
+    expect(childProps.query.available).toBe(true);
+    expect(childProps.query.valid).toBe(true);
+
+    expect(childProps.query.value).toEqual({
+        abc: 123,
+        def: 456
+    });
+});
+
+//
+// Changes
+//
+
+test('ReactRouterQueryStringHoc should push by default', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
+
+    childProps.query.onChange({abc: 456});
+
+    expect(push).toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+    expect(push.mock.calls[0][0]).toBe("?abc=456");
+});
+
+test('ReactRouterQueryStringHoc should replace', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            method: "replace"
+        })
+    ).props();
+
+    childProps.query.onChange({abc: 456});
+
+    expect(replace).toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
+    expect(replace.mock.calls[0][0]).toBe("?abc=456");
+});
+
+test('ReactRouterQueryStringHoc should merge its keys', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123&def=789"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
+
+    childProps.query.onChange({abc: 456});
+
+    expect(push).toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+    expect(push.mock.calls[0][0]).toBe("?abc=456&def=789");
+});
+
+test('ReactRouterQueryStringHoc should merge its keys, deleting those which have been changed to undefined', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123&def=789"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
+
+    childProps.query.onChange({abc: undefined});
+
+    expect(push).toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+    expect(push.mock.calls[0][0]).toBe("?def=789");
+});
+
+
+test('ReactRouterQueryStringHoc should error when called with non-keyed data types', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    ).props();
+
+    let ERROR_MESSAGE = "ReactRouterQueryStringHoc onChange must be passed an object";
+
+    expect(() => {
+        childProps.query.onChange();
+    }).toThrow(ERROR_MESSAGE);
+
+    expect(() => {
+        childProps.query.onChange(123);
+    }).toThrow(ERROR_MESSAGE);
+
+    expect(() => {
+        childProps.query.onChange("abc");
+    }).toThrow(ERROR_MESSAGE);
+
+    expect(() => {
+        childProps.query.onChange([]);
+    }).toThrow(ERROR_MESSAGE);
+
+    expect(() => {
+        childProps.query.onChange(null);
+    }).toThrow(ERROR_MESSAGE);
+});
+
+test('ReactRouterQueryStringHoc should pass its changed value through config.deconstruct', () => {
+    let date = new Date(0);
+
+    let push = jest.fn();
+    let replace = jest.fn();
+    let deconstruct = jest.fn(({date, ...rest}) => ({
+        date: date.toJSON(),
+        ...rest
+    }));
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: ""
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            deconstruct
+        })
+    ).props();
+
+    childProps.query.onChange({date});
+
+    expect(deconstruct.mock.calls[0][0]).toEqual({date});
+    expect(push).toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+    expect(push.mock.calls[0][0]).toBe("?date=%221970-01-01T00%3A00%3A00.000Z%22");
+});
+
+test('ReactRouterQueryStringHoc should pass each changed value through config.stringify', () => {
+    let push = jest.fn();
+    let replace = jest.fn();
+    let stringify = (data) => "A" + JSON.stringify(data);
+
+    let childProps = shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: "?abc=123"
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query",
+            stringify
+        })
+    ).props();
+
+    childProps.query.onChange({abc: 456, def: 789});
+
+    expect(push).toHaveBeenCalled();
+    expect(replace).not.toHaveBeenCalled();
+    expect(push.mock.calls[0][0]).toBe("?abc=A456&def=A789");
+});
+
+//
+// Data types
+//
+
+const setAndRefresh = (value: *) => {
+
+    let push = jest.fn();
+    let replace = jest.fn();
+
+    shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search: ""
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    )
+        .props()
+        .query
+        .onChange(value);
+
+    let search = push.mock.calls[0][0];
+
+    return shallowRenderHoc(
+        {
+            history: {
+                push,
+                replace
+            },
+            location: {
+                search
+            }
+        },
+        ReactRouterQueryStringHoc({
+            name: "query"
+        })
+    )
+        .props()
+        .query
+        .value;
+};
+
+test('ReactRouterQueryStringHoc should cope with various data types', () => {
+    expect(setAndRefresh({abc: "def"})).toEqual({abc: "def"});
+    expect(setAndRefresh({abc: 123})).toEqual({abc: 123});
+    expect(setAndRefresh({abc: true})).toEqual({abc: true});
+    expect(setAndRefresh({abc: undefined})).toEqual({});
+    expect(setAndRefresh({abc: [1,2,3]})).toEqual({abc: [1,2,3]});
+    expect(setAndRefresh({abc: [1,2,null]})).toEqual({abc: [1,2,null]});
+    expect(setAndRefresh({abc: [1,2,undefined]})).toEqual({abc: [1,2,null]}); // undefined is cast to null due to json stringification
+});

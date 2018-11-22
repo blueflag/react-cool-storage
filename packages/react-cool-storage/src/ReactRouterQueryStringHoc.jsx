@@ -1,14 +1,17 @@
 // @flow
-import type {ComponentType} from 'react';
-import type {Node} from 'react';
+import ReactCoolStorageHoc from './ReactCoolStorageHoc';
 
-import React from 'react';
-import map from 'unmutable/lib/map';
+import forEach from 'unmutable/lib/forEach';
+import pipeWith from 'unmutable/lib/pipeWith';
 
 type Config = {
-    method: string,
     name: string,
-    silent: boolean
+    method?: string,
+    silent?: boolean,
+    reconstruct?: Function,
+    deconstruct?: Function,
+    parse?: (data: string) => any,
+    stringify?: (data: any) => string
 };
 
 type Props = {
@@ -21,86 +24,59 @@ type Props = {
     }
 };
 
-type ChildProps = {
-    // [config.name]?: ReactCoolStorageMessage
-};
+const hoc = "ReactRouterQueryStringHoc";
 
 export default (config: Config): Function => {
     let {
         method = "push",
-        name,
-        silent = false
+        parse = (data: string): any => JSON.parse(data),
+        stringify = (data: any): string => JSON.stringify(data)
     } = config;
 
-    if(typeof name !== "string") {
-        throw new Error(`ReactRouterQueryStringHoc() expects param "config.name" to be a string, but got undefined`);
+    if(method !== "push" && method !== "replace") {
+        throw new Error(`${hoc} expects param "config.method" to be either "push" or "replace"`);
     }
 
-    return (Component: ComponentType<ChildProps>) => class ReactRouterQueryStringHoc extends React.Component<Props> {
+    let getSearchParams = (props: any) => new window.URLSearchParams(props.location.search);
 
-        checkAvailable = () => {
-            if(typeof URLSearchParams === "undefined") {
-                throw new Error(`ReactRouterQueryStringHoc requires URLSearchParams to be defined`);
+    return ReactCoolStorageHoc({
+        hoc,
+        config,
+        checkAvailable: (props: Props): ?string => {
+            if(typeof window.URLSearchParams === "undefined") {
+                return `${hoc} requires URLSearchParams to be defined`;
             }
 
-            let {
-                history,
-                location
-            } = this.props;
-
-            if(!history || !location) {
-                throw new Error(`ReactRouterQueryStringHoc requires React Router history and location props`);
+            if(!props.history || !props.location) {
+                return `${hoc} requires React Router history and location props`;
             }
-        };
+        },
+        getValue: (props: Props): any => {
+            let query = {};
+            let searchParams = getSearchParams(props);
+            for (let [key, value] of searchParams) {
+                query[key] = parse(value);
+            }
+            return query;
+        },
+        handleChange: (props: Props, {changedValues, removedKeys}: *) => {
+            let searchParams = getSearchParams(props);
 
-        handleChange = (newValue: *) => {
-            let {history} = this.props;
-            let searchParams = new URLSearchParams();
+            pipeWith(
+                changedValues,
+                forEach((value, key) => {
+                    searchParams.set(key, stringify(value));
+                })
+            );
 
-            map((value, key) => {
-                searchParams.set(key, value);
-            })(newValue);
+            pipeWith(
+                removedKeys,
+                forEach((key) => {
+                    searchParams.delete(key);
+                })
+            );
 
-            history[method]("?" + searchParams.toString());
+            props.history[method]("?" + searchParams.toString());
         }
-
-        render(): Node {
-
-            let message = {
-                value: {},
-                onChange: () => {},
-                available: false
-            };
-
-            try {
-                this.checkAvailable();
-
-                let query = {};
-                let searchParams = new URLSearchParams(location.search);
-                for (let [key, value] of searchParams) {
-                    query[key] = value;
-                }
-
-                message = {
-                    value: query,
-                    onChange: this.handleChange,
-                    available: true
-                };
-
-            } catch(e) {
-                if(!silent) {
-                    throw e;
-                }
-            }
-
-            let childProps = {
-                [name]: message
-            };
-
-            return <Component
-                {...this.props}
-                {...childProps}
-            />;
-        }
-    };
+    });
 };

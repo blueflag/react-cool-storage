@@ -7,5 +7,6 @@ module.exports = {
         "!**/node_modules/**"
     ],
     testMatch: ["**/__test__/**/*-test.js?(x)"],
-    testURL: 'http://localhost'
+    testURL: 'http://localhost',
+    setupFiles: ["jest-localstorage-mock"]
 };
