@@ -24,6 +24,8 @@ type Props = {
     }
 };
 
+const hoc = "ReactRouterQueryStringHoc";
+
 export default (config: Config): Function => {
     let {
         method = "push",
@@ -32,21 +34,21 @@ export default (config: Config): Function => {
     } = config;
 
     if(method !== "push" && method !== "replace") {
-        throw new Error(`ReactRouterQueryStringHoc() expects param "config.method" to be either "push" or "replace"`);
+        throw new Error(`${hoc} expects param "config.method" to be either "push" or "replace"`);
     }
 
     let getSearchParams = (props: any) => new window.URLSearchParams(props.location.search);
 
     return ReactCoolStorageHoc({
-        hoc: "ReactRouterQueryStringHoc",
+        hoc,
         config,
         checkAvailable: (props: Props) => {
             if(typeof window.URLSearchParams === "undefined") {
-                throw new Error(`ReactRouterQueryStringHoc requires URLSearchParams to be defined`);
+                throw new Error(`${hoc} requires URLSearchParams to be defined`);
             }
 
             if(!props.history || !props.location) {
-                throw new Error(`ReactRouterQueryStringHoc requires React Router history and location props`);
+                throw new Error(`${hoc} requires React Router history and location props`);
             }
         },
         getValue: (props: Props): any => {
