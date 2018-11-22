@@ -14,7 +14,7 @@ let shallowRenderHoc = (props, hock) => {
 
 test('ReactRouterQueryStringHoc must be passed a name, and throw an error if it isnt', () => {
     // $FlowFixMe - intentional misuse of types
-    expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc() expects param "config.name" to be a string, but got undefined`);
+    expect(() => ReactRouterQueryStringHoc({})).toThrow(`ReactRouterQueryStringHoc expects param "config.name" to be a string, but got undefined`);
 });
 
 test('ReactRouterQueryStringHoc must throw error if not passed a history prop', () => {
