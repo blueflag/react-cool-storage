@@ -81,59 +81,6 @@ ReactRouterQueryStringHoc requires these props to be passed to it:
 
 ReactRouterQueryStringHoc passes down a `ReactCoolStorageMessage` as a prop with a name of `name`.
 
-### WebStorageHoc
-
-`WebStorageHoc` gives you an easy to use binding for working with Web Storage i.e. LocalStorage and SessionStorage.
-
-It is **uncontrolled**, meaning that it only reads from storage on initial mount. Changes are saved, but hocs are not updated if the storage changes while mounted.
-
-*TODO: In future, this will be able to be controlled*
-
-```js
-WebStorageHoc({
-    name: string,
-    key: string,
-    // optional
-    method?: string = "localStorage",
-    silent?: boolean = false,
-    deconstruct?: Function,
-    reconstruct?: Function,
-    parse?: (data: string) => any,
-    stringify?: (data: any) => string
-})
-```
-
-- `name` - The name of the prop that will be passed to the hoc's child component.
-- `key` - A globally unique key that will be used to store the data in web storage.
-- `method` - The `history` method to use. Can be "localStorage" or "sessionStorage". Defaults to "localStorage".
-- `silent` - When false, errors are thrown if there are any missing resources. When true, no errors are thrown and instead `ReactCoolStorageMessage` will contain `available: false` to indicate that the chosen storage mechanism can't be used.
-- `deconstruct` - A function that is called before `WebStorageHoc` stringifies data when a change occurs. This provides an opportunity to convert custom data types into simpler ones before stringification takes place. Defaults to a passthrough function.
-- `reconstruct` - A function that is called after `WebStorageHoc` has parsed its data. It is given the parsed object. This provides an opportunity to convert data into custom data types before its is received by the hoc's child component. Defaults to a passthrough function.
-- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
-- `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
-
-```js
-import WebStorageHoc from 'react-cool-storage/lib/WebStorageHoc';
-
-export default WebStorageHoc({
-    name: "query",
-    key: "localStorageKey"
-})(MyComponent);
-```
-
-#### Resources
-
-WebStorageHoc requires `window.localStorage` or `window.sessionStorage` to be available, depending on the `method` you choose.
-This generally means that the browser must support web storage, allow its use, and have sufficient space.
-
-#### Props
-
-WebStorageHoc requires no props.
-
-#### Child Props
-
-WebStorageHoc passes down a `ReactCoolStorageMessage` as a prop with a name of `name`.
-
 ## The future
 
 - ReactRouterParamHoc
