@@ -38,6 +38,14 @@ ReactRouterQueryStringHoc({
 - `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
 - `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
 
+```js
+import ReactRouterQueryStringHoc from 'react-cool-storage/lib/ReactRouterQueryStringHoc';
+
+export default ReactRouterQueryStringHoc({
+    name: "query"
+})(MyComponent);
+```
+
 #### Resources
 
 ReactRouterQueryStringHoc requires three resources:
