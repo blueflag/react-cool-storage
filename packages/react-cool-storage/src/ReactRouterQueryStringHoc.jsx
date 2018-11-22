@@ -5,8 +5,8 @@ import forEach from 'unmutable/lib/forEach';
 import pipeWith from 'unmutable/lib/pipeWith';
 
 type Config = {
-    afterParse?: Function,
-    beforeStringify?: Function,
+    reconstruct?: Function,
+    deconstruct?: Function,
     method?: string,
     name: string,
     parse?: (data: string) => any,

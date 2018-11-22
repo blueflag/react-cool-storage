@@ -213,8 +213,8 @@ test('ReactRouterQueryStringHoc should notify of invalid data', () => {
     expect(childProps.query.valid).toBe(false);
 });
 
-test('ReactRouterQueryStringHoc should pass its value through config.afterParse', () => {
-    let afterParse = jest.fn(() => ({ABC: 789}));
+test('ReactRouterQueryStringHoc should pass its value through config.reconstruct', () => {
+    let reconstruct = jest.fn(() => ({ABC: 789}));
 
     let childProps = shallowRenderHoc(
         {
@@ -228,11 +228,11 @@ test('ReactRouterQueryStringHoc should pass its value through config.afterParse'
         },
         ReactRouterQueryStringHoc({
             name: "query",
-            afterParse
+            reconstruct
         })
     ).props();
 
-    expect(afterParse.mock.calls[0][0]).toEqual({
+    expect(reconstruct.mock.calls[0][0]).toEqual({
         abc: 123,
         def: 456
     });
@@ -422,10 +422,10 @@ test('ReactRouterQueryStringHoc should error when called with non-keyed data typ
     }).toThrow(ERROR_MESSAGE);
 });
 
-test('ReactRouterQueryStringHoc should pass its changed value through config.beforeStringify', () => {
+test('ReactRouterQueryStringHoc should pass its changed value through config.deconstruct', () => {
     let push = jest.fn();
     let replace = jest.fn();
-    let beforeStringify = jest.fn(() => ({abc: 457}));
+    let deconstruct = jest.fn(() => ({abc: 457}));
 
     let childProps = shallowRenderHoc(
         {
@@ -439,13 +439,13 @@ test('ReactRouterQueryStringHoc should pass its changed value through config.bef
         },
         ReactRouterQueryStringHoc({
             name: "query",
-            beforeStringify
+            deconstruct
         })
     ).props();
 
     childProps.query.onChange({abc: 456});
 
-    expect(beforeStringify.mock.calls[0][0]).toEqual({abc: 456});
+    expect(deconstruct.mock.calls[0][0]).toEqual({abc: 456});
     expect(push).toHaveBeenCalled();
     expect(replace).not.toHaveBeenCalled();
     expect(push.mock.calls[0][0]).toBe("?abc=457");

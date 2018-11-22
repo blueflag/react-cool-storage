@@ -19,8 +19,8 @@ type Config = {
     config: {
         name: string,
         silent?: boolean,
-        afterParse?: Function,
-        beforeStringify?: Function
+        deconstruct?: Function,
+        reconstruct?: Function
     },
     checkAvailable: (props: any) => void,
     getValue: (props: any) => any,
@@ -31,8 +31,8 @@ export default (config: Config): Function => {
     let {
         hoc,
         config: {
-            afterParse = identity(),
-            beforeStringify = identity(),
+            deconstruct = identity(),
+            reconstruct = identity(),
             name,
             silent = false
         },
@@ -48,7 +48,7 @@ export default (config: Config): Function => {
     return (Component: ComponentType<any>) => class ReactCoolStorageHoc extends React.Component<any> {
 
         handleChange = (newValue: *) => {
-            let value = beforeStringify(newValue);
+            let value = deconstruct(newValue);
 
             if(!isKeyed(value)) {
                 throw new Error(`ReactRouterQueryStringHoc onChange must be passed an object`);
@@ -85,7 +85,7 @@ export default (config: Config): Function => {
                     available: true,
                     onChange: this.handleChange,
                     valid,
-                    value: afterParse(value)
+                    value: reconstruct(value)
                 });
 
             } catch(e) {
