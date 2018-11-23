@@ -1,4 +1,6 @@
 // @flow
+import storageAvailable from 'storage-available';
+
 import ReactCoolStorageHoc from './ReactCoolStorageHoc';
 
 import pipeWith from 'unmutable/lib/pipeWith';
@@ -49,31 +51,8 @@ export default (config: Config): Function => {
         hoc,
         config,
         checkAvailable: (/*props: Props*/): ?string => {
-            let x = '__storage_test__';
-
-            try {
-                storage.setItem(x, x);
-                storage.removeItem(x);
-
-            } catch(e) {
-                /* istanbul ignore next */
-                // $FlowFixMe - flow doesnt know about DOMException
-                let available = e instanceof DOMException && (
-                    // everything except Firefox
-                    e.code === 22 ||
-                    // Firefox
-                    e.code === 1014 ||
-                    // test name field too, because code might not be present
-                    // everything except Firefox
-                    e.name === 'QuotaExceededError' ||
-                    // Firefox
-                    e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
-                    // acknowledge QuotaExceededError only if there's something already stored
-                    storage.length !== 0;
-
-                if(!available) {
-                    return `WebStorageHoc requires ${method} to be available.`;
-                }
+            if(!storageAvailable(method)) {
+                return `WebStorageHoc requires ${method} to be available.`;
             }
         },
         getValue,

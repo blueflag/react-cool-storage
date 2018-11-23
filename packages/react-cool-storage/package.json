@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "babel-runtime": "6.23.0",
+    "storage-available": "^1.1.0",
     "unmutable": "^0.39.0"
   }
 }
