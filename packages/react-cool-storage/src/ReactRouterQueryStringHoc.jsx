@@ -43,7 +43,7 @@ export default (config: Config): Function => {
         hoc,
         config,
         checkAvailable: (props: Props): ?string => {
-            if(typeof window.URLSearchParams === "undefined") {
+            if(typeof window === "undefined" || typeof window.URLSearchParams === "undefined") {
                 return `${hoc} requires URLSearchParams to be defined`;
             }
 
