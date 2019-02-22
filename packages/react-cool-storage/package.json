@@ -1,6 +1,6 @@
 {
   "name": "react-cool-storage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React hocs with a common API for storing data outside of React. Query string, local storage etc. 😎",
   "main": "lib/index.js",
   "license": "UNLICENSED",
@@ -22,8 +22,18 @@
     "watch": "yarn run build -w"
   },
   "dependencies": {
-    "babel-runtime": "6.23.0",
+    "@babel/runtime": "^7.1.5",
     "storage-available": "^1.1.0",
-    "unmutable": "^0.39.0"
+    "unmutable": "^0.43.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "babel-plugin-extract-flow-types": "^1.0.0",
+    "babel-preset-blueflag": "^1.0.0",
+    "blueflag-test": "^0.22.0",
+    "jest-localstorage-mock": "^2.3.0",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1"
   }
 }
