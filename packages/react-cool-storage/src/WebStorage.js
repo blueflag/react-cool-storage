@@ -37,7 +37,7 @@ export default (config: Config): StorageMechanism => {
 
     let checkAvailable = (): ?string => {
         if(!storageAvailable(method)) {
-            return `WebStorageHoc requires ${method} to be available.`;
+            return `${storageType} requires ${method} to be available`;
         }
     };
 

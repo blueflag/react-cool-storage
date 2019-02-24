@@ -31,22 +31,6 @@ test('WebStorage must throw error if passed an invalid method', () => {
 // Resource errors
 //
 
-// test('WebStorage must throw error if localStorage doesnt exist prop', () => {
-//     let temp = window.localStorage;
-//     delete window.localStorage;
-
-//     expect(() => {
-//         shallowRenderHoc(
-//             {},
-//             ReactCoolStorageHoc("storage", WebStorage({
-//                 key: "localStorageKey"
-//             }))
-//         );
-//     }).toThrow(`WebStorage requires localStorage to be available`);
-
-//     window.localStorage = temp;
-// });
-
 test('WebStorage must pass available: false if localStorage doesnt exist', () => {
     let temp = window.localStorage;
     delete window.localStorage;
@@ -61,6 +45,7 @@ test('WebStorage must pass available: false if localStorage doesnt exist', () =>
     expect(childProps.storage.value).toBe(ReactCoolStorageMessage.unavailable.value);
     expect(childProps.storage.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
     expect(childProps.storage.available).toBe(ReactCoolStorageMessage.unavailable.available);
+    expect(childProps.storage.availabilityError).toBe(`WebStorage requires localStorage to be available`);
 
     window.localStorage = temp;
 });

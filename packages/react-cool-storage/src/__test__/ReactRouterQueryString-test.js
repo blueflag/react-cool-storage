@@ -25,54 +25,6 @@ test('ReactRouterQueryString must throw error if passed an invalid method', () =
 // Resource errors
 //
 
-// test('ReactRouterQueryString must throw error if not passed a history prop', () => {
-//     expect(() => {
-//         shallowRenderHoc(
-//             {
-//                 location: {
-//                     search: "?abc=123&def=456"
-//                 }
-//             },
-//             ReactCoolStorageHoc("query", ReactRouterQueryString())
-//         );
-//     }).toThrow(`ReactRouterQueryString requires React Router history and location props`);
-// });
-
-// test('ReactRouterQueryString must throw error if not passed a location prop', () => {
-//     expect(() => {
-//         shallowRenderHoc(
-//             {
-//                 history: {
-//                     push: () => {},
-//                     replace: () => {}
-//                 }
-//             },
-//             ReactCoolStorageHoc("query", ReactRouterQueryString())
-//         );
-//     }).toThrow(`ReactRouterQueryString requires React Router history and location props`);
-// });
-
-// test('ReactRouterQueryString must throw error if URLSearchParams is not available', () => {
-//     let temp = window.URLSearchParams;
-//     window.URLSearchParams = undefined;
-
-//     expect(() => {
-//         shallowRenderHoc(
-//             {
-//                 history: {
-//                     push: () => {},
-//                     replace: () => {}
-//                 }
-//             },
-//             ReactCoolStorageHoc("query", ReactRouterQueryString({
-//                 name: "query"
-//             }))
-//         );
-//     }).toThrow(`ReactRouterQueryString requires URLSearchParams to be defined`);
-
-//     window.URLSearchParams = temp;
-// });
-
 test('ReactRouterQueryString must pass available: false if not passed a history prop', () => {
     let childProps = shallowRenderHoc(
         {
@@ -86,6 +38,7 @@ test('ReactRouterQueryString must pass available: false if not passed a history 
     expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
     expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
     expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
+    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
 });
 
 test('ReactRouterQueryString must pass available: false if not passed a location prop', () => {
@@ -102,6 +55,7 @@ test('ReactRouterQueryString must pass available: false if not passed a location
     expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
     expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
     expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
+    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
 });
 
 test('ReactRouterQueryString must pass available: false if URLSearchParams is not available', () => {
@@ -123,6 +77,7 @@ test('ReactRouterQueryString must pass available: false if URLSearchParams is no
     expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
     expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
     expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
+    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires URLSearchParams to be defined`);
 });
 
 //

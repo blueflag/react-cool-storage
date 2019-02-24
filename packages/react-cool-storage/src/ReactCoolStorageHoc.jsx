@@ -53,7 +53,10 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
 
             let availabilityError: ?string = checkAvailable(props);
             if(availabilityError) {
-                return ReactCoolStorageMessage.unavailable;
+                return {
+                    ...ReactCoolStorageMessage.unavailable,
+                    availabilityError
+                };
             }
 
             try {
@@ -64,6 +67,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
 
             return {
                 available: true,
+                availabilityError: undefined,
                 valid,
                 value: reconstruct(value)
             };
