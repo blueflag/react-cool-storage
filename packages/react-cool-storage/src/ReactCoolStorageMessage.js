@@ -1,10 +1,16 @@
 // @flow
 
-type OnChange = (newValue: any) => void;
+export type OnChange = (newValue: any) => void;
 
-type ReactCoolStorageMessageConfig = {
+export type ReactCoolStorageMessageConfig = {
     available: boolean,
     onChange: OnChange,
+    valid: boolean,
+    value: any
+};
+
+export type MessageState = {
+    available: boolean,
     valid: boolean,
     value: any
 };
@@ -23,10 +29,9 @@ export default class ReactCoolStorageMessage {
         this.value = config.value;
     }
 
-    static unavailable = new ReactCoolStorageMessage({
+    static unavailable = {
         value: {},
-        onChange: () => {},
         available: false,
         valid: false
-    });
+    };
 }
