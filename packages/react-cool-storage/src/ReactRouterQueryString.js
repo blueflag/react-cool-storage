@@ -11,6 +11,16 @@ type Config = {
     reconstruct?: Function
 };
 
+type Props = {
+    history: {
+        push: Function,
+        replace: Function
+    },
+    location: {
+        search: string
+    }
+};
+
 const storageType = 'ReactRouterQueryString';
 
 export default (config: Config = {}): StorageMechanism => {
