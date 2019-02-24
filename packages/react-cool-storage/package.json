@@ -2,7 +2,7 @@
   "name": "react-cool-storage",
   "version": "0.1.1",
   "description": "React hocs with a common API for storing data outside of React. Query string, local storage etc. 😎",
-  "main": "lib/index.js",
+  "main": "lib/ReactCoolStorageHoc.js",
   "license": "UNLICENSED",
   "author": "Damien Clarke",
   "repository": {
@@ -17,8 +17,14 @@
   },
   "private": false,
   "scripts": {
-    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib --ignore **/*-test.js",
+    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib && find lib -name *-test.js -delete",
     "build-all": "yarn build",
+    "flow": "blueflag-test flow",
+    "flow-coverage": "blueflag-test flow-coverage -M",
+    "lint": "blueflag-test lint --monorepo",
+    "test": "yarn jest",
+    "test-all": "yarn lint && yarn flow && yarn test && yarn flow-coverage",
+    "view-coverage": "yarn run coverage; open ./coverage/lcov-report/index.html",
     "watch": "yarn run build -w"
   },
   "dependencies": {
