@@ -9,6 +9,7 @@ import ReactCoolStorageMessage from './ReactCoolStorageMessage';
 
 import filter from 'unmutable/lib/filter';
 import keyArray from 'unmutable/lib/keyArray';
+import last from 'unmutable/lib/last';
 import isKeyed from 'unmutable/lib/isKeyed';
 import merge from 'unmutable/lib/merge';
 import omit from 'unmutable/lib/omit';
@@ -30,8 +31,6 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
         throw new Error(`ReactCoolStorageHoc expects first param to be a string, but got ${typeof name}`);
     }
 
-    let storageMechanism = storageMechanisms[0]; // TEMPORARY
-
     return (Component: ComponentType<ChildProps>) => class ReactCoolStorageHoc extends React.Component<Props, State> {
 
         constructor(props: Props) {
@@ -41,23 +40,46 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             };
         }
 
+        getAvailableStorageMechanism = (props: Props): * => {
+            let availabilityError;
+
+            let storageMechanism: ?StorageMechanism = storageMechanisms
+                .find((storageMechanism) => {
+                    availabilityError = storageMechanism.checkAvailable(props);
+                    return !availabilityError;
+                });
+
+            if(!storageMechanism) {
+                storageMechanism = last()(storageMechanisms);
+            }
+
+            return {
+                storageMechanism,
+                availabilityError
+            };
+        };
+
         getMessageState = (props: Props): MessageState => {
             let {
-                checkAvailable,
-                getValue,
-                reconstruct
-            } = storageMechanism;
+                storageMechanism,
+                availabilityError
+            } = this.getAvailableStorageMechanism(props);
 
-            let value = {};
-            let valid = true;
-
-            let availabilityError: ?string = checkAvailable(props);
             if(availabilityError) {
                 return {
                     ...ReactCoolStorageMessage.unavailable,
                     availabilityError
                 };
             }
+
+            let {
+                getValue,
+                reconstruct,
+                storageType
+            } = storageMechanism;
+
+            let value = {};
+            let valid = true;
 
             try {
                 value = getValue(props);
@@ -69,11 +91,21 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 available: true,
                 availabilityError: undefined,
                 valid,
-                value: reconstruct(value)
+                value: reconstruct(value),
+                storageType
             };
         }
 
         handleChange = (newValue: *) => {
+            let {
+                storageMechanism,
+                availabilityError
+            } = this.getAvailableStorageMechanism(this.props);
+
+            if(availabilityError) {
+                return;
+            }
+
             let {
                 deconstruct,
                 getValue,

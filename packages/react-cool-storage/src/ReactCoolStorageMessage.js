@@ -6,6 +6,7 @@ export type ReactCoolStorageMessageConfig = {
     available: boolean,
     availabilityError: ?string,
     onChange: OnChange,
+    storageType: string,
     valid: boolean,
     value: any
 };
@@ -13,6 +14,7 @@ export type ReactCoolStorageMessageConfig = {
 export type MessageState = {
     available: boolean,
     availabilityError: ?string,
+    storageType: string,
     valid: boolean,
     value: any
 };
@@ -22,6 +24,7 @@ export default class ReactCoolStorageMessage {
     available: boolean;
     availabilityError: ?string;
     onChange: OnChange;
+    storageType: string;
     valid: boolean;
     value: any;
 
@@ -29,6 +32,7 @@ export default class ReactCoolStorageMessage {
         this.available = config.available;
         this.availabilityError = config.availabilityError;
         this.onChange = config.onChange;
+        this.storageType = config.storageType;
         this.valid = config.valid;
         this.value = config.value;
     }
@@ -37,6 +41,7 @@ export default class ReactCoolStorageMessage {
         value: {},
         available: false,
         availabilityError: undefined,
+        storageType: undefined,
         valid: false
     };
 }
