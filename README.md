@@ -136,6 +136,9 @@ WebStorageHoc passes down a `ReactCoolStorageMessage` as a prop with a name of `
 ## The future
 
 - ReactRouterParamHoc
+- ReachRouterQueryStringHoc
+- ReachRouterParamHoc
+- MemoryHoc
 - IndexedDBHoc
 - CookieHoc
 - IronDBHoc?
