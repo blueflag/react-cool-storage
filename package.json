@@ -6,35 +6,25 @@
     "build": "lerna run build --parallel --",
     "build-all": "lerna run build-all --parallel --",
     "build-docs": "cp README.md packages/react-cool-storage/README.md && lerna run build-docs --parallel --",
-    "flow": "blueflag-test flow",
-    "flow-coverage": "blueflag-test flow-coverage -M",
-    "lint": "blueflag-test lint --monorepo",
-    "test": "yarn jest",
-    "test-all": "yarn lint && yarn flow && yarn test && yarn flow-coverage",
+    "flow": "lerna run flow --parallel --",
+    "flow-coverage": "lerna run flow-coverage --parallel --",
+    "lint": "lerna run lint --parallel --",
+    "test": "lerna run test --parallel --",
+    "test-all": "lerna run test-all --parallel --",
     "deploy-docs": "yarn lerna --scope react-cool-storage-docs run deploy",
     "view-coverage": "yarn run coverage; open ./coverage/lcov-report/index.html",
     "watch": "lerna run watch --parallel --"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/gatsby*",
-      "**/gatsby*/**"
-    ]
+  "dependencies": {
+    "lerna": "^3.10.7"
   },
   "devDependencies": {
-    "babel-cli": "^6.23.0",
-    "babel-core": "^6.23.0",
-    "babel-preset-blueflag": "^0.6.0",
-    "blueflag-test": "^0.21.0",
-    "jest-localstorage-mock": "^2.3.0",
-    "lerna": "^2.9.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1"
+    "@commitlint/cli": "^7.2.1",
+    "husky": "^1.1.2"
   },
-  "dependencies": {
-    "babel-plugin-extract-flow-types": "^1.0.0"
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   }
 }

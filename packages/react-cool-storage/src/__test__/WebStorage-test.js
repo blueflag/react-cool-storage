@@ -1,7 +1,8 @@
 // @flow
 import React from 'react';
 
-import WebStorageHoc from '../WebStorageHoc';
+import ReactCoolStorageHoc from '../ReactCoolStorageHoc';
+import WebStorage from '../WebStorage';
 import ReactCoolStorageMessage from '../ReactCoolStorageMessage';
 
 let shallowRenderHoc = (props, hock) => {
@@ -13,82 +14,54 @@ let shallowRenderHoc = (props, hock) => {
 // Config errors
 //
 
-test('WebStorageHoc must be passed a key, and throw an error if it isnt', () => {
+test('WebStorage must be passed a key, and throw an error if it isnt', () => {
     // $FlowFixMe - intentional misuse of types
-    expect(() => WebStorageHoc({})).toThrow(`WebStorageHoc expects param "config.key" to be a string, but got undefined`);
+    expect(() => ReactCoolStorageHoc("storage", WebStorage({}))).toThrow(`WebStorage expects param "config.key" to be a string, but got undefined`);
 });
 
-
-test('WebStorageHoc must be passed a name, and throw an error if it isnt', () => {
+test('WebStorage must throw error if passed an invalid method', () => {
     // $FlowFixMe - intentional misuse of types
-    expect(() => WebStorageHoc({
-        key: "storageKey"
-    })).toThrow(`WebStorageHoc expects param "config.name" to be a string, but got undefined`);
-});
-
-test('WebStorageHoc must throw error if passed an invalid method', () => {
-    // $FlowFixMe - intentional misuse of types
-    expect(() => WebStorageHoc({
+    expect(() => ReactCoolStorageHoc("storage", WebStorage({
         key: "storageKey",
         method: "foo"
-    })).toThrow(`WebStorageHoc expects param "config.method" to be either "localStorage" or "sessionStorage"`);
+    }))).toThrow(`WebStorage expects param "config.method" to be either "localStorage" or "sessionStorage"`);
 });
 
 //
 // Resource errors
 //
 
-test('WebStorageHoc must throw error if localStorage doesnt exist prop', () => {
-    let temp = window.localStorage;
-    delete window.localStorage;
-
-    expect(() => {
-        shallowRenderHoc(
-            {},
-            WebStorageHoc({
-                name: "storage",
-                key: "localStorageKey"
-            })
-        );
-    }).toThrow(`WebStorageHoc requires localStorage to be available`);
-
-    window.localStorage = temp;
-});
-
-test('WebStorageHoc must silently pass available: false if not passed a history prop and silent: true', () => {
+test('WebStorage must pass available: false if localStorage doesnt exist', () => {
     let temp = window.localStorage;
     delete window.localStorage;
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
-            key: "localStorageKey",
-            silent: true
-        })
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
     ).props();
 
-    expect(childProps.storage).toBe(ReactCoolStorageMessage.unavailable);
+    expect(childProps.storage.value).toBe(ReactCoolStorageMessage.unavailable.value);
+    expect(childProps.storage.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
+    expect(childProps.storage.available).toBe(ReactCoolStorageMessage.unavailable.available);
+    expect(childProps.storage.availabilityError).toBe(`WebStorage requires localStorage to be available`);
 
     window.localStorage = temp;
-
-    // for coverage, call noop change function
-    childProps.storage.onChange();
 });
 
 //
 // Transparency
 //
 
-test('WebStorageHoc should pass through props', () => {
+test('WebStorage should pass through props', () => {
     let childProps = shallowRenderHoc(
         {
             xyz: 789
         },
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "storageKey"
-        })
+        }))
     ).props();
 
     expect(childProps.xyz).toBe(789);
@@ -98,15 +71,14 @@ test('WebStorageHoc should pass through props', () => {
 // Child props
 //
 
-test('WebStorageHoc should read localStorage and pass down props', () => {
+test('WebStorage should read localStorage and pass down props', () => {
     localStorage.setItem("localStorageKey", `{"abc":123}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     expect(childProps.storage.value).toEqual({
@@ -116,16 +88,15 @@ test('WebStorageHoc should read localStorage and pass down props', () => {
     expect(childProps.storage.valid).toBe(true);
 });
 
-test('WebStorageHoc should read sessionStorage if told to and pass down props', () => {
+test('WebStorage should read sessionStorage if told to and pass down props', () => {
     sessionStorage.setItem("sessionStorageKey", `{"abc":123}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "sessionStorageKey",
             method: "sessionStorage"
-        })
+        }))
     ).props();
 
     expect(childProps.storage.value).toEqual({
@@ -136,15 +107,14 @@ test('WebStorageHoc should read sessionStorage if told to and pass down props', 
 });
 
 
-test('WebStorageHoc should cope with unset data in localStorage', () => {
+test('WebStorage should cope with unset data in localStorage', () => {
     localStorage.clear();
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     expect(childProps.storage.value).toEqual({});
@@ -153,15 +123,14 @@ test('WebStorageHoc should cope with unset data in localStorage', () => {
 });
 
 
-test('WebStorageHoc should notify of invalid data', () => {
+test('WebStorage should notify of invalid data', () => {
     localStorage.setItem("localStorageKey", `{1231*(&@@&#Y(223423423}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     expect(childProps.storage.value).toEqual({});
@@ -169,7 +138,7 @@ test('WebStorageHoc should notify of invalid data', () => {
     expect(childProps.storage.valid).toBe(false);
 });
 
-test('WebStorageHoc should pass its value through config.reconstruct', () => {
+test('WebStorage should pass its value through config.reconstruct', () => {
     let date = new Date(0);
 
     localStorage.setItem("localStorageKey", `{"date":"1970-01-01T00:00:00.000Z"}`);
@@ -181,11 +150,10 @@ test('WebStorageHoc should pass its value through config.reconstruct', () => {
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey",
             reconstruct
-        })
+        }))
     ).props();
 
     expect(reconstruct.mock.calls[0][0]).toEqual({
@@ -195,7 +163,7 @@ test('WebStorageHoc should pass its value through config.reconstruct', () => {
     expect(childProps.storage.value.date.getTime()).toBe(date.getTime());
 });
 
-test('WebStorageHoc should pass the whole value through config.parse', () => {
+test('WebStorage should pass the whole value through config.parse', () => {
 
     localStorage.setItem("localStorageKey", `A{"abc":123,"def":456}`);
 
@@ -203,11 +171,10 @@ test('WebStorageHoc should pass the whole value through config.parse', () => {
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey",
             parse
-        })
+        }))
     ).props();
 
     expect(childProps.storage.available).toBe(true);
@@ -223,15 +190,14 @@ test('WebStorageHoc should pass the whole value through config.parse', () => {
 // Changes
 //
 
-test('WebStorageHoc should setItem properly', () => {
+test('WebStorage should setItem properly', () => {
     localStorage.setItem("localStorageKey", `{"abc":123}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     childProps.storage.onChange({abc: 456});
@@ -239,15 +205,14 @@ test('WebStorageHoc should setItem properly', () => {
     expect(localStorage.getItem("localStorageKey")).toBe(`{"abc":456}`);
 });
 
-test('WebStorageHoc should merge its keys', () => {
+test('WebStorage should merge its keys', () => {
     localStorage.setItem("localStorageKey", `{"abc":123,"def":789}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     childProps.storage.onChange({abc: 456});
@@ -255,15 +220,14 @@ test('WebStorageHoc should merge its keys', () => {
     expect(localStorage.getItem("localStorageKey")).toBe(`{"abc":456,"def":789}`);
 });
 
-test('WebStorageHoc should merge its keys, deleting those which have been changed to undefined', () => {
+test('WebStorage should merge its keys, deleting those which have been changed to undefined', () => {
     localStorage.setItem("localStorageKey", `{"abc":123,"def":789}`);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
     childProps.storage.onChange({abc: undefined});
@@ -271,16 +235,15 @@ test('WebStorageHoc should merge its keys, deleting those which have been change
     expect(localStorage.getItem("localStorageKey")).toBe(`{"def":789}`);
 });
 
-test('WebStorageHoc should error when called with non-keyed data types', () => {
+test('WebStorage should error when called with non-keyed data types', () => {
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     ).props();
 
-    let ERROR_MESSAGE = "WebStorageHoc onChange must be passed an object";
+    let ERROR_MESSAGE = "WebStorage onChange must be passed an object";
 
     expect(() => {
         childProps.storage.onChange();
@@ -303,7 +266,7 @@ test('WebStorageHoc should error when called with non-keyed data types', () => {
     }).toThrow(ERROR_MESSAGE);
 });
 
-test('WebStorageHoc should pass its changed value through config.deconstruct', () => {
+test('WebStorage should pass its changed value through config.deconstruct', () => {
     localStorage.setItem("localStorageKey", `{}`);
 
     let date = new Date(0);
@@ -315,11 +278,10 @@ test('WebStorageHoc should pass its changed value through config.deconstruct', (
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey",
             deconstruct
-        })
+        }))
     ).props();
 
     childProps.storage.onChange({date});
@@ -328,17 +290,16 @@ test('WebStorageHoc should pass its changed value through config.deconstruct', (
     expect(localStorage.getItem("localStorageKey")).toBe(`{"date":"1970-01-01T00:00:00.000Z"}`);
 });
 
-test('WebStorageHoc should pass the value through config.stringify', () => {
+test('WebStorage should pass the value through config.stringify', () => {
     localStorage.setItem("localStorageKey", `{}`);
     let stringify = (data) => "A" + JSON.stringify(data);
 
     let childProps = shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey",
             stringify
-        })
+        }))
     ).props();
 
     childProps.storage.onChange({abc: 456, def: 789});
@@ -356,10 +317,9 @@ const setAndRefresh = (value: *) => {
 
     shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     )
         .props()
         .storage
@@ -367,17 +327,16 @@ const setAndRefresh = (value: *) => {
 
     return shallowRenderHoc(
         {},
-        WebStorageHoc({
-            name: "storage",
+        ReactCoolStorageHoc("storage", WebStorage({
             key: "localStorageKey"
-        })
+        }))
     )
         .props()
         .storage
         .value;
 };
 
-test('WebStorageHoc should cope with various data types', () => {
+test('WebStorage should cope with various data types', () => {
     expect(setAndRefresh({abc: "def"})).toEqual({abc: "def"});
     expect(setAndRefresh({abc: 123})).toEqual({abc: 123});
     expect(setAndRefresh({abc: true})).toEqual({abc: true});
