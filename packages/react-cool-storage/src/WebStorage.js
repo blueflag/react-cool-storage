@@ -2,6 +2,7 @@
 import storageAvailable from 'storage-available';
 import pipeWith from 'unmutable/pipeWith';
 import StorageMechanism from './StorageMechanism';
+import Synchronizer from './Synchronizer';
 
 type Config = {
     key: string,
@@ -13,6 +14,8 @@ type Config = {
 };
 
 const storageType = 'WebStorage';
+
+const synchronizerMap: {[key: string]: Synchronizer} = {}; // create a global map of synchronizers
 
 export default (config: Config): StorageMechanism => {
     let {
@@ -32,6 +35,10 @@ export default (config: Config): StorageMechanism => {
         throw new Error(`${storageType} expects param "config.method" to be either "localStorage" or "sessionStorage"`);
     }
 
+    if(!synchronizerMap[key]) {
+        synchronizerMap[key] = new Synchronizer();
+    }
+
     let storage = typeof window !== "undefined" && window[method];
     let getValue = () => parse(storage.getItem(key)) || {};
 
@@ -41,21 +48,24 @@ export default (config: Config): StorageMechanism => {
         }
     };
 
-    let handleChange = ({updatedValue}: *) => {
+    let storageMechanism = new StorageMechanism({
+        checkAvailable,
+        getValue,
+        storageType,
+        deconstruct,
+        reconstruct,
+        updateFromProps: false,
+        synchronizer: synchronizerMap[key]
+    });
+
+    storageMechanism.handleChange = ({updatedValue, origin}: *) => {
         pipeWith(
             updatedValue,
             stringify,
             (str: string) => storage.setItem(key, str)
         );
+        synchronizerMap[key].onSync(updatedValue, origin);
     };
 
-    return new StorageMechanism({
-        checkAvailable,
-        getValue,
-        handleChange,
-        storageType,
-        deconstruct,
-        reconstruct,
-        updateFromProps: false
-    });
+    return storageMechanism;
 };
