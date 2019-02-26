@@ -136,4 +136,33 @@ test('MemoryStorage should update one hoc when another using the same memory sto
     expect(value2).toEqual({abc: 123});
 });
 
+test('MemoryStorage should not synchronize when using different memoryStorage instances', () => {
+    let wrapper1 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", MemoryStorage())
+    );
+
+    let wrapper2 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", MemoryStorage())
+    );
+
+    wrapper1
+        .props()
+        .storage
+        .onChange({abc: 123});
+
+    let value1 = wrapper1
+        .props()
+        .storage
+        .value;
+
+    let value2 = wrapper2
+        .props()
+        .storage
+        .value;
+
+    expect(value1).toEqual({abc: 123});
+    expect(value2).toEqual({});
+});
 

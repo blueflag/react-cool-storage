@@ -1,14 +1,9 @@
 // @flow
 
-import StorageMechanism from '../StorageMechanism';
+import Synchronizer from '../Synchronizer';
 
-test('StorageMechanism should allow sync listeners to be added, and call their callbacks', () => {
-    let storageMechanism = new StorageMechanism({
-        checkAvailable: () => {},
-        getValue: () => {},
-        storageType: "test",
-        updateFromProps: false
-    });
+test('Synchronizer should allow sync listeners to be added, and call their callbacks', () => {
+    let storageMechanism = new Synchronizer();
 
     let instance1 = {};
     let instance2 = {};
@@ -31,20 +26,14 @@ test('StorageMechanism should allow sync listeners to be added, and call their c
     expect(instance2callback.mock.calls[0][0]).toBe(123);
 });
 
-test('StorageMechanism removeSyncListener should remove listeners', () => {
-    let storageMechanism = new StorageMechanism({
-        checkAvailable: () => {},
-        getValue: () => {},
-        storageType: "test",
-        updateFromProps: false
-    });
+test('Synchronizer removeSyncListener should remove listeners', () => {
+    let storageMechanism = new Synchronizer();
 
     let instance1 = {};
     let instance2 = {};
     let instance3 = {};
     let instance1callback = jest.fn();
     let instance2callback = jest.fn();
-    let instance3callback = jest.fn();
 
     storageMechanism.addSyncListener(instance1callback, instance1);
     storageMechanism.addSyncListener(instance2callback, instance2);

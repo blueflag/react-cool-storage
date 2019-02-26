@@ -1,6 +1,7 @@
 // @flow
 
 import identity from 'unmutable/identity';
+import Synchronizer from './Synchronizer';
 
 type Config = {
     storageType: string,
@@ -9,6 +10,7 @@ type Config = {
     handleChange?: (handleChangeProps: any) => void,
     deconstruct?: Function,
     reconstruct?: Function,
+    synchronizer: ?Synchronizer,
     updateFromProps: boolean
 };
 
@@ -26,6 +28,7 @@ export default class StorageMechanism {
     reconstruct: Function;
     updateFromProps: boolean;
     syncListeners: SyncListener[] = [];
+    synchronizer: ?Synchronizer;
 
     constructor(config: Config) {
         this.storageType = config.storageType;
@@ -34,25 +37,15 @@ export default class StorageMechanism {
         this.handleChange = config.handleChange || identity();
         this.deconstruct = config.deconstruct || identity();
         this.reconstruct = config.reconstruct || identity();
+        this.synchronizer = config.synchronizer;
         this.updateFromProps = config.updateFromProps;
     }
 
     addSyncListener(callback: (value: any) => void, origin: any) {
-        this.syncListeners.push({
-            callback,
-            origin
-        });
+        this.synchronizer && this.synchronizer.addSyncListener(callback, origin);
     }
 
     removeSyncListener(originToRemove: any) {
-        this.syncListeners = this.syncListeners.filter(({origin}) => origin !== originToRemove);
-    }
-
-    onSync(value: any, changeOrigin: any) {
-        this.syncListeners.forEach(({callback, origin}) => {
-            if(!changeOrigin || !origin || changeOrigin !== origin) {
-                callback(value);
-            }
-        });
+        this.synchronizer && this.synchronizer.removeSyncListener(originToRemove);
     }
 }
