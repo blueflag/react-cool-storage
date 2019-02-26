@@ -48,6 +48,19 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             this.state = {
                 message: this.getMessageState(props)
             };
+
+            this.storageMechanism.addSyncListener(
+                (value) => {
+                    this.setState({
+                        message: this.getMessageState(this.props, {value})
+                    });
+                },
+                this
+            );
+        }
+
+        componentWillUnmount() {
+            this.storageMechanism.removeSyncListener(this);
         }
 
         setStorageMechanism = (props: Props): * => {
@@ -139,7 +152,8 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 updatedValue,
                 changedValues,
                 removedKeys,
-                props: this.props
+                props: this.props,
+                origin: this
             });
 
             if(!updateFromProps) {
