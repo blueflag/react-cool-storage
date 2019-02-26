@@ -33,42 +33,40 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
 
     return (Component: ComponentType<ChildProps>) => class ReactCoolStorageHoc extends React.Component<Props, State> {
 
+        storageMechanism: StorageMechanism;
+        availabilityError: ?string;
+
         constructor(props: Props) {
             super(props);
+
+            this.setStorageMechanism(props);
+
+            if(process.env.NODE_ENV !== 'production' && this.availabilityError) {
+                console.warn(this.availabilityError); // eslint-disable-line
+            }
+
             this.state = {
                 message: this.getMessageState(props)
             };
         }
 
-        getAvailableStorageMechanism = (props: Props): * => {
-            let availabilityError;
-
+        setStorageMechanism = (props: Props): * => {
             let storageMechanism: ?StorageMechanism = storageMechanisms
                 .find((storageMechanism) => {
-                    availabilityError = storageMechanism.checkAvailable(props);
-                    return !availabilityError;
+                    this.availabilityError = storageMechanism.checkAvailable(props);
+                    return !this.availabilityError;
                 });
 
             if(!storageMechanism) {
                 storageMechanism = last()(storageMechanisms);
             }
 
-            return {
-                storageMechanism,
-                availabilityError
-            };
+            this.storageMechanism = storageMechanism;
         };
 
         getMessageState = (props: Props, options: ?{value: any}): MessageState => {
-            let {
-                storageMechanism,
-                availabilityError
-            } = this.getAvailableStorageMechanism(props);
-
+            let {availabilityError} = this;
             if(availabilityError) {
-                if(process.env.NODE_ENV !== 'production') {
-                    console.warn(availabilityError); // eslint-disable-line
-                }
                 return {
                     ...ReactCoolStorageMessage.unavailable,
                     availabilityError
@@ -79,7 +77,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 getValue,
                 reconstruct,
                 storageType
-            } = storageMechanism;
+            } = this.storageMechanism;
 
             let value = {};
             let valid = true;
@@ -103,7 +101,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             let {
                 storageMechanism,
                 availabilityError
-            } = this.getAvailableStorageMechanism(this.props);
+            } = this;
 
             if(availabilityError) {
                 return;
@@ -152,9 +150,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
         }
 
         render(): Node {
-            let {updateFromProps} = this
-                .getAvailableStorageMechanism(this.props)
-                .storageMechanism;
+            let {updateFromProps} = this.storageMechanism;
 
             let message = updateFromProps
                 ? () => this.getMessageState(this.props)
