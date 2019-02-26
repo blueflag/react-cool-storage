@@ -1,120 +1,80 @@
 // @flow
-import type {ComponentType} from 'react';
 import type {Node} from 'react';
-
 import React from 'react';
 import {Fragment} from 'react';
+import {Box, Grid, GridItem, NavigationList, NavigationListItem, Text, Typography} from 'dcme-style';
+import Link from 'component/Link';
+import SiteNavigation from 'component/SiteNavigation';
+import PageLayout from 'component/PageLayout';
+import Layout from '../Layout';
 
-import {Box} from 'dcme-style';
-import {NavigationList} from 'dcme-style';
-import {NavigationListItem} from 'dcme-style';
-import {Text} from 'dcme-style';
+const renderApi = (api) => api
+    .split('\n')
+    .map((line: string): Node => {
+        if(line.slice(0,2) === "# ") {
+            return line.slice(2);
+        }
+        if(!line) {
+            return <br />;
+        }
+        return <a className="Link" href={`#${line.replace("()","")}`}>{line.replace("()","")}</a>;
+    })
+    .map((line, key) => <NavigationListItem key={key}>{line}</NavigationListItem>);
 
-import Link from './Link';
-import PageLayout from './PageLayout';
-
-import filter from 'unmutable/lib/filter';
-import flatMap from 'unmutable/lib/flatMap';
-import identity from 'unmutable/lib/identity';
-import map from 'unmutable/lib/map';
-import pipe from 'unmutable/lib/pipe';
-
-type Item = {
-    name: string,
-    description?: Node,
-    renderWith: ComponentType<*>
-};
-
-type Section = {
-    title?: string,
-    description?: Node,
-    items: Item[]
-};
+const renderDoclets = ({api, md}) => api
+    .split('\n')
+    .filter(_ => _)
+    .map((name, key) => {
+        let simpleName = name.replace("()","");
+        if(name.slice(0,2) === "# ") {
+            return <Box key={key}>
+                <a name={name.slice(2).toLowerCase().replace(/\s+/g, "_")} />
+                <Text element="h2" modifier="sizeMega marginMega weightMicro">{name.slice(2)}</Text>
+            </Box>;
+        }
+        let Component = md[simpleName];
+        if(!Component) {
+            Component = () => <span>...</span>;
+        }
+        return <Box key={key} modifier="marginBottomGiga">
+            <a name={simpleName} />
+            <Text element="h3" modifier="sizeKilo marginKilo">{name}</Text>
+            <Typography>
+                <Component />
+            </Typography>
+        </Box>;
+    })
+    .filter(_ => _);
 
 type Props = {
-    after?: Node,
-    before?: Node,
-    sections: Section[],
-    name?: string
+    name: string,
+    api: string,
+    md: *,
+    description: ?ComponentType<*>,
+    after: ?ComponentType<*>
 };
 
-const getSimpleName = (name: string): string => name.replace("()","");
-
-const renderNavigation = map((section: Section) => {
-
-    let links = section.items.map((item: Item, key: number): Node => {
-        let simpleName = getSimpleName(item.name);
-        return <NavigationListItem key={key}>
-            <a className="Link" href={`#${simpleName}`}>{simpleName}</a>
-        </NavigationListItem>;
-    });
-
-    return <NavigationList modifier="margin">
-        {section.title && <NavigationListItem>{section.title}</NavigationListItem>}
-        {links}
-    </NavigationList>;
-});
-
-const renderContent = pipe(
-    flatMap((section: Section) => {
-        let {items, title} = section;
-        let elements = [];
-
-        if(title) {
-            let anchor = title
-                .toLowerCase()
-                .replace(/\s+/g, "_");
-
-            elements.push(
-                <Box>
-                    <a name={anchor} />
-                    <Text element="h2" modifier="sizeMega marginMega weightMicro">{title}</Text>
+export default ({name, api, md, description, after}: Props) => {
+    let Description = description;
+    let After = after;
+    return <Layout>
+        <PageLayout
+            modifier="marginBottom"
+            content={() => <Box>
+                <Box modifier="marginBottomGiga">
+                    <Typography>
+                        <Description />
+                    </Typography>
                 </Box>
-            );
-        }
-
-        elements = elements.concat(
-            items.map((item: Item): Node => {
-                let {
-                    name,
-                    renderWith: RenderWith = ({description}) => description
-                } = item;
-
-                let simpleName = getSimpleName(name);
-                return <Box modifier="marginBottomGiga">
-                    <a name={simpleName} />
-                    <Text element="h3" modifier="sizeKilo marginKilo">{name}</Text>
-                    <RenderWith {...item} />
-                </Box>;
-            })
-        );
-
-        return elements;
-    }),
-    filter(identity()),
-    map((element, key) => <Box key={key}>{element}</Box>)
-);
-
-const renderExtra = (content) => content && <Box modifier="marginBottomGiga">{content}</Box>;
-
-export default ({after, before, sections, name}: Props) => {
-    return <PageLayout
-        modifier="marginBottom"
-        content={() => <Box>
-            {renderExtra(before)}
-            {renderContent(sections)}
-            {renderExtra(after)}
-        </Box>}
-        nav={() => <Fragment>
-            <NavigationList modifier="margin">
-                <NavigationListItem><Link to="/api">Api</Link></NavigationListItem>
-            </NavigationList>
-            {name &&
-                <NavigationList modifier="margin">
+                {renderDoclets({api, md})}
+                {After && <Typography><After /></Typography>}
+            </Box>}
+            nav={() => <Fragment>
+                <NavigationList>
                     <NavigationListItem>{name}</NavigationListItem>
+                    {renderApi(api)}
                 </NavigationList>
-            }
-            {renderNavigation(sections)}
-        </Fragment>}
-    />;
+            </Fragment>}
+        />
+    </Layout>;
 };

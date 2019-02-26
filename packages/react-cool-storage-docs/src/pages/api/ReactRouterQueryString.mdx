@@ -1,0 +1,81 @@
+import Code from '../../component/Code';
+import ReactRouterQueryStringExample from '../../example/ReactRouterQueryStringExample';
+prop location
+prop history
+
+# ReactRouterQueryString
+
+<ReactRouterQueryStringExample location={location} history={history} />
+
+ReactRouterQueryString gives you an easy to use binding for working with React Router v4's query string.
+
+It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
+
+It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
+
+<Code language="jsx">{`
+import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+
+ReactCoolStorageHoc({
+    // optional
+    method?: string = "push",
+    deconstruct?: Function,
+    reconstruct?: Function,
+    parse?: (data: string) => any,
+    stringify?: (data: any) => string
+})`}</Code>
+
+- `method` - The `history` method to use. Can be "push" or "replace". Defaults to "push".
+- `deconstruct` - A function that is called before ReactRouterQueryString stringifies data when a change occurs. This provides an opportunity to convert custom data types into simpler ones before stringification takes place. Defaults to a passthrough function.
+- `reconstruct` - A function that is called after ReactRouterQueryString has parsed its data. It is given the parsed object. This provides an opportunity to convert data into custom data types before its is received by the hoc's child component. Defaults to a passthrough function.
+- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
+- `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
+
+## Resources
+
+ReactRouterQueryString requires three resources:
+- `window.URLSearchParams` must exist. Polyfills are available if you need to support older browsers.
+- A React Router v4 `history` object as a prop
+- A React Router v4 `location` object as a prop
+
+## Props
+
+ReactRouterQueryString requires these props to be passed to it:
+- A React Router v4 `history` object as a prop
+- A React Router v4 `location` object as a prop
+
+## Example
+
+<Code language="jsx">{`
+import React from 'react';
+import ReactCoolStorageHoc from 'react-cool-storage';
+import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+
+const ReactRouterQueryStringExample = (props) => {
+    let {query} = props;
+    return <div>
+        <label>query string "foo"</label>
+        <input
+            value={query.value.foo || ""}
+            onChange={(event) => query.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>query string "bar"</label>
+        <input
+            value={query.value.bar || ""}
+            onChange={(event) => query.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+export default ReactCoolStorageHoc(
+    'query',
+    ReactRouterQueryString({
+        method: "replace"
+    })
+)(ReactRouterQueryStringExample);
+
+`}</Code>

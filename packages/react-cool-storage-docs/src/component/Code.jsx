@@ -16,7 +16,7 @@ type Props = {
 export default class Code extends React.Component<Props> {
     render(): Node {
         let {children, modifier = "", language} = this.props;
-        let __html = Prism.highlight(children, Prism.languages[language], 'language');
+        let __html = Prism.highlight(children.trim(), Prism.languages[language], 'language');
         return <pre className={`language-${language} ${modifier}`}>
             <code>
                 <span dangerouslySetInnerHTML={{__html}} />
