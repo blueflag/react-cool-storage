@@ -55,6 +55,7 @@ export default (config: Config): StorageMechanism => {
         handleChange,
         storageType,
         deconstruct,
-        reconstruct
+        reconstruct,
+        updateFromProps: false
     });
 };

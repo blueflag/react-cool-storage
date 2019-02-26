@@ -8,7 +8,8 @@ type Config = {
     getValue: (props: any) => any,
     handleChange: (props: any, existingValue: any, newValue: any) => void,
     deconstruct?: Function,
-    reconstruct?: Function
+    reconstruct?: Function,
+    updateFromProps: boolean
 };
 
 export default class StorageMechanism {
@@ -18,6 +19,7 @@ export default class StorageMechanism {
     handleChange: (props: any, existingValue: any, newValue: any) => void;
     deconstruct: Function;
     reconstruct: Function;
+    updateFromProps: boolean;
 
     constructor(config: Config) {
         this.storageType = config.storageType;
@@ -26,5 +28,6 @@ export default class StorageMechanism {
         this.handleChange = config.handleChange;
         this.deconstruct = config.deconstruct || identity();
         this.reconstruct = config.reconstruct || identity();
+        this.updateFromProps = config.updateFromProps;
     }
 }
