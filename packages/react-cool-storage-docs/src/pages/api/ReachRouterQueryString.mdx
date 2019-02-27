@@ -1,0 +1,84 @@
+import Code from '../../component/Code';
+import ReachRouterQueryStringExample from '../../example/ReachRouterQueryStringExample';
+prop location
+
+# ReachRouterQueryString
+
+<ReachRouterQueryStringExample location={location} />
+
+ReachRouterQueryString gives you an easy to use binding for working with Reach Router's query string.
+
+It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
+
+It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
+
+<Code language="jsx">{`
+import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
+
+ReactCoolStorageHoc({
+    navigate: Function,
+    // optional
+    method?: string = "push",
+    deconstruct?: (data: any) => any, // convert to serializable data
+    reconstruct?: (data: any) => any, // convert from serializable data
+    parse?: (data: string) => any,
+    stringify?: (data: any) => string
+})`}</Code>
+
+- `navigate` - The `navigate` method exported from Reach Router. e.g. `import {navigate} from "@reach/router"`
+- `method` - The `history` method to use. Can be "push" or "replace". Defaults to "push".
+- `deconstruct` - Used to convert data into a serializable format. It is called before ReachRouterQueryString stringifies data when a change occurs. Defaults to a passthrough function.
+- `reconstruct` - Used to convert data from a serializable format into richer data types. It is called after ReachRouterQueryString has parsed its data. It is given the parsed object. Defaults to a passthrough function.
+- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
+- `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
+
+## Resources
+
+ReachRouterQueryString requires three resources:
+- `window.URLSearchParams` must exist. Polyfills are available if you need to support older browsers.
+- A Reach Router `navigation` function to be passed into config
+- A Reach Router `location` object as a prop
+
+## Props
+
+ReachRouterQueryString requires these props to be passed to it:
+- A Reach Router `location` object as a prop
+
+## Example
+
+<Code language="jsx">
+{`
+import React from 'react';
+import ReactCoolStorageHoc from 'react-cool-storage';
+import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
+import {navigate} from "@reach/router"
+
+const ReachRouterQueryStringExample = (props) => {
+    let {query} = props;
+    return <div>
+        <label>query string "foo"</label>
+        <input
+            value={query.value.foo || ""}
+            onChange={(event) => query.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>query string "bar"</label>
+        <input
+            value={query.value.bar || ""}
+            onChange={(event) => query.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+export default ReactCoolStorageHoc(
+    'query',
+    ReachRouterQueryString({
+        navigate,
+        method: "replace"
+    })
+)(ReachRouterQueryStringExample);
+`}
+</Code>

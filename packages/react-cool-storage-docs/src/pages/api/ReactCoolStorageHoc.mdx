@@ -1,0 +1,40 @@
+import Code from '../../component/Code';
+
+# ReactCoolStorageHoc
+
+ReactCoolStorageHoc is a React higher order component that accepts a name and a number of storage mechanisms, providing access to storage mechanisms via props.
+
+If more than one storage mechanism is provided, the first available one is used. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the `name` child prop will contain a `ReactCoolStorageMessage` describing the error about why it's not available.
+
+It passes down a prop with a name of the `name` provided in the first argument, which holds a ReactCoolStorageMessage containing the value and a function to change the value.
+
+<Code language="jsx">{`
+import ReactCoolStorageHoc from 'react-cool-storage/ReactCoolStorageHoc';
+
+ReactCoolStorageHoc(
+    name: string,
+    ...storageMechanisms: StorageMechanism[]
+);
+`}</Code>
+
+## Child Props
+
+ReactCoolStorageHoc passes down a prop of `name` containing a `ReactCoolStorageMessage`.
+
+<Code language="jsx">{`
+ReactCoolStorageMessage {
+    value: any;
+    onChange: (newValue: any) => void,
+    available: boolean;
+    availabilityError: ?string;
+    storageType: string;
+    valid: boolean;
+}
+`}</Code>
+
+- `value` - The current value. Defaults to an object with keys and values.
+- `onChange` - A callback to change the value. Defaults to requiring an object with keys and values. Values are merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
+- `available` - Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `onChange` has no effect.
+- `availableError` - If no storage mechanisms are available, this contains the error message describing why.
+- `storageType` - The name of the current storage mechanism.
+- `valid` - Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.

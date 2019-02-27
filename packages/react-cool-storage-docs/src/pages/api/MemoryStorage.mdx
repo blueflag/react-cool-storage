@@ -1,0 +1,64 @@
+import Code from '../../component/Code';
+import MemoryStorageExample from '../../example/MemoryStorageExample';
+
+# MemoryStorage
+
+<MemoryStorageExample />
+
+MemoryStorage gives you an easy to use binding for working with data stored in memory. Often this is used as a fallback storage mechanism when others are unavailable.
+
+Each instanciation of `MemoryStorage()` contains it's own unique data store. You can use the one MemoryStorage instance in many ReactCoolStorageHocs and they will all remain in sync with each other.
+
+There are no limitations on the kind of data it can store.
+
+It is **controlled**, meaning that it will update immediately whenever the data source changes.
+
+<Code language="jsx">{`
+import MemoryStorage from 'react-cool-storage/MemoryStorage';
+
+MemoryStorage()
+`}</Code>
+
+MemoryStorage has no config.
+
+## Resources
+
+MemoryStorage requires no resources.
+
+## Props
+
+MemoryStorage requires no props.
+
+## Example
+
+<Code language="jsx">{`
+import React from 'react';
+import ReactCoolStorageHoc from 'react-cool-storage';
+import MemoryStorage from 'react-cool-storage/MemoryStorage';
+
+const MemoryStorageExample = (props) => {
+    let {memoryStorage} = props;
+    return <div>
+        <label>Data stored under a key of "foo"</label>
+        <input
+            value={memoryStorage.value.foo || ""}
+            onChange={(event) => memoryStorage.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>Data stored under a key of "bar"</label>
+        <input
+            value={memoryStorage.value.bar || ""}
+            onChange={(event) => memoryStorage.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+export default ReactCoolStorageHoc(
+    'memoryStorage',
+    MemoryStorage()
+)(MemoryStorageExample);
+
+`}</Code>

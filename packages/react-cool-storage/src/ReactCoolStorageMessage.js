@@ -1,10 +1,20 @@
 // @flow
 
-type OnChange = (newValue: any) => void;
+export type OnChange = (newValue: any) => void;
 
-type ReactCoolStorageMessageConfig = {
+export type ReactCoolStorageMessageConfig = {
     available: boolean,
+    availabilityError: ?string,
     onChange: OnChange,
+    storageType: string,
+    valid: boolean,
+    value: any
+};
+
+export type MessageState = {
+    available: boolean,
+    availabilityError: ?string,
+    storageType: string,
     valid: boolean,
     value: any
 };
@@ -12,21 +22,26 @@ type ReactCoolStorageMessageConfig = {
 export default class ReactCoolStorageMessage {
 
     available: boolean;
+    availabilityError: ?string;
     onChange: OnChange;
+    storageType: string;
     valid: boolean;
     value: any;
 
     constructor(config: ReactCoolStorageMessageConfig) {
         this.available = config.available;
+        this.availabilityError = config.availabilityError;
         this.onChange = config.onChange;
+        this.storageType = config.storageType;
         this.valid = config.valid;
         this.value = config.value;
     }
 
-    static unavailable = new ReactCoolStorageMessage({
+    static unavailable = {
         value: {},
-        onChange: () => {},
         available: false,
+        availabilityError: undefined,
+        storageType: undefined,
         valid: false
-    });
+    };
 }
