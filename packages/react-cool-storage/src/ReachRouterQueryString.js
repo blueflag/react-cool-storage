@@ -4,6 +4,7 @@ import forEach from 'unmutable/forEach';
 import StorageMechanism from './StorageMechanism';
 
 type Config = {
+    navigate: Function,
     method?: "push"|"replace",
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
@@ -12,25 +13,27 @@ type Config = {
 };
 
 type Props = {
-    history: {
-        push: Function,
-        replace: Function
-    },
     location: {
+        pathname: string,
         search: string
     }
 };
 
-const storageType = 'ReactRouterQueryString';
+const storageType = 'ReachRouterQueryString';
 
-export default (config: Config = {}): StorageMechanism => {
+export default (config: Config): StorageMechanism => {
     let {
+        navigate,
         method = "push",
         parse = (data: string): any => JSON.parse(data),
         stringify = (data: any): string => JSON.stringify(data),
         deconstruct,
         reconstruct
     } = config;
+
+    if(typeof navigate !== "function") {
+        throw new Error(`${storageType} expects param "config.navigate" to be a Reach Router navigate function`);
+    }
 
     if(method !== "push" && method !== "replace") {
         throw new Error(`${storageType} expects param "config.method" to be either "push" or "replace"`);
@@ -52,12 +55,13 @@ export default (config: Config = {}): StorageMechanism => {
             return `${storageType} requires URLSearchParams to be defined`;
         }
 
-        if(!props.history || !props.location) {
-            return `${storageType} requires React Router history and location props`;
+        if(!props.location) {
+            return `${storageType} requires a Reach Router location prop`;
         }
     };
 
     let handleChange = ({changedValues, removedKeys, props}: *) => {
+        let {pathname} = props.location;
         let searchParams = getSearchParams(props);
 
         pipeWith(
@@ -74,7 +78,12 @@ export default (config: Config = {}): StorageMechanism => {
             })
         );
 
-        props.history[method]("?" + searchParams.toString());
+        navigate(
+            `${pathname}?` + searchParams.toString(),
+            {
+                replace: method === "replace"
+            }
+        );
     };
 
     return new StorageMechanism({

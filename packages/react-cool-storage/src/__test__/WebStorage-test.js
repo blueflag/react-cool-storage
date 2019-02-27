@@ -345,3 +345,82 @@ test('WebStorage should cope with various data types', () => {
     expect(setAndRefresh({abc: [1,2,null]})).toEqual({abc: [1,2,null]});
     expect(setAndRefresh({abc: [1,2,undefined]})).toEqual({abc: [1,2,null]}); // undefined is cast to null due to json stringification
 });
+
+//
+// synchronisation
+//
+
+test('WebStorage should update one hoc when another updates', () => {
+    localStorage.setItem("localStorageKey", `{}`);
+
+    let wrapper1 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    let wrapper2 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    wrapper1
+        .props()
+        .storage
+        .onChange({abc: 123});
+
+    let value1 = wrapper1
+        .props()
+        .storage
+        .value;
+
+    let value2 = wrapper2
+        .props()
+        .storage
+        .value;
+
+    expect(value1).toEqual({abc: 123});
+    expect(value2).toEqual({abc: 123});
+});
+
+test('WebStorage should not sync hocs when different keys are used', () => {
+    localStorage.setItem("localStorageKey1", `{}`);
+    localStorage.setItem("localStorageKey2", `{}`);
+
+    let wrapper1 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey1"
+        }))
+    );
+
+    let wrapper2 = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey2"
+        }))
+    );
+
+    wrapper1
+        .props()
+        .storage
+        .onChange({abc: 123});
+
+    let value1 = wrapper1
+        .props()
+        .storage
+        .value;
+
+    let value2 = wrapper2
+        .props()
+        .storage
+        .value;
+
+    expect(value1).toEqual({abc: 123});
+    expect(value2).toEqual({});
+});
+
+
