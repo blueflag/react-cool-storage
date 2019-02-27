@@ -1,6 +1,6 @@
 {
   "name": "react-cool-storage",
-  "version": "0.1.1",
+  "version": "2.0.0",
   "description": "React hocs with a common API for storing data outside of React. Query string, local storage etc. 😎",
   "main": "lib/ReactCoolStorageHoc.js",
   "license": "UNLICENSED",
