@@ -12,6 +12,7 @@
   "files": [
     "lib",
     "MemoryStorage.js",
+    "ReachCoolStorageMessage.js",
     "ReachRouterQueryString.js",
     "ReactRouterQueryString.js",
     "WebStorage.js"
