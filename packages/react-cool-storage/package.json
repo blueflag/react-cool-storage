@@ -10,7 +10,11 @@
     "url": "git+https://github.com/blueflag/react-cool-storage.git"
   },
   "files": [
-    "lib"
+    "lib",
+    "MemoryStorage.js",
+    "ReachRouterQueryString.js",
+    "ReactRouterQueryString.js",
+    "WebStorage.js"
   ],
   "bugs": {
     "url": "https://github.com/blueflag/react-cool-storage/issues"
