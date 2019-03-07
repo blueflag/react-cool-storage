@@ -423,4 +423,41 @@ test('WebStorage should not sync hocs when different keys are used', () => {
     expect(value2).toEqual({});
 });
 
+//
+// usage outside React
+//
+
+test('WebStorage value should be accessible from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    expect(webStorage.value).toEqual({abc: 123});
+});
+
+test('WebStorage value should be changeable from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    webStorage.onChange({abc: 456});
+
+    let value = wrapper
+        .props()
+        .storage
+        .value;
+
+    expect(webStorage.value).toEqual({abc: 456});
+});
 

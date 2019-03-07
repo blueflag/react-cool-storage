@@ -7,13 +7,7 @@ import type {MessageState} from './ReactCoolStorageMessage';
 import React from 'react';
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
 
-import filter from 'unmutable/lib/filter';
-import keyArray from 'unmutable/lib/keyArray';
 import last from 'unmutable/lib/last';
-import isKeyed from 'unmutable/lib/isKeyed';
-import merge from 'unmutable/lib/merge';
-import omit from 'unmutable/lib/omit';
-import pipeWith from 'unmutable/lib/pipeWith';
 
 type Props = {};
 
@@ -49,7 +43,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 message: this.getMessageState(props)
             };
 
-            this.storageMechanism.addSyncListener(
+            this.storageMechanism._addSyncListener(
                 (value) => {
                     this.setState({
                         message: this.getMessageState(this.props, {value})
@@ -60,13 +54,13 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
         }
 
         componentWillUnmount() {
-            this.storageMechanism.removeSyncListener(this);
+            this.storageMechanism._removeSyncListener(this);
         }
 
         setStorageMechanism = (props: Props): * => {
             let storageMechanism: ?StorageMechanism = storageMechanisms
                 .find((storageMechanism) => {
-                    this.availabilityError = storageMechanism.checkAvailable(props);
+                    this.availabilityError = storageMechanism._availableFromProps(props);
                     return !this.availabilityError;
                 });
 
@@ -86,17 +80,13 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 };
             }
 
-            let {
-                getValue,
-                reconstruct,
-                storageType
-            } = this.storageMechanism;
+            let {_reconstruct, type} = this.storageMechanism;
 
             let value = {};
             let valid = true;
 
             try {
-                value = options ? options.value : getValue(props);
+                value = options ? options.value : this.storageMechanism._valueFromProps(props);
             } catch(e) {
                 valid = false;
             }
@@ -105,58 +95,25 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
                 available: true,
                 availabilityError: undefined,
                 valid,
-                value: reconstruct(value),
-                storageType
+                value: _reconstruct(value),
+                storageType: type
             };
         }
 
         handleChange = (newValue: *) => {
-            let {
-                storageMechanism,
-                availabilityError
-            } = this;
-
-            if(availabilityError) {
+            if(this.availabilityError) {
                 return;
             }
 
-            let {
-                deconstruct,
-                getValue,
-                handleChange,
-                storageType,
-                updateFromProps
-            } = storageMechanism;
-
-            let value = deconstruct(newValue);
-
-            if(!isKeyed(value)) {
-                throw new Error(`${storageType} onChange must be passed an object`);
-            }
-
-            let removedKeys = pipeWith(
+            let updatedValue = this.storageMechanism._onChangeWithOptions(
                 newValue,
-                filter(_ => typeof _ === "undefined"),
-                keyArray()
+                {
+                    origin: this,
+                    props: this.props
+                }
             );
 
-            let changedValues = omit(removedKeys)(value);
-
-            let updatedValue = pipeWith(
-                getValue(this.props),
-                merge(changedValues),
-                omit(removedKeys)
-            );
-
-            handleChange({
-                updatedValue,
-                changedValues,
-                removedKeys,
-                props: this.props,
-                origin: this
-            });
-
-            if(!updateFromProps) {
+            if(!this.storageMechanism._updateFromProps) {
                 this.setState({
                     message: this.getMessageState(this.props, {value: updatedValue})
                 });
@@ -164,9 +121,9 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
         }
 
         render(): Node {
-            let {updateFromProps} = this.storageMechanism;
+            let {_updateFromProps} = this.storageMechanism;
 
-            let message = updateFromProps
+            let message = _updateFromProps
                 ? () => this.getMessageState(this.props)
                 : () => this.state.message;
 

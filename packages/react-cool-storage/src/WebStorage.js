@@ -13,59 +13,90 @@ type Config = {
     reconstruct?: Function
 };
 
-const storageType = 'WebStorage';
-
 const synchronizerMap: {[key: string]: Synchronizer} = {}; // create a global map of synchronizers
 
-export default (config: Config): StorageMechanism => {
-    let {
-        key,
-        method = "localStorage",
-        parse = (data: string): any => JSON.parse(data),
-        stringify = (data: any): string => JSON.stringify(data),
-        deconstruct,
-        reconstruct
-    } = config;
+class WebStorage extends StorageMechanism {
 
-    if(typeof key !== "string") {
-        throw new Error(`${storageType} expects param "config.key" to be a string, but got ${typeof key}`);
-    }
+    constructor(config: Config) {
+        let {
+            key,
+            method = "localStorage",
+            parse = (data: string): any => JSON.parse(data),
+            stringify = (data: any): string => JSON.stringify(data),
+            deconstruct,
+            reconstruct
+        } = config;
 
-    if(method !== "localStorage" && method !== "sessionStorage") {
-        throw new Error(`${storageType} expects param "config.method" to be either "localStorage" or "sessionStorage"`);
-    }
+        const type = 'WebStorage';
 
-    if(!synchronizerMap[key]) {
-        synchronizerMap[key] = new Synchronizer();
-    }
-
-    let storage = typeof window !== "undefined" && window[method];
-    let getValue = () => parse(storage.getItem(key)) || {};
-
-    let checkAvailable = (): ?string => {
-        if(!storageAvailable(method)) {
-            return `${storageType} requires ${method} to be available`;
+        if(typeof key !== "string") {
+            throw new Error(`${type} expects param "config.key" to be a string, but got ${typeof key}`);
         }
-    };
 
-    let storageMechanism = new StorageMechanism({
-        checkAvailable,
-        getValue,
-        storageType,
-        deconstruct,
-        reconstruct,
-        updateFromProps: false,
-        synchronizer: synchronizerMap[key]
-    });
+        if(method !== "localStorage" && method !== "sessionStorage") {
+            throw new Error(`${type} expects param "config.method" to be either "localStorage" or "sessionStorage"`);
+        }
 
-    storageMechanism.handleChange = ({updatedValue, origin}: *) => {
+        if(!synchronizerMap[key]) {
+            synchronizerMap[key] = new Synchronizer();
+        }
+
+        super({
+            deconstruct,
+            reconstruct,
+            requiresProps: false,
+            synchronizer: synchronizerMap[key],
+            type,
+            updateFromProps: false
+        });
+
+        this._key = key;
+        this._method = method;
+        this._parse = parse;
+        this._stringify = stringify;
+    }
+
+    //
+    // private
+    //
+
+    _key: string;
+    _method: "localStorage"|"sessionStorage";
+    _parse: (data: string) => any;
+    _stringify: (data: any) => string;
+
+    //
+    // private overrides
+    //
+
+    _availableFromProps(props: any /* eslint-disable-line */): ?string {
+        if(!storageAvailable(this._method)) {
+            return `${this._type} requires ${this._method} to be available`;
+        }
+    }
+
+    _valueFromProps(props: any /* eslint-disable-line */): any {
+        let storage = typeof window !== "undefined" && window[this._method];
+        if(!storage) {
+            return;
+        }
+
+        return this._parse(storage.getItem(this._key)) || {};
+    }
+
+    _handleChange({updatedValue, origin}: any): void {
+        let storage = typeof window !== "undefined" && window[this._method];
+        if(!storage) {
+            return;
+        }
+
         pipeWith(
             updatedValue,
-            stringify,
-            (str: string) => storage.setItem(key, str)
+            this._stringify,
+            (str: string) => storage.setItem(this._key, str)
         );
-        synchronizerMap[key].onSync(updatedValue, origin);
-    };
+        synchronizerMap[this._key].onSync(updatedValue, origin);
+    }
+}
 
-    return storageMechanism;
-};
+export default (config: Config): StorageMechanism => new WebStorage(config);
