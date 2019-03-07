@@ -35,7 +35,7 @@
   "dependencies": {
     "@babel/runtime": "^7.1.5",
     "storage-available": "^1.1.0",
-    "unmutable": "^0.43.0"
+    "unmutable": "^0.44.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
