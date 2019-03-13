@@ -427,6 +427,16 @@ test('WebStorage should not sync hocs when different keys are used', () => {
 // usage outside React
 //
 
+test('WebStorage available should be accessible from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    expect(webStorage.available).toBe(true);
+});
+
 test('WebStorage value should be accessible from WebStorage instance', () => {
     localStorage.setItem("localStorageKey", `{"abc":123}`);
 
