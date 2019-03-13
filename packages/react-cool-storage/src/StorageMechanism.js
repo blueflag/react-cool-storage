@@ -106,7 +106,11 @@ export default class StorageMechanism {
     // public
     //
 
-    get available(): ?string {
+    get available(): ?boolean {
+        return !this.availabilityError;
+    }
+
+    get availabilityError(): ?string {
         return this._requiresProps
             ? `${this._type} requires props and cannot be accessed outside of React`
             : this._availableFromProps();
