@@ -23,7 +23,16 @@ const MemoryStorageExample = (props) => {
     </div>;
 };
 
+const MyMemoryStorage = MemoryStorage();
+
 export default ReactCoolStorageHoc(
     'memoryStorage',
-    MemoryStorage()
+    MyMemoryStorage
 )(MemoryStorageExample);
+
+// also add this MemoryStorage instance to the window
+// to demonstrate usage outside of React
+
+if(typeof window !== "undefined") {
+    window.MyMemoryStorage = MyMemoryStorage;
+}

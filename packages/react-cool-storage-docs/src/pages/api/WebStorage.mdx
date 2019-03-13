@@ -43,6 +43,13 @@ This generally means that the browser must support web storage, allow its use, a
 ## Props
 WebStorage requires no props.
 
+## Outside React
+
+WebStorage doesn't require any props, so you can also access and change WebStorage data outside of React. All ReactCoolStorageHocs that use the WebStorage with the same key will update and stay in sync.
+
+`MyWebStorage` has been added to the window. Try running `MyWebStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
+
+
 ## Example
 
 <Code language="jsx">{`
@@ -76,4 +83,15 @@ export default ReactCoolStorageHoc(
         key: 'exampleStorage'
     })
 )(WebStorageExample);
+
+// also add a WebStorage instance to the window
+// to demonstrate usage outside of React
+
+if(typeof window !== "undefined") {
+    window.MyWebStorage = WebStorage({
+        key: 'exampleStorage'
+    });
+}
+
+
 `}</Code>
