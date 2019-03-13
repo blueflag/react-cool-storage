@@ -1,11 +1,11 @@
 // @flow
-import pipeWith from 'unmutable/pipeWith';
 import forEach from 'unmutable/forEach';
+import pipeWith from 'unmutable/pipeWith';
 import StorageMechanism from './StorageMechanism';
 
 type Config = {
     navigate: Function,
-    method?: "push"|"replace",
+    method?: "localStorage"|"sessionStorage",
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
@@ -19,55 +19,83 @@ type Props = {
     }
 };
 
-const storageType = 'ReachRouterQueryString';
+class ReachRouterQueryString extends StorageMechanism {
 
-export default (config: Config): StorageMechanism => {
-    let {
-        navigate,
-        method = "push",
-        parse = (data: string): any => JSON.parse(data),
-        stringify = (data: any): string => JSON.stringify(data),
-        deconstruct,
-        reconstruct
-    } = config;
+    constructor(config: Config) {
+        let {
+            navigate,
+            method = "push",
+            parse = (data: string): any => JSON.parse(data),
+            stringify = (data: any): string => JSON.stringify(data),
+            deconstruct,
+            reconstruct
+        } = config;
 
-    if(typeof navigate !== "function") {
-        throw new Error(`${storageType} expects param "config.navigate" to be a Reach Router navigate function`);
-    }
+        const type = 'ReachRouterQueryString';
 
-    if(method !== "push" && method !== "replace") {
-        throw new Error(`${storageType} expects param "config.method" to be either "push" or "replace"`);
-    }
-
-    let getSearchParams = (props: any) => new window.URLSearchParams(props.location.search);
-
-    let getValue = (props: Props): any => {
-        let query = {};
-        let searchParams = getSearchParams(props);
-        for (let [key, value] of searchParams) {
-            query[key] = parse(value);
+        if(typeof navigate !== "function") {
+            throw new Error(`${type} expects param "config.navigate" to be a Reach Router navigate function`);
         }
-        return query;
-    };
 
-    let checkAvailable = (props: Props): ?string => {
+        if(method !== "push" && method !== "replace") {
+            throw new Error(`${type} expects param "config.method" to be either "push" or "replace"`);
+        }
+
+        super({
+            deconstruct,
+            reconstruct,
+            requiresProps: true,
+            type,
+            updateFromProps: true
+        });
+
+        this._navigate = navigate;
+        this._method = method;
+        this._parse = parse;
+        this._stringify = stringify;
+    }
+
+    //
+    // private
+    //
+
+    _navigate: Function;
+    _method: "push"|"replace";
+    _parse: (data: string) => any;
+    _stringify: (data: any) => string;
+    _getSearchParams = (props: Props) => new window.URLSearchParams(props.location.search);
+
+    //
+    // private overrides
+    //
+
+    _availableFromProps(props: Props /* eslint-disable-line */): ?string {
         if(typeof window === "undefined" || typeof window.URLSearchParams === "undefined") {
-            return `${storageType} requires URLSearchParams to be defined`;
+            return `${this._type} requires URLSearchParams to be defined`;
         }
 
         if(!props.location) {
-            return `${storageType} requires a Reach Router location prop`;
+            return `${this._type} requires a Reach Router location prop`;
         }
-    };
+    }
 
-    let handleChange = ({changedValues, removedKeys, props}: *) => {
+    _valueFromProps(props: Props /* eslint-disable-line */): any {
+        let query = {};
+        let searchParams = this._getSearchParams(props);
+        for (let [key, value] of searchParams) {
+            query[key] = this._parse(value);
+        }
+        return query;
+    }
+
+    _handleChange({changedValues, removedKeys, props}: any): void {
         let {pathname} = props.location;
-        let searchParams = getSearchParams(props);
+        let searchParams = this._getSearchParams(props);
 
         pipeWith(
             changedValues,
             forEach((value, key) => {
-                searchParams.set(key, stringify(value));
+                searchParams.set(key, this._stringify(value));
             })
         );
 
@@ -78,21 +106,14 @@ export default (config: Config): StorageMechanism => {
             })
         );
 
-        navigate(
+        this._navigate(
             `${pathname}?` + searchParams.toString(),
             {
-                replace: method === "replace"
+                replace: this._method === "replace"
             }
         );
-    };
+    }
+}
 
-    return new StorageMechanism({
-        checkAvailable,
-        getValue,
-        handleChange,
-        storageType,
-        deconstruct,
-        reconstruct,
-        updateFromProps: true
-    });
-};
+export default (config: Config): StorageMechanism => new ReachRouterQueryString(config);
+
