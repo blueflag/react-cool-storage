@@ -1,6 +1,7 @@
 // @flow
 import storageAvailable from 'storage-available';
 import pipeWith from 'unmutable/pipeWith';
+import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
 import Synchronizer from './Synchronizer';
 import deepMemo from 'deep-memo';
@@ -53,7 +54,13 @@ class WebStorage extends StorageMechanism {
 
         this._key = key;
         this._method = method;
-        this._parse = deepMemo((data) => parse(data) || {});
+        this._parse = deepMemo((str) => {
+            try {
+                return parse(str) || {};
+            } catch(e) {
+                return InvalidValueMarker;
+            }
+        });
         this._stringify = stringify;
 
     }

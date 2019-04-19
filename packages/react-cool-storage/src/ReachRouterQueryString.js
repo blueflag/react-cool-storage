@@ -1,6 +1,7 @@
 // @flow
 import forEach from 'unmutable/forEach';
 import pipeWith from 'unmutable/pipeWith';
+import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
 
@@ -52,7 +53,13 @@ class ReachRouterQueryString extends StorageMechanism {
 
         this._navigate = navigate;
         this._method = method;
-        this._parse = deepMemo(parse);
+        this._parse = deepMemo((str) => {
+            try {
+                return parse(str);
+            } catch(e) {
+                return InvalidValueMarker;
+            }
+        });
         this._stringify = stringify;
     }
 
