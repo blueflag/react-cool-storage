@@ -3,6 +3,7 @@ import storageAvailable from 'storage-available';
 import pipeWith from 'unmutable/pipeWith';
 import StorageMechanism from './StorageMechanism';
 import Synchronizer from './Synchronizer';
+import deepMemo from 'deep-memo';
 
 type Config = {
     key: string,
@@ -52,8 +53,9 @@ class WebStorage extends StorageMechanism {
 
         this._key = key;
         this._method = method;
-        this._parse = parse;
+        this._parse = deepMemo((data) => parse(data) || {});
         this._stringify = stringify;
+
     }
 
     //
@@ -65,6 +67,14 @@ class WebStorage extends StorageMechanism {
     _parse: (data: string) => any;
     _stringify: (data: any) => string;
 
+    _stringFromProps = (props: any /* eslint-disable-line */): string => {
+        let storage = typeof window !== "undefined" && window[this._method];
+        if(!storage) {
+            return "";
+        }
+        return storage.getItem(this._key);
+    };
+
     //
     // private overrides
     //
@@ -75,13 +85,12 @@ class WebStorage extends StorageMechanism {
         }
     }
 
-    _valueFromProps(props: any /* eslint-disable-line */): any {
-        let storage = typeof window !== "undefined" && window[this._method];
-        if(!storage) {
-            return;
-        }
-
-        return this._parse(storage.getItem(this._key)) || {};
+    _valueFromProps(props: any): any {
+        return pipeWith(
+            props,
+            this._stringFromProps,
+            this._parse
+        );
     }
 
     _handleChange({updatedValue, origin}: any): void {
