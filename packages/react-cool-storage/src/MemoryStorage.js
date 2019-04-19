@@ -54,4 +54,4 @@ class MemoryStorage extends StorageMechanism {
     }
 }
 
-export default (config: ?Config): StorageMechanism => new MemoryStorage(config);
+export default (config: ?Config): StorageMechanism => new MemoryStorage(config || {});
