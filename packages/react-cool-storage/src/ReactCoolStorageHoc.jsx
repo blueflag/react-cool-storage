@@ -5,6 +5,7 @@ import type StorageMechanism from './StorageMechanism';
 import type {MessageState} from './ReactCoolStorageMessage';
 
 import React from 'react';
+import InvalidValueMarker from './InvalidValueMarker';
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
 
 import last from 'unmutable/lib/last';
@@ -12,7 +13,8 @@ import last from 'unmutable/lib/last';
 type Props = {};
 
 type State = {
-    message: MessageState
+    message: MessageState,
+    instanceRef: any
 };
 
 type ChildProps = {
@@ -40,17 +42,22 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             }
 
             this.state = {
-                message: this.getMessageState(props)
+                message: this.getMessageState(props),
+                instanceRef: this
+                // ^ adding a ref to this in state is ok in this case
+                // because the values used from this are constant after initial construction
             };
 
             this.storageMechanism._addSyncListener(
-                (value) => {
-                    this.setState({
-                        message: this.getMessageState(this.props, {value})
-                    });
-                },
+                (value) => this.setMessage(this.props, {value}),
                 this
             );
+        }
+
+        static getDerivedStateFromProps(props, {instanceRef}) {
+            return {
+                message: instanceRef.getMessageState(props)
+            };
         }
 
         componentWillUnmount() {
@@ -71,31 +78,35 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             this.storageMechanism = storageMechanism;
         };
 
+        setMessage = (props: Props, options: ?{value: any}) => {
+            this.setState({
+                message: this.getMessageState(this.props, options),
+                instanceRef: this
+            });
+        };
+
         getMessageState = (props: Props, options: ?{value: any}): MessageState => {
-            let {availabilityError} = this;
-            if(availabilityError) {
+            if(this.availabilityError) {
                 return {
                     ...ReactCoolStorageMessage.unavailable,
-                    availabilityError
+                    availabilityError: this.availabilityError
                 };
             }
 
             let {_reconstruct, type} = this.storageMechanism;
 
-            let value = {};
-            let valid = true;
+            let value = options
+                ? options.value
+                : this.storageMechanism._valueFromProps(props);
 
-            try {
-                value = options ? options.value : this.storageMechanism._valueFromProps(props);
-            } catch(e) {
-                valid = false;
-            }
+            let valid = value !== InvalidValueMarker;
+            value = valid ? _reconstruct(value) : {};
 
             return {
                 available: true,
                 availabilityError: undefined,
                 valid,
-                value: _reconstruct(value),
+                value,
                 storageType: type
             };
         }
@@ -114,23 +125,15 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             );
 
             if(!this.storageMechanism._updateFromProps) {
-                this.setState({
-                    message: this.getMessageState(this.props, {value: updatedValue})
-                });
+                this.setMessage(this.props, {value: updatedValue});
             }
         }
 
         render(): Node {
-            let {_updateFromProps} = this.storageMechanism;
-
-            let message = _updateFromProps
-                ? () => this.getMessageState(this.props)
-                : () => this.state.message;
-
             let childProps = {
                 ...this.props,
                 [name]: new ReactCoolStorageMessage({
-                    ...message(),
+                    ...this.state.message,
                     onChange: this.handleChange
                 })
             };
