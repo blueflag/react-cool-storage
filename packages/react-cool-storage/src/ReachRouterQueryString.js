@@ -2,6 +2,7 @@
 import forEach from 'unmutable/forEach';
 import pipeWith from 'unmutable/pipeWith';
 import StorageMechanism from './StorageMechanism';
+import deepMemo from 'deep-memo';
 
 type Config = {
     navigate: Function,
@@ -51,7 +52,7 @@ class ReachRouterQueryString extends StorageMechanism {
 
         this._navigate = navigate;
         this._method = method;
-        this._parse = parse;
+        this._parse = deepMemo(parse);
         this._stringify = stringify;
     }
 
@@ -80,12 +81,18 @@ class ReachRouterQueryString extends StorageMechanism {
     }
 
     _valueFromProps(props: Props /* eslint-disable-line */): any {
-        let query = {};
         let searchParams = this._getSearchParams(props);
-        for (let [key, value] of searchParams) {
-            query[key] = this._parse(value);
+
+        let params = [];
+        for (let searchParam of searchParams) {
+            params.push(searchParam);
         }
-        return query;
+
+        let json = params
+            .map(([key, value]) => `"${key}": ${value}`)
+            .join(",");
+
+        return this._parse(`{${json}}`);
     }
 
     _handleChange({changedValues, removedKeys, props}: any): void {
