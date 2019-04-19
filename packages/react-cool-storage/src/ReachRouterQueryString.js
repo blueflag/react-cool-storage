@@ -11,7 +11,8 @@ type Config = {
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
-    reconstruct?: Function
+    reconstruct?: Function,
+    memoize?: boolean
 };
 
 type Props = {
@@ -30,7 +31,8 @@ class ReachRouterQueryString extends StorageMechanism {
             parse = (data: string): any => JSON.parse(data),
             stringify = (data: any): string => JSON.stringify(data),
             deconstruct,
-            reconstruct
+            reconstruct,
+            memoize = true
         } = config;
 
         const type = 'ReachRouterQueryString';
@@ -53,14 +55,18 @@ class ReachRouterQueryString extends StorageMechanism {
 
         this._navigate = navigate;
         this._method = method;
-        this._parse = deepMemo((str) => {
+        this._parse = (str) => {
             try {
                 return parse(str);
             } catch(e) {
                 return InvalidValueMarker;
             }
-        });
+        };
         this._stringify = stringify;
+
+        if(memoize) {
+            this._parse = deepMemo(this._parse);
+        }
     }
 
     //

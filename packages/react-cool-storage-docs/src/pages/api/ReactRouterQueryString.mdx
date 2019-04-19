@@ -22,7 +22,8 @@ ReactRouterQueryString({
     deconstruct?: (data: any) => any,
     reconstruct?: (data: any) => any,
     parse?: (data: string) => any,
-    stringify?: (data: any) => string
+    stringify?: (data: any) => string,
+    memoize?: boolean = true
 })`}</Code>
 
 - `method` - The `history` method to use. Can be "push" or "replace". Defaults to "push".
@@ -30,6 +31,7 @@ ReactRouterQueryString({
 - `reconstruct` - Used to convert data from a serializable format into richer data types. It is called after ReactRouterQueryString has parsed its data. It is given the parsed object. Defaults to a passthrough function.- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
 - `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
 - `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
+- `memoize` - When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
 
 ## Resources
 

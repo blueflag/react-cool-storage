@@ -369,6 +369,28 @@ test('WebStorage should memoize partially', () => {
     expect(secondValue).not.toBe(thirdValue);
 });
 
+test('WebStorage should not memoize if config.memoize = false', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey",
+            memoize: false
+        }))
+    );
+
+    let firstValue = wrapper.props().storage.value;
+
+    wrapper.props().storage.onChange({abc: 123});
+    wrapper.update();
+
+    let secondValue = wrapper.props().storage.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).not.toBe(secondValue);
+});
+
 //
 // Data types
 //

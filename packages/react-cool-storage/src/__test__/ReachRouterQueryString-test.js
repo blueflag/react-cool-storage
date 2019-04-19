@@ -414,6 +414,32 @@ test('ReachRouterQueryString should memoize properly', () => {
     expect(secondValue).toBe(thirdValue);
 });
 
+test('ReachRouterQueryString should not memoize if config.memoize = false', () => {
+    let navigate = jest.fn();
+
+    let wrapper = shallowRenderHoc(
+        {
+            location: {
+                pathname: "/abc",
+                search: "?abc=123"
+            }
+        },
+        ReactCoolStorageHoc("query", ReachRouterQueryString({
+            navigate,
+            memoize: false
+        }))
+    );
+
+    let firstValue = wrapper.props().query.value;
+
+    navigateOnChange(wrapper, navigate, "query", {abc: 123});
+
+    let secondValue = wrapper.props().query.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).not.toBe(secondValue);
+});
+
 test('ReachRouterQueryString should memoize partially', () => {
     let navigate = jest.fn();
 

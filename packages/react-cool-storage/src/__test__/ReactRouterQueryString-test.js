@@ -460,6 +460,33 @@ test('ReactRouterQueryString should memoize properly', () => {
     expect(secondValue).toBe(thirdValue);
 });
 
+test('ReactRouterQueryString should not memoize if config.memoize = false', () => {
+    let push = jest.fn();
+
+    let wrapper = shallowRenderHoc(
+        {
+            history: {
+                push
+            },
+            location: {
+                search: "?abc=123"
+            }
+        },
+        ReactCoolStorageHoc("query", ReactRouterQueryString({
+            memoize: false
+        }))
+    );
+
+    let firstValue = wrapper.props().query.value;
+
+    pushOnChange(wrapper, push, "query", {abc: 123});
+
+    let secondValue = wrapper.props().query.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).not.toBe(secondValue);
+});
+
 test('ReactRouterQueryString should memoize partially', () => {
     let push = jest.fn();
 
