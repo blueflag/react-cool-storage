@@ -11,6 +11,7 @@
   },
   "files": [
     "lib",
+    "InvalidValueMarker.js",
     "MemoryStorage.js",
     "ReactCoolStorageMessage.js",
     "ReachRouterQueryString.js",
