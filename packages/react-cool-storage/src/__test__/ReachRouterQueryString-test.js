@@ -161,14 +161,14 @@ test('ReachRouterQueryString should pass its value through config.reconstruct', 
     expect(childProps.query.value.date.getTime()).toBe(date.getTime());
 });
 
-test('ReachRouterQueryString should pass each value through config.parse', () => {
-    let parse = (str: string) => JSON.parse(str.slice(1));
+test('ReachRouterQueryString should pass value through config.parse', () => {
+    let parse = (str: string) =>  JSON.parse(str.replace("abc", "ABC"));
 
     let childProps = shallowRenderHoc(
         {
             location: {
                 pathname: "/abc",
-                search: "?abc=A123&def=A456"
+                search: "?abc=123&def=456"
             }
         },
         ReactCoolStorageHoc("query", ReachRouterQueryString({
@@ -181,7 +181,7 @@ test('ReachRouterQueryString should pass each value through config.parse', () =>
     expect(childProps.query.valid).toBe(true);
 
     expect(childProps.query.value).toEqual({
-        abc: 123,
+        ABC: 123,
         def: 456
     });
 });
@@ -365,6 +365,117 @@ test('ReachRouterQueryString should pass each changed value through config.strin
     expect(navigate).toHaveBeenCalled();
     expect(navigate.mock.calls[0][0]).toBe("/abc?abc=A456&def=A789");
 });
+
+//
+// Memoization
+//
+
+let navigateOnChange = (wrapper, navigate, prop, newValue) => {
+    wrapper.props()[prop].onChange(newValue);
+    let pathname = wrapper.props().location.pathname;
+    wrapper.setProps({
+        location: {
+            pathname,
+            search: navigate.mock.calls[navigate.mock.calls.length - 1][0].slice(pathname.length)
+        }
+    });
+    wrapper.update();
+};
+
+test('ReachRouterQueryString should memoize properly', () => {
+    let navigate = jest.fn();
+
+    let wrapper = shallowRenderHoc(
+        {
+            location: {
+                pathname: "/abc",
+                search: "?abc=123"
+            }
+        },
+        ReactCoolStorageHoc("query", ReachRouterQueryString({
+            navigate
+        }))
+    );
+
+    let firstValue = wrapper.props().query.value;
+
+    navigateOnChange(wrapper, navigate, "query", {abc: 123});
+
+    let secondValue = wrapper.props().query.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).toBe(secondValue);
+
+    navigateOnChange(wrapper, navigate, "query", {abc: 123});
+
+    let thirdValue = wrapper.props().query.value;
+
+    expect(secondValue).toEqual(thirdValue);
+    expect(secondValue).toBe(thirdValue);
+});
+
+test('ReachRouterQueryString should not memoize if config.memoize = false', () => {
+    let navigate = jest.fn();
+
+    let wrapper = shallowRenderHoc(
+        {
+            location: {
+                pathname: "/abc",
+                search: "?abc=123"
+            }
+        },
+        ReactCoolStorageHoc("query", ReachRouterQueryString({
+            navigate,
+            memoize: false
+        }))
+    );
+
+    let firstValue = wrapper.props().query.value;
+
+    navigateOnChange(wrapper, navigate, "query", {abc: 123});
+
+    let secondValue = wrapper.props().query.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).not.toBe(secondValue);
+});
+
+test('ReachRouterQueryString should memoize partially', () => {
+    let navigate = jest.fn();
+
+    let wrapper = shallowRenderHoc(
+        {
+            location: {
+                pathname: "/abc",
+                search: "?abc=%5B123%2C456%5D&def=%5B100%2C200%5D"
+            }
+        },
+        ReactCoolStorageHoc("query", ReachRouterQueryString({
+            navigate
+        }))
+    );
+
+    let firstValue = wrapper.props().query.value;
+
+    navigateOnChange(wrapper, navigate, "query", {abc: [123, 456], def: [100, 200]});
+
+    let secondValue = wrapper.props().query.value;
+
+    expect(firstValue.abc).toEqual(secondValue.abc);
+    expect(firstValue.abc).toBe(secondValue.abc);
+    expect(firstValue.def).toEqual(secondValue.def);
+    expect(firstValue.def).toBe(secondValue.def);
+
+    navigateOnChange(wrapper, navigate, "query", {abc: [123, 789], def: [100, 200]});
+
+    let thirdValue = wrapper.props().query.value;
+
+    expect(secondValue.abc).not.toEqual(thirdValue.abc);
+    expect(secondValue.abc).not.toBe(thirdValue.abc);
+    expect(secondValue.def).toEqual(thirdValue.def);
+    expect(secondValue.def).toBe(thirdValue.def);
+});
+
 
 //
 // Data types

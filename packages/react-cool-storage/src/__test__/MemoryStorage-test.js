@@ -166,3 +166,45 @@ test('MemoryStorage should not synchronize when using different memoryStorage in
     expect(value2).toEqual({});
 });
 
+
+//
+// usage outside React
+//
+
+test('MemoryStorage available should be accessible from MemoryStorage instance', () => {
+    let memoryStorage = MemoryStorage();
+    expect(memoryStorage.available).toBe(true);
+});
+
+
+test('MemoryStorage availabilityError should be undefined on MemoryStorage instance', () => {
+    let memoryStorage = MemoryStorage();
+    expect(memoryStorage.availabilityError).toBe(undefined);
+});
+
+test('MemoryStorage value should be accessible from MemoryStorage instance', () => {
+    let memoryStorage = MemoryStorage({
+        initialValue: {abc: 123}
+    });
+    expect(memoryStorage.value).toEqual({abc: 123});
+});
+
+test('MemoryStorage value should be changeable from MemoryStorage instance', () => {
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", MemoryStorage())
+    );
+
+    let memoryStorage = MemoryStorage();
+
+    memoryStorage.onChange({abc: 456});
+
+    let value = wrapper
+        .props()
+        .storage
+        .value;
+
+    expect(memoryStorage.value).toEqual({abc: 456});
+});
+
+

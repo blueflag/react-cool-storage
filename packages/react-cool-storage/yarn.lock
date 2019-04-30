@@ -1650,6 +1650,16 @@ deep-is@~0.1.3:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.3.tgz#b369d6fb5dbc13eecf524f91b070feedc357cf34"
 
+deep-memo@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/deep-memo/-/deep-memo-0.1.2.tgz#562f30661b31c221a6ba53da574b46b5fdf17cfd"
+  dependencies:
+    "@babel/runtime" "^7.1.5"
+    fast-deep-equal "^1.0.0"
+    is-plain-object "^2.0.4"
+    lodash.range "^3.2.0"
+    unmutable "^0.45.1"
+
 default-require-extensions@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/default-require-extensions/-/default-require-extensions-1.0.0.tgz#f37ea15d3e13ffd9b437d33e1a75b5fb97874cb8"
@@ -5393,9 +5403,9 @@ universalify@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
 
-unmutable@^0.43.0:
-  version "0.43.1"
-  resolved "https://registry.yarnpkg.com/unmutable/-/unmutable-0.43.1.tgz#71f8cbca2f8dc04759b60442d9b1626cbecad7be"
+unmutable@^0.45.1:
+  version "0.45.1"
+  resolved "https://registry.yarnpkg.com/unmutable/-/unmutable-0.45.1.tgz#182ded785db16a2947758518b0eebd4d3cf6566f"
   dependencies:
     "@babel/runtime" "^7.1.5"
     fast-deep-equal "^1.0.0"

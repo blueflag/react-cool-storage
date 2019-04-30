@@ -308,6 +308,90 @@ test('WebStorage should pass the value through config.stringify', () => {
 });
 
 //
+// Memoization
+//
+
+test('WebStorage should memoize properly', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    let firstValue = wrapper.props().storage.value;
+
+    wrapper.props().storage.onChange({abc: 123});
+    wrapper.update();
+
+    let secondValue = wrapper.props().storage.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).toBe(secondValue);
+
+    wrapper.props().storage.onChange({abc: 123});
+    wrapper.update();
+
+    let thirdValue = wrapper.props().storage.value;
+
+    expect(secondValue).toEqual(thirdValue);
+    expect(secondValue).toBe(thirdValue);
+});
+
+test('WebStorage should memoize partially', () => {
+    localStorage.setItem("localStorageKey", `{"abc":[123, 456], "def": "foo"}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    let firstValue = wrapper.props().storage.value.abc;
+
+    wrapper.props().storage.onChange({abc: [123, 456], def: "bar"});
+    wrapper.update();
+
+    let secondValue = wrapper.props().storage.value.abc;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).toBe(secondValue);
+
+    wrapper.props().storage.onChange({abc: [123, 789], def: "bar"});
+    wrapper.update();
+
+    let thirdValue = wrapper.props().storage.value.abc;
+
+    expect(secondValue).not.toEqual(thirdValue);
+    expect(secondValue).not.toBe(thirdValue);
+});
+
+test('WebStorage should not memoize if config.memoize = false', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey",
+            memoize: false
+        }))
+    );
+
+    let firstValue = wrapper.props().storage.value;
+
+    wrapper.props().storage.onChange({abc: 123});
+    wrapper.update();
+
+    let secondValue = wrapper.props().storage.value;
+
+    expect(firstValue).toEqual(secondValue);
+    expect(firstValue).not.toBe(secondValue);
+});
+
+//
 // Data types
 //
 
@@ -423,4 +507,50 @@ test('WebStorage should not sync hocs when different keys are used', () => {
     expect(value2).toEqual({});
 });
 
+//
+// usage outside React
+//
 
+test('WebStorage available should be accessible from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    expect(webStorage.available).toBe(true);
+});
+
+test('WebStorage value should be accessible from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    expect(webStorage.value).toEqual({abc: 123});
+});
+
+test('WebStorage value should be changeable from WebStorage instance', () => {
+    localStorage.setItem("localStorageKey", `{"abc":123}`);
+
+    let wrapper = shallowRenderHoc(
+        {},
+        ReactCoolStorageHoc("storage", WebStorage({
+            key: "localStorageKey"
+        }))
+    );
+
+    let webStorage = WebStorage({
+        key: "localStorageKey"
+    });
+
+    webStorage.onChange({abc: 456});
+
+    let value = wrapper
+        .props()
+        .storage
+        .value;
+
+    expect(webStorage.value).toEqual({abc: 456});
+});

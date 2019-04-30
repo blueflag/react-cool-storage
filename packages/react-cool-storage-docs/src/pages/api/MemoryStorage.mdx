@@ -7,7 +7,7 @@ import MemoryStorageExample from '../../example/MemoryStorageExample';
 
 MemoryStorage gives you an easy to use binding for working with data stored in memory. Often this is used as a fallback storage mechanism when others are unavailable.
 
-Each instanciation of `MemoryStorage()` contains it's own unique data store. You can use the one MemoryStorage instance in many ReactCoolStorageHocs and they will all remain in sync with each other.
+Each instanciation of `MemoryStorage()` contains its own unique data store. You can use the one MemoryStorage instance in many ReactCoolStorageHocs and they will all remain in sync with each other.
 
 There are no limitations on the kind of data it can store.
 
@@ -28,6 +28,12 @@ MemoryStorage requires no resources.
 ## Props
 
 MemoryStorage requires no props.
+
+## Outside React
+
+MemoryStorage doesn't require any props, so you can also access and change a MemoryStorage instance's value outside of React. All ReactCoolStorageHocs that use the MemoryStorage will update and stay in sync.
+
+A `MyMemoryStorage` instance has been added to the window. Try running `MyMemoryStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
 
 ## Example
 
@@ -56,9 +62,18 @@ const MemoryStorageExample = (props) => {
     </div>;
 };
 
+const MyMemoryStorage = MemoryStorage();
+
 export default ReactCoolStorageHoc(
     'memoryStorage',
-    MemoryStorage()
+    MyMemoryStorage
 )(MemoryStorageExample);
+
+// also add this MemoryStorage instance to the window
+// to demonstrate usage outside of React
+
+if(typeof window !== "undefined") {
+    window.MyMemoryStorage = MyMemoryStorage;
+}
 
 `}</Code>
