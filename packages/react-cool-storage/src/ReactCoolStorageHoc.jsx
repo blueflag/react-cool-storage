@@ -5,20 +5,16 @@ import type StorageMechanism from './StorageMechanism';
 import type {MessageState} from './ReactCoolStorageMessage';
 
 import React from 'react';
+import InvalidValueMarker from './InvalidValueMarker';
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
 
-import filter from 'unmutable/lib/filter';
-import keyArray from 'unmutable/lib/keyArray';
 import last from 'unmutable/lib/last';
-import isKeyed from 'unmutable/lib/isKeyed';
-import merge from 'unmutable/lib/merge';
-import omit from 'unmutable/lib/omit';
-import pipeWith from 'unmutable/lib/pipeWith';
 
 type Props = {};
 
 type State = {
-    message: MessageState
+    message: MessageState,
+    instanceRef: any
 };
 
 type ChildProps = {
@@ -46,27 +42,32 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             }
 
             this.state = {
-                message: this.getMessageState(props)
+                message: this.getMessageState(props),
+                instanceRef: this
+                // ^ adding a ref to this in state is ok in this case
+                // because the values used from this are constant after initial construction
             };
 
-            this.storageMechanism.addSyncListener(
-                (value) => {
-                    this.setState({
-                        message: this.getMessageState(this.props, {value})
-                    });
-                },
+            this.storageMechanism._addSyncListener(
+                (value) => this.setMessage(this.props, {value}),
                 this
             );
         }
 
+        static getDerivedStateFromProps(props, {instanceRef}) {
+            return {
+                message: instanceRef.getMessageState(props)
+            };
+        }
+
         componentWillUnmount() {
-            this.storageMechanism.removeSyncListener(this);
+            this.storageMechanism._removeSyncListener(this);
         }
 
         setStorageMechanism = (props: Props): * => {
             let storageMechanism: ?StorageMechanism = storageMechanisms
                 .find((storageMechanism) => {
-                    this.availabilityError = storageMechanism.checkAvailable(props);
+                    this.availabilityError = storageMechanism._availableFromProps(props);
                     return !this.availabilityError;
                 });
 
@@ -77,103 +78,62 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
             this.storageMechanism = storageMechanism;
         };
 
+        setMessage = (props: Props, options: ?{value: any}) => {
+            this.setState({
+                message: this.getMessageState(this.props, options),
+                instanceRef: this
+            });
+        };
+
         getMessageState = (props: Props, options: ?{value: any}): MessageState => {
-            let {availabilityError} = this;
-            if(availabilityError) {
+            if(this.availabilityError) {
                 return {
                     ...ReactCoolStorageMessage.unavailable,
-                    availabilityError
+                    availabilityError: this.availabilityError
                 };
             }
 
-            let {
-                getValue,
-                reconstruct,
-                storageType
-            } = this.storageMechanism;
+            let {_reconstruct, type} = this.storageMechanism;
 
-            let value = {};
-            let valid = true;
+            let value = options
+                ? options.value
+                : this.storageMechanism._valueFromProps(props);
 
-            try {
-                value = options ? options.value : getValue(props);
-            } catch(e) {
-                valid = false;
-            }
+            let valid = value !== InvalidValueMarker;
+            value = valid ? _reconstruct(value) : {};
 
             return {
                 available: true,
                 availabilityError: undefined,
                 valid,
-                value: reconstruct(value),
-                storageType
+                value,
+                storageType: type
             };
         }
 
         handleChange = (newValue: *) => {
-            let {
-                storageMechanism,
-                availabilityError
-            } = this;
-
-            if(availabilityError) {
+            if(this.availabilityError) {
                 return;
             }
 
-            let {
-                deconstruct,
-                getValue,
-                handleChange,
-                storageType,
-                updateFromProps
-            } = storageMechanism;
-
-            let value = deconstruct(newValue);
-
-            if(!isKeyed(value)) {
-                throw new Error(`${storageType} onChange must be passed an object`);
-            }
-
-            let removedKeys = pipeWith(
+            let updatedValue = this.storageMechanism._onChangeWithOptions(
                 newValue,
-                filter(_ => typeof _ === "undefined"),
-                keyArray()
+                {
+                    origin: this,
+                    props: this.props
+                }
             );
 
-            let changedValues = omit(removedKeys)(value);
-
-            let updatedValue = pipeWith(
-                getValue(this.props),
-                merge(changedValues),
-                omit(removedKeys)
-            );
-
-            handleChange({
-                updatedValue,
-                changedValues,
-                removedKeys,
-                props: this.props,
-                origin: this
-            });
-
-            if(!updateFromProps) {
-                this.setState({
-                    message: this.getMessageState(this.props, {value: updatedValue})
-                });
+            if(!this.storageMechanism._updateFromProps) {
+                this.setMessage(this.props, {value: updatedValue});
             }
         }
 
         render(): Node {
-            let {updateFromProps} = this.storageMechanism;
-
-            let message = updateFromProps
-                ? () => this.getMessageState(this.props)
-                : () => this.state.message;
-
             let childProps = {
                 ...this.props,
                 [name]: new ReactCoolStorageMessage({
-                    ...message(),
+                    ...this.state.message,
                     onChange: this.handleChange
                 })
             };

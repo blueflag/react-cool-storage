@@ -11,6 +11,7 @@
   },
   "files": [
     "lib",
+    "InvalidValueMarker.js",
     "MemoryStorage.js",
     "ReactCoolStorageMessage.js",
     "ReachRouterQueryString.js",
@@ -34,8 +35,9 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.1.5",
+    "deep-memo": "^0.1.2",
     "storage-available": "^1.1.0",
-    "unmutable": "^0.43.0"
+    "unmutable": "^0.45.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",

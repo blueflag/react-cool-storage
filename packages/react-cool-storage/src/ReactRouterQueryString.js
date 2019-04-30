@@ -1,14 +1,17 @@
 // @flow
-import pipeWith from 'unmutable/pipeWith';
 import forEach from 'unmutable/forEach';
+import pipeWith from 'unmutable/pipeWith';
+import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
+import deepMemo from 'deep-memo';
 
 type Config = {
-    method?: "push"|"replace",
+    method?: "localStorage"|"sessionStorage",
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
-    reconstruct?: Function
+    reconstruct?: Function,
+    memoize?: boolean
 };
 
 type Props = {
@@ -21,49 +24,93 @@ type Props = {
     }
 };
 
-const storageType = 'ReactRouterQueryString';
+class ReactRouterQueryString extends StorageMechanism {
 
-export default (config: Config = {}): StorageMechanism => {
-    let {
-        method = "push",
-        parse = (data: string): any => JSON.parse(data),
-        stringify = (data: any): string => JSON.stringify(data),
-        deconstruct,
-        reconstruct
-    } = config;
+    constructor(config: Config = {}) {
+        let {
+            method = "push",
+            parse = (data: string): any => JSON.parse(data),
+            stringify = (data: any): string => JSON.stringify(data),
+            deconstruct,
+            reconstruct,
+            memoize = true
+        } = config;
 
-    if(method !== "push" && method !== "replace") {
-        throw new Error(`${storageType} expects param "config.method" to be either "push" or "replace"`);
+        const type = 'ReactRouterQueryString';
+
+        if(method !== "push" && method !== "replace") {
+            throw new Error(`${type} expects param "config.method" to be either "push" or "replace"`);
+        }
+
+        super({
+            deconstruct,
+            reconstruct,
+            requiresProps: true,
+            type,
+            updateFromProps: true
+        });
+
+        this._method = method;
+        this._parse = (str) => {
+            try {
+                return parse(str);
+            } catch(e) {
+                return InvalidValueMarker;
+            }
+        };
+        this._stringify = stringify;
+
+        if(memoize) {
+            this._parse = deepMemo(this._parse);
+        }
     }
 
-    let getSearchParams = (props: any) => new window.URLSearchParams(props.location.search);
+    //
+    // private
+    //
 
-    let getValue = (props: Props): any => {
-        let query = {};
-        let searchParams = getSearchParams(props);
-        for (let [key, value] of searchParams) {
-            query[key] = parse(value);
-        }
-        return query;
-    };
+    _navigate: Function;
+    _method: "push"|"replace";
+    _parse: (data: string) => any;
+    _stringify: (data: any) => string;
+    _getSearchParams = (props: Props) => new window.URLSearchParams(props.location.search);
 
-    let checkAvailable = (props: Props): ?string => {
+    //
+    // private overrides
+    //
+
+    _availableFromProps(props: Props /* eslint-disable-line */): ?string {
         if(typeof window === "undefined" || typeof window.URLSearchParams === "undefined") {
-            return `${storageType} requires URLSearchParams to be defined`;
+            return `${this._type} requires URLSearchParams to be defined`;
         }
 
         if(!props.history || !props.location) {
-            return `${storageType} requires React Router history and location props`;
+            return `${this._type} requires React Router history and location props`;
         }
-    };
+    }
 
-    let handleChange = ({changedValues, removedKeys, props}: *) => {
-        let searchParams = getSearchParams(props);
+    _valueFromProps(props: Props /* eslint-disable-line */): any {
+        let searchParams = this._getSearchParams(props);
+
+        let params = [];
+        for (let searchParam of searchParams) {
+            params.push(searchParam);
+        }
+
+        let json = params
+            .map(([key, value]) => `"${key}": ${value}`)
+            .join(",");
+
+        return this._parse(`{${json}}`);
+    }
+
+    _handleChange({changedValues, removedKeys, props}: any): void {
+        let searchParams = this._getSearchParams(props);
 
         pipeWith(
             changedValues,
             forEach((value, key) => {
-                searchParams.set(key, stringify(value));
+                searchParams.set(key, this._stringify(value));
             })
         );
 
@@ -74,16 +121,9 @@ export default (config: Config = {}): StorageMechanism => {
             })
         );
 
-        props.history[method]("?" + searchParams.toString());
-    };
+        props.history[this._method]("?" + searchParams.toString());
+    }
+}
 
-    return new StorageMechanism({
-        checkAvailable,
-        getValue,
-        handleChange,
-        storageType,
-        deconstruct,
-        reconstruct,
-        updateFromProps: true
-    });
-};
+export default (config: ?Config): StorageMechanism => new ReactRouterQueryString(config || {});
+
