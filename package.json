@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "preversion": "yarn build-all",
+    "bootstrap": "yarn prep",
     "prep": "yarn lerna bootstrap",
     "bump": "yarn lerna publish",
     "build": "yarn lerna run build --parallel",
