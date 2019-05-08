@@ -1,210 +1,179 @@
 // @flow
-import React from 'react';
-
+import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReactCoolStorageHoc from '../ReactCoolStorageHoc';
 import MemoryStorage from '../MemoryStorage';
-import ReactCoolStorageMessage from '../ReactCoolStorageMessage';
 
-let shallowRenderHoc = (props, hock) => {
-    let Component = hock((props) => <div />);
-    return shallow(<Component {...props}/>);
-};
+import {act} from 'react-hooks-testing-library';
+import {renderHook} from 'react-hooks-testing-library';
+import {renderHoc} from './react-hoc-testing-library';
 
-//
-// Config errors - none
-//
+describe('MemoryStorage storage mechanism tests', () => {
 
-//
-// Resource errors - none
-//
-
-//
-// Transparency
-//
-
-const setAndRefresh = (value: *) => {
-
-    let wrapper = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    );
-
-    wrapper
-        .props()
-        .storage
-        .onChange(value);
-
-    wrapper.update();
-
-    return wrapper
-        .props()
-        .storage
-        .value;
-};
-
-test('MemoryStorage should pass through props', () => {
-    let childProps = shallowRenderHoc(
-        {
-            xyz: 789
-        },
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    ).props();
-
-    expect(childProps.xyz).toBe(789);
-});
-
-//
-// Child props
-//
-
-test('MemoryStorage should set value', () => {
-    expect(setAndRefresh({abc: "def"})).toEqual({abc: "def"});
-});
-
-test('MemoryStorage should merge value', () => {
-    let wrapper = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    );
-
-    wrapper
-        .props()
-        .storage
-        .onChange({abc: 123});
-
-    wrapper.update();
-
-    wrapper
-        .props()
-        .storage
-        .onChange({def: 456});
-
-    let value = wrapper
-        .props()
-        .storage
-        .value;
-
-    expect(value).toEqual({abc: 123, def: 456});
-});
-
-//
-// Data types
-//
-
-test('MemoryStorage should cope with various data types', () => {
-    expect(setAndRefresh({abc: "def"})).toEqual({abc: "def"});
-    expect(setAndRefresh({abc: 123})).toEqual({abc: 123});
-    expect(setAndRefresh({abc: true})).toEqual({abc: true});
-    expect(setAndRefresh({abc: undefined})).toEqual({});
-    expect(setAndRefresh({abc: [1,2,3]})).toEqual({abc: [1,2,3]});
-    expect(setAndRefresh({abc: [1,2,null]})).toEqual({abc: [1,2,null]});
-});
-
-//
-// synchronisation
-//
-
-test('MemoryStorage should update one hoc when another using the same memory storage instance updates', () => {
-    let memoryStorage = MemoryStorage();
-
-    let wrapper1 = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", memoryStorage)
-    );
-
-    let wrapper2 = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", memoryStorage)
-    );
-
-    wrapper1
-        .props()
-        .storage
-        .onChange({abc: 123});
-
-    let value1 = wrapper1
-        .props()
-        .storage
-        .value;
-
-    let value2 = wrapper2
-        .props()
-        .storage
-        .value;
-
-    expect(value1).toEqual({abc: 123});
-    expect(value2).toEqual({abc: 123});
-});
-
-test('MemoryStorage should not synchronize when using different memoryStorage instances', () => {
-    let wrapper1 = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    );
-
-    let wrapper2 = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    );
-
-    wrapper1
-        .props()
-        .storage
-        .onChange({abc: 123});
-
-    let value1 = wrapper1
-        .props()
-        .storage
-        .value;
-
-    let value2 = wrapper2
-        .props()
-        .storage
-        .value;
-
-    expect(value1).toEqual({abc: 123});
-    expect(value2).toEqual({});
-});
-
-
-//
-// usage outside React
-//
-
-test('MemoryStorage available should be accessible from MemoryStorage instance', () => {
-    let memoryStorage = MemoryStorage();
-    expect(memoryStorage.available).toBe(true);
-});
-
-
-test('MemoryStorage availabilityError should be undefined on MemoryStorage instance', () => {
-    let memoryStorage = MemoryStorage();
-    expect(memoryStorage.availabilityError).toBe(undefined);
-});
-
-test('MemoryStorage value should be accessible from MemoryStorage instance', () => {
-    let memoryStorage = MemoryStorage({
-        initialValue: {abc: 123}
+    test('MemoryStorage should always be available', () => {
+        const MyMemoryStorage = MemoryStorage();
+        expect(MyMemoryStorage.available).toBe(true);
+        expect(MyMemoryStorage.availabilityError).toBe(undefined);
+        expect(MyMemoryStorage.valid).toBe(true);
+        expect(MyMemoryStorage.storageType).toBe("MemoryStorage");
+        expect(MyMemoryStorage.value).toEqual({});
     });
-    expect(memoryStorage.value).toEqual({abc: 123});
+
+    test('MemoryStorage value should be set and get', () => {
+        const MyMemoryStorage = MemoryStorage();
+        MyMemoryStorage.onChange({abc: 100});
+        expect(MyMemoryStorage.value).toEqual({abc: 100});
+    });
+
 });
 
-test('MemoryStorage value should be changeable from MemoryStorage instance', () => {
-    let wrapper = shallowRenderHoc(
-        {},
-        ReactCoolStorageHoc("storage", MemoryStorage())
-    );
+describe('Behaviour tests that should apply to all storage mechanisms', () => {
 
-    let memoryStorage = MemoryStorage();
+    test('MemoryStorage value should merge', () => {
+        const MyMemoryStorage = MemoryStorage();
+        MyMemoryStorage.onChange({abc: 100, def: 200});
+        MyMemoryStorage.onChange({def: 300, ghi: 400});
+        expect(MyMemoryStorage.value).toEqual({abc: 100, def: 300, ghi: 400});
+    });
 
-    memoryStorage.onChange({abc: 456});
+    test('MemoryStorage value should delete keys set to undefined', () => {
+        const MyMemoryStorage = MemoryStorage();
+        MyMemoryStorage.onChange({abc: 100, def: 200});
+        MyMemoryStorage.onChange({abc: undefined});
+        expect(MyMemoryStorage.value).toEqual({def: 200});
+    });
 
-    let value = wrapper
-        .props()
-        .storage
-        .value;
+    test('MemoryStorage onChange should throw error if given non object', () => {
+        const MyMemoryStorage = MemoryStorage();
+        expect(() => MyMemoryStorage.onChange(123)).toThrowError(`MemoryStorage onChange must be passed an object`);
+    });
 
-    expect(memoryStorage.value).toEqual({abc: 456});
 });
 
+describe('MemoryStorage data flow config tests', () => {
 
+    test('MemoryStorage should accept initialValue', () => {
+        const MyMemoryStorage = MemoryStorage({
+            initialValue: {
+                def: 600
+            }
+        });
+
+        expect(MyMemoryStorage.value).toEqual({def: 600});
+    });
+
+    test('MemoryStorage should set initialValue as function', () => {
+        let initialValue = jest.fn(() => ({def: 200}));
+
+        const MyMemoryStorage = MemoryStorage({initialValue});
+
+        expect(MyMemoryStorage.value).toEqual({def: 200});
+        expect(initialValue.mock.calls[0][0]).toEqual({});
+    });
+
+    test('MemoryStorage should not set initialValue if function returns falsey', () => {
+
+        const MyMemoryStorage = MemoryStorage({initialValue: () => false});
+
+        expect(MyMemoryStorage.value).toEqual({});
+    });
+
+    test('MemoryStorage should throw error if initialValue is not keyed', () => {
+        expect(() => MemoryStorage({initialValue: 600})).toThrowError(`MemoryStorage initialValue must be passed an object`);
+    });
+
+});
+
+describe('Hook tests', () => {
+
+    test('MemoryStorage hook should work', () => {
+        const useReactCoolStorage = ReactCoolStorageHook(MemoryStorage());
+        const {result} = renderHook(() => useReactCoolStorage({}));
+        const memoryStorage = result.current;
+
+        expect(memoryStorage.available).toBe(true);
+        expect(memoryStorage.availabilityError).toBe(undefined);
+        expect(memoryStorage.storageType).toBe("MemoryStorage");
+        expect(memoryStorage.valid).toBe(true);
+        expect(memoryStorage.value).toEqual({});
+    });
+
+    test('MemoryStorage hook should change', () => {
+        const useReactCoolStorage = ReactCoolStorageHook(MemoryStorage());
+        const {result} = renderHook(() => useReactCoolStorage({}));
+
+        act(() => {
+            result.current.onChange({abc: 123});
+        });
+
+        expect(result.current.value).toEqual({abc: 123});
+    });
+
+    test('MemoryStorage hook should rerender based on change directly from MemoryStorage instance', () => {
+        const MyMemoryStorage = MemoryStorage();
+        const useReactCoolStorage = ReactCoolStorageHook(MyMemoryStorage);
+        const {result} = renderHook(() => useReactCoolStorage({}));
+
+        act(() => {
+            MyMemoryStorage.onChange({abc: 123});
+        });
+
+        expect(result.current.value).toEqual({abc: 123});
+    });
+
+});
+
+describe('Hoc tests', () => {
+
+    test('MemoryStorage hoc should work', () => {
+        const hoc = ReactCoolStorageHoc('foo', MemoryStorage());
+        const {result} = renderHoc(hoc, {});
+        const memoryStorage = result.current.foo;
+
+        expect(memoryStorage.available).toBe(true);
+        expect(memoryStorage.availabilityError).toBe(undefined);
+        expect(memoryStorage.storageType).toBe("MemoryStorage");
+        expect(memoryStorage.valid).toBe(true);
+        expect(memoryStorage.value).toEqual({});
+    });
+
+    test('MemoryStorage hoc should change', () => {
+        const hoc = ReactCoolStorageHoc('foo', MemoryStorage());
+        const {result, act} = renderHoc(hoc, {});
+
+        act(() => {
+            result.current.foo.onChange({abc: 123});
+        });
+
+        expect(result.current.foo.value).toEqual({abc: 123});
+    });
+
+    test('MemoryStorage hoc should rerender based on change directly from MemoryStorage instance', () => {
+        const MyMemoryStorage = MemoryStorage();
+        const hoc = ReactCoolStorageHoc('foo', MyMemoryStorage);
+        const {result, act} = renderHoc(hoc, {});
+
+        act(() => {
+            MyMemoryStorage.onChange({abc: 123});
+        });
+
+        expect(result.current.foo.value).toEqual({abc: 123});
+    });
+
+});
+
+describe('Hoc tests that should apply to all storage mechanisms', () => {
+
+    test('MemoryStorage hoc should transparently pass props', () => {
+        const hoc = ReactCoolStorageHoc('foo', MemoryStorage());
+        const {result} = renderHoc(hoc, {abc: 100, def: 200});
+        const {abc, def} = result.current;
+
+        expect(abc).toBe(100);
+        expect(def).toBe(200);
+    });
+
+    test('ReactCoolStorageHoc should throw error if not passed a prop name', () => {
+        expect(() => ReactCoolStorageHoc(123, MemoryStorage())).toThrowError(`ReactCoolStorageHoc expects first param to be a string, but got number`);
+    });
+
+});
