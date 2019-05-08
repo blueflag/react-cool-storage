@@ -2,15 +2,13 @@
 import StorageMechanism from './StorageMechanism';
 import Synchronizer from './Synchronizer';
 
-import isKeyed from 'unmutable/lib/isKeyed';
-
 type Config = {
     initialValue?: any
 };
 
 class MemoryStorage extends StorageMechanism {
 
-    constructor(config: Config = {}) {
+    constructor(config: Config) {
         let {initialValue} = config;
 
         let type = 'MemoryStorage';
@@ -22,11 +20,9 @@ class MemoryStorage extends StorageMechanism {
             updateFromProps: false
         });
 
-        if(initialValue && !isKeyed(initialValue)) {
-            throw new Error(`${type} initialValue must be passed an object`);
-        }
+        this._valueStore = {};
 
-        this._valueStore = config.initialValue || {};
+        this._setInitialValue(initialValue);
     }
 
     //

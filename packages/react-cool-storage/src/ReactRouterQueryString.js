@@ -6,7 +6,7 @@ import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
 
 type Config = {
-    method?: "localStorage"|"sessionStorage",
+    method?: "push"|"replace",
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
@@ -29,8 +29,8 @@ class ReactRouterQueryString extends StorageMechanism {
     constructor(config: Config = {}) {
         let {
             method = "push",
-            parse = (data: string): any => JSON.parse(data),
-            stringify = (data: any): string => JSON.stringify(data),
+            parse,
+            stringify,
             deconstruct,
             reconstruct,
             memoize = true
@@ -51,17 +51,19 @@ class ReactRouterQueryString extends StorageMechanism {
         });
 
         this._method = method;
-        this._parse = (str) => {
+        this._defaultParse = (str) => {
             try {
-                return parse(str);
+                return JSON.parse(str);
             } catch(e) {
                 return InvalidValueMarker;
             }
         };
-        this._stringify = stringify;
+        this._defaultStringify = (data: any): string => JSON.stringify(data);
+        this._customParse = parse;
+        this._customStringify = stringify;
 
         if(memoize) {
-            this._parse = deepMemo(this._parse);
+            this._defaultParse = deepMemo(this._defaultParse);
         }
     }
 
@@ -71,9 +73,10 @@ class ReactRouterQueryString extends StorageMechanism {
 
     _navigate: Function;
     _method: "push"|"replace";
-    _parse: (data: string) => any;
-    _stringify: (data: any) => string;
-    _getSearchParams = (props: Props) => new window.URLSearchParams(props.location.search);
+    _defaultParse: (data: string) => any;
+    _defaultStringify: (data: any) => string;
+    _customParse: ?(data: string) => any;
+    _customStringify: ?(data: any) => string;
 
     //
     // private overrides
@@ -89,8 +92,18 @@ class ReactRouterQueryString extends StorageMechanism {
         }
     }
 
-    _valueFromProps(props: Props /* eslint-disable-line */): any {
-        let searchParams = this._getSearchParams(props);
+    _rawFromProps(props: Props): any {
+        return props.location.search;
+    }
+
+    _valueFromProps(props: Props): any {
+        let raw = this._rawFromProps(props);
+
+        if(this._customParse) {
+            return this._customParse(raw);
+        }
+
+        let searchParams = new window.URLSearchParams(raw);
 
         let params = [];
         for (let searchParam of searchParams) {
@@ -101,16 +114,22 @@ class ReactRouterQueryString extends StorageMechanism {
             .map(([key, value]) => `"${key}": ${value}`)
             .join(",");
 
-        return this._parse(`{${json}}`);
+        return this._defaultParse(`{${json}}`);
     }
 
-    _handleChange({changedValues, removedKeys, props}: any): void {
-        let searchParams = this._getSearchParams(props);
+    _handleChange({updatedValue, changedValues, removedKeys, props}: any): void {
+
+        let raw = this._rawFromProps(props);
+        let searchParams = new window.URLSearchParams(raw);
+
+        if(this._customStringify) {
+            props.history[this._method](this._customStringify(updatedValue));
+        }
 
         pipeWith(
             changedValues,
             forEach((value, key) => {
-                searchParams.set(key, this._stringify(value));
+                searchParams.set(key, this._defaultStringify(value));
             })
         );
 
