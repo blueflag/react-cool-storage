@@ -9,6 +9,12 @@ export default class Synchronizer {
     syncListeners: SyncListener[] = [];
 
     addSyncListener(callback: (value: any) => void, origin: any) {
+        const exists = this.syncListeners.some((syncListener) => syncListener.origin === origin);
+
+        if(exists) {
+            return;
+        }
+
         this.syncListeners.push({
             callback,
             origin
