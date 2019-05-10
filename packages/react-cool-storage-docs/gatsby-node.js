@@ -16,11 +16,6 @@ exports.onCreateWebpackConfig = ({
           ]
         }
       ]
-    },
-    resolve: {
-      alias: {
-        'react-cool-storage': path.resolve(__dirname, "../react-cool-storage/")
-      }
     }
   });
 }
