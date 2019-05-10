@@ -3,7 +3,7 @@
   "scripts": {
     "preversion": "yarn build-all",
     "bootstrap": "yarn prep",
-    "prep": "yarn && yarn lerna bootstrap && cd packages/react-cool-storage && npm link ../react-cool-storage-docs/node_modules/react",
+    "prep": "yarn && yarn lerna bootstrap && cd packages/react-cool-storage",
     "bump": "yarn lerna publish",
     "build": "yarn lerna run build --parallel",
     "build-all": "yarn lerna run build-all --parallel",
