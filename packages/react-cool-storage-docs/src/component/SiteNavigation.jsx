@@ -23,7 +23,8 @@ export default () => <Box>
         <NavigationListItem>API</NavigationListItem>
     </NavigationList>
     <NavigationList modifier="margin">
-        <NavigationListItem>Hocs</NavigationListItem>
+        <NavigationListItem>React bindings</NavigationListItem>
+        <NavigationListItem><Link to="/api/ReactCoolStorageHook">ReactCoolStorageHook</Link></NavigationListItem>
         <NavigationListItem><Link to="/api/ReactCoolStorageHoc">ReactCoolStorageHoc</Link></NavigationListItem>
     </NavigationList>
     <NavigationList modifier="margin">

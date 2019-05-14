@@ -4,6 +4,8 @@ import Code from '../../component/Code';
 
 ReactCoolStorageHoc is a React higher order component that accepts a name and a number of storage mechanisms, providing access to storage mechanisms via props.
 
+This is also available [as a hook](/api/ReactCoolStorageHook).
+
 If more than one storage mechanism is provided, the first available one is used. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the `name` child prop will contain a `ReactCoolStorageMessage` describing the error about why it's not available.
 
 It passes down a prop with a name of the `name` provided in the first argument, which holds a ReactCoolStorageMessage containing the value and a function to change the value.

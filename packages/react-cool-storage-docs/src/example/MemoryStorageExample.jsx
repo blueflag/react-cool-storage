@@ -1,10 +1,14 @@
 // @flow
 import React from 'react';
-import ReactCoolStorageHoc from 'react-cool-storage';
+import ReactCoolStorageHook from 'react-cool-storage';
 import MemoryStorage from 'react-cool-storage/MemoryStorage';
 
-const MemoryStorageExample = (props) => {
-    let {memoryStorage} = props;
+const MyMemoryStorage = MemoryStorage();
+const useReactCoolStorage = ReactCoolStorageHook(MyMemoryStorage);
+
+export default (props) => {
+    let memoryStorage = useReactCoolStorage(props);
+
     return <div>
         <label>Data stored under a key of "foo"</label>
         <input
@@ -22,13 +26,6 @@ const MemoryStorageExample = (props) => {
         />
     </div>;
 };
-
-const MyMemoryStorage = MemoryStorage();
-
-export default ReactCoolStorageHoc(
-    'memoryStorage',
-    MyMemoryStorage
-)(MemoryStorageExample);
 
 // also add this MemoryStorage instance to the window
 // to demonstrate usage outside of React

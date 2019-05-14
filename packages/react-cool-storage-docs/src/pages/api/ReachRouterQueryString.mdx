@@ -46,7 +46,48 @@ ReachRouterQueryString requires three resources:
 ReachRouterQueryString requires these props to be passed to it:
 - A Reach Router `location` object as a prop
 
-## Example
+## Example using hooks
+
+<Code language="jsx">{`
+
+import React from 'react';
+import {useState} from 'react';
+import ReactCoolStorageHook from 'react-cool-storage';
+import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
+import {navigate} from 'gatsby';
+
+const useReactCoolStorage = ReactCoolStorageHook(
+    ReachRouterQueryString({
+        navigate,
+        method: "replace"
+    })
+);
+
+export default (props) => {
+    let query = useReactCoolStorage(props);
+
+    return <div>
+        <label>query string "foo"</label>
+        <input
+            value={query.value.foo || ""}
+            onChange={(event) => query.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>query string "bar"</label>
+        <input
+            value={query.value.bar || ""}
+            onChange={(event) => query.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+
+`}</Code>
+
+## Example using hocs
 
 <Code language="jsx">
 {`

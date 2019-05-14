@@ -25,7 +25,8 @@ WebStorage({
     reconstruct?: (data: any) => any,
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
-    memoize?: boolean = true
+    memoize?: boolean = true,
+    initialValue?: Object|() => Object
 })
 `}</Code>
 
@@ -36,6 +37,7 @@ WebStorage({
 - `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
 - `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
 - `memoize` - When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time ReactCoolStorage's web storage data changes, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
+- `initialValue` - If provided a object, or a function that returns an object, `initialValue` will set the value when the storage mechanism is instanciated.
 
 ## Resources
 WebStorage requires `window.localStorage` or `window.sessionStorage` to be available, depending on the `method` you choose.
@@ -52,7 +54,55 @@ WebStorage doesn't require any props, so you can also access and change WebStora
 `MyWebStorage` has been added to the window. Try running `MyWebStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
 
 
-## Example
+## Example using hooks
+
+<Code language="jsx">{`
+
+import React from 'react';
+import ReactCoolStorageHoc from 'react-cool-storage/ReactCoolStorageHoc';
+import WebStorage from 'react-cool-storage/WebStorage';
+
+const useReactCoolStorage = ReactCoolStorageHook(
+    WebStorage({
+        key: 'exampleStorage'
+    })
+);
+
+export default (props) => {
+    let webStorage = useReactCoolStorage(props);
+
+    return <div>
+        <label>localStorage data stored under a key of "exampleStorage.foo"</label>
+        <input
+            value={webStorage.value.foo || ""}
+            onChange={(event) => webStorage.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>localStorage data stored under a key of "exampleStorage.bar"</label>
+        <input
+            value={webStorage.value.bar || ""}
+            onChange={(event) => webStorage.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+// also add a WebStorage instance to the window
+// to demonstrate usage outside of React
+
+if(typeof window !== "undefined") {
+    window.MyWebStorage = WebStorage({
+        key: 'exampleStorage'
+    });
+}
+
+
+
+`}</Code>
+
+## Example using hocs
 
 <Code language="jsx">{`
 import React from 'react';

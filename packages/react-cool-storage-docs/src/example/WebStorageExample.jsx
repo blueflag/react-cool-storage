@@ -1,10 +1,17 @@
 // @flow
 import React from 'react';
-import ReactCoolStorageHoc from 'react-cool-storage';
+import ReactCoolStorageHook from 'react-cool-storage';
 import WebStorage from 'react-cool-storage/WebStorage';
 
-const WebStorageExample = (props) => {
-    let {webStorage} = props;
+const useReactCoolStorage = ReactCoolStorageHook(
+    WebStorage({
+        key: 'exampleStorage'
+    })
+);
+
+export default (props) => {
+    let webStorage = useReactCoolStorage(props);
+
     return <div>
         <label>localStorage data stored under a key of "exampleStorage.foo"</label>
         <input
@@ -22,13 +29,6 @@ const WebStorageExample = (props) => {
         />
     </div>;
 };
-
-export default ReactCoolStorageHoc(
-    'webStorage',
-    WebStorage({
-        key: 'exampleStorage'
-    })
-)(WebStorageExample);
 
 // also add a WebStorage instance to the window
 // to demonstrate usage outside of React

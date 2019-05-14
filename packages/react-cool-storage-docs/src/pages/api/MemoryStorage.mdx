@@ -16,10 +16,12 @@ It is **controlled**, meaning that it will update immediately whenever the data 
 <Code language="jsx">{`
 import MemoryStorage from 'react-cool-storage/MemoryStorage';
 
-MemoryStorage()
+MemoryStorage({
+    initialValue?: Object|() => Object
+})
 `}</Code>
 
-MemoryStorage has no config.
+- `initialValue` - If provided a object, or a function that returns an object, `initialValue` will set the value when the storage mechanism is instanciated.
 
 ## Resources
 
@@ -35,7 +37,47 @@ MemoryStorage doesn't require any props, so you can also access and change a Mem
 
 A `MyMemoryStorage` instance has been added to the window. Try running `MyMemoryStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
 
-## Example
+## Example using hooks
+
+<Code language="jsx">{`
+
+import React from 'react';
+import ReactCoolStorageHook from 'react-cool-storage';
+import MemoryStorage from 'react-cool-storage/MemoryStorage';
+
+const MyMemoryStorage = MemoryStorage();
+const useReactCoolStorage = ReactCoolStorageHook(MyMemoryStorage);
+
+export default (props) => {
+    let memoryStorage = useReactCoolStorage(props);
+
+    return <div>
+        <label>Data stored under a key of "foo"</label>
+        <input
+            value={memoryStorage.value.foo || ""}
+            onChange={(event) => memoryStorage.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>Data stored under a key of "bar"</label>
+        <input
+            value={memoryStorage.value.bar || ""}
+            onChange={(event) => memoryStorage.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+// also add this MemoryStorage instance to the window
+// to demonstrate usage outside of React
+
+if(typeof window !== "undefined") {
+    window.MyMemoryStorage = MyMemoryStorage;
+}
+`}</Code>
+
+## Example using hocs
 
 <Code language="jsx">{`
 import React from 'react';
