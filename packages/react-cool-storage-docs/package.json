@@ -20,9 +20,9 @@
     "node-sass": "^4.9.4",
     "prismjs": "^1.11.0",
     "react": "16.8.3",
-    "react-dom": "16.8.3",
-    "react-cool-storage": "^2.1.0",
+    "react-cool-storage": "file:.yalc/react-cool-storage",
     "react-dataparcels": "^0.18.2",
+    "react-dom": "16.8.3",
     "react-helmet": "^5.2.0",
     "react-markdown": "^4.0.6",
     "react-spruce": "^0.1.0",
@@ -34,7 +34,8 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
-    "watch": "gatsby develop"
+    "watch": "gatsby develop",
+    "yalc-update": "../../node_modules/.bin/yalc update"
   },
   "repository": {
     "type": "git",
