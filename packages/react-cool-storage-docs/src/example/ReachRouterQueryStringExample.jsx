@@ -1,6 +1,5 @@
 // @flow
 import React from 'react';
-import {useState} from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
 import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
 import {navigate} from 'gatsby';

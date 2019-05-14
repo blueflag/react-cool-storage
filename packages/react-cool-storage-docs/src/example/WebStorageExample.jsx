@@ -33,8 +33,8 @@ export default (props) => {
 // also add a WebStorage instance to the window
 // to demonstrate usage outside of React
 
-if(typeof window !== "undefined") {
-    window.MyWebStorage = WebStorage({
-        key: 'exampleStorage'
-    });
-}
+// if(typeof window !== "undefined") {
+//     window.MyWebStorage = WebStorage({
+//         key: 'exampleStorage'
+//     });
+// }

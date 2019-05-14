@@ -7172,14 +7172,6 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-cool-storage@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/react-cool-storage/-/react-cool-storage-0.1.1.tgz#412b2ebbb0a9d791ec60cb60246856b4f1a1cd4d"
-  dependencies:
-    babel-runtime "6.23.0"
-    storage-available "^1.1.0"
-    unmutable "^0.39.0"
-
 react-dataparcels@^0.18.2:
   version "0.18.2"
   resolved "https://registry.yarnpkg.com/react-dataparcels/-/react-dataparcels-0.18.2.tgz#690b2efdb6989bf4ce076c4c073f8baf3d7092cd"
@@ -7211,7 +7203,7 @@ react-dev-utils@^4.2.1:
     strip-ansi "3.0.1"
     text-table "0.2.0"
 
-react-dom@^16.5.1:
+react-dom@16.8.3:
   version "16.8.3"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.3.tgz#ae236029e66210783ac81999d3015dfc475b9c32"
   dependencies:
@@ -7306,7 +7298,7 @@ react-spruce@^0.1.0:
   dependencies:
     classnames "^2.2.6"
 
-react@^16.5.1:
+react@16.8.3:
   version "16.8.3"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.3.tgz#c6f988a2ce895375de216edcfaedd6b9a76451d9"
   dependencies:
@@ -7795,8 +7787,8 @@ sax@^1.2.4, sax@~1.2.4:
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
 scheduler@^0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.3.tgz#bed3c5850f62ea9c716a4d781f9daeb9b2a58896"
+  version "0.13.6"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -8295,10 +8287,6 @@ stdout-stream@^1.4.0:
   resolved "https://registry.yarnpkg.com/stdout-stream/-/stdout-stream-1.4.1.tgz#5ac174cdd5cd726104aa0c0b2bd83815d8d535de"
   dependencies:
     readable-stream "^2.0.1"
-
-storage-available@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/storage-available/-/storage-available-1.1.0.tgz#0988c893d3a35ff637b986045688a3f334371ba8"
 
 stream-browserify@^2.0.1:
   version "2.0.2"
@@ -8909,14 +8897,6 @@ unmutable@^0.29.2:
 unmutable@^0.34.1:
   version "0.34.1"
   resolved "https://registry.yarnpkg.com/unmutable/-/unmutable-0.34.1.tgz#e417973cf11540756565fb15027402275401b311"
-  dependencies:
-    fast-deep-equal "^1.0.0"
-    is-plain-object "^2.0.4"
-    lodash.range "^3.2.0"
-
-unmutable@^0.39.0:
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/unmutable/-/unmutable-0.39.0.tgz#8ccdfb237ba4c572cba793cbbbd7d503227ad576"
   dependencies:
     fast-deep-equal "^1.0.0"
     is-plain-object "^2.0.4"

@@ -1,16 +1,9 @@
 // @flow
-import type {ComponentType} from 'react';
 import type {Node} from 'react';
 import type StorageMechanism from './StorageMechanism';
 
 import React from 'react';
 import ReactCoolStorageHook from './ReactCoolStorageHook';
-
-type Props = {};
-
-type ChildProps = {
-    // [name]: ReactCoolStorageMessage
-};
 
 export default (name: string, ...storageMechanisms: StorageMechanism[]): Function => {
 
@@ -20,7 +13,7 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
 
     const useReactCoolStorage = ReactCoolStorageHook(...storageMechanisms);
 
-    return (Component: ComponentType<ChildProps>) => (props: Props): Node => {
+    return (Component) => (props): Node => {
 
         let coolStorageMessage = useReactCoolStorage(props);
 

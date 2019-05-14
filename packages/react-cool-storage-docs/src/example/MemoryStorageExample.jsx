@@ -30,6 +30,6 @@ export default (props) => {
 // also add this MemoryStorage instance to the window
 // to demonstrate usage outside of React
 
-if(typeof window !== "undefined") {
-    window.MyMemoryStorage = MyMemoryStorage;
-}
+// if(typeof window !== "undefined") {
+//     window.MyMemoryStorage = MyMemoryStorage;
+// }
