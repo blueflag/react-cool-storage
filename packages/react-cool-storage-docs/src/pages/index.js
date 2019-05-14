@@ -1,28 +1,30 @@
 // @flow
 import React from 'react';
-import {Box, CenteredLanding, Grid, GridItem, Link as HtmlLink, NavigationList, NavigationListItem, Text, Typography, Wrapper} from 'dcme-style';
+import {Fragment} from 'react';
+import {Box} from 'dcme-style';
+import {CenteredLanding} from 'dcme-style';
+import {Grid} from 'dcme-style';
+import {GridItem} from 'dcme-style';
+import {Link as HtmlLink} from 'dcme-style';
+import {NavigationList} from 'dcme-style';
+import {NavigationListItem} from 'dcme-style';
+import {Text} from 'dcme-style';
+import {Typography} from 'dcme-style';
+import {Wrapper} from 'dcme-style';
+
 import Link from '../component/Link';
 import PageLayout from '../component/PageLayout';
 import Layout from '../layout/Layout';
 import IndexMarkdown from './indexMdx.mdx';
 
+import DocsHeader from 'dcme-gatsby/lib/layout/DocsHeader';
+
 export default () => <Layout>
-    <Box modifier="invertedCopy invertedBackground">
-        <Wrapper>
-            <CenteredLanding
-                modifier="heightHalf"
-                top={() => <Text element="h1" modifier="sizeTera superDuper margin">react-cool-storage</Text>}
-                bottom={() => <Grid>
-                    <GridItem modifier="8 padding">
-                        <Text element="p" modifier="monospace margin">React hooks and hocs with a common API for storing state outside of React. Query string, local storage etc. 😎</Text>
-                        <Text element="p" modifier="monospace"><HtmlLink href="https://github.com/blueflag/react-cool-storage">github</HtmlLink> | <HtmlLink href="https://www.npmjs.com/package/react-cool-storage">npm</HtmlLink> | <Link to="#API">api documentation</Link></Text>
-                    </GridItem>
-                    <GridItem modifier="4 padding">
-                    </GridItem>
-                </Grid>}
-            />
-        </Wrapper>
-    </Box>
+    <DocsHeader
+        title={() => <Text element="h1" modifier="sizeTera superDuper margin">react-cool-storage</Text>}
+        description={() => "React hooks and hocs with a common API for storing state outside of React. Query string, local storage etc. 😎"}
+        links={() => <Text><HtmlLink href="https://github.com/blueflag/react-cool-storage">github</HtmlLink> | <HtmlLink href="https://www.npmjs.com/package/react-cool-storage">npm</HtmlLink> | <Link to="/api">api documentation</Link></Text>}
+    />
     <Box modifier="paddingTopKilo">
         <Wrapper modifier="marginBottom">
             <PageLayout

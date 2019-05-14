@@ -3,69 +3,33 @@
 @include BruceBoxSizing;
 @import '~dcme-style/lib/all';
 
-$primary: #ff0048;
+$primary: #4ea3f6;
 
 @include DcmeConfig;
 @include DcmeBase;
-@include DcmeBox {
-    &-example {
-        margin-left: -2rem;
-        margin-right: -2rem;
-    }
-    &-exampleInner {
-        border: 2px dashed grey(90);
-        padding: 2rem;
-    }
-}
+@include DcmeBox;
 @include DcmeBulletList;
 @include DcmeButton;
 @include DcmeCenteredLanding;
 @include DcmeDivider;
 @include DcmeGrid;
-@include DcmeImage {
-    &-logo {
-        @include BruceBreakpoint('small') {
-            margin-top: -50%;
-        }
-    }
-    &-apiPageIcon {
-        display: none !important;
-        float: right;
-        width: 30%;
-        margin-top: -2rem;
-        margin-bottom: 0;
-        margin-left: 1rem;
-
-        @include BruceBreakpoint('large') {
-            display: block !important;
-        }
-    }
-    &-icon {
-        max-height: 12rem;
-
-        @include BruceBreakpoint('small') {
-            max-height: auto;
-        }
-    }
-}
+@include DcmeImage;
 @include DcmeInput;
 @include DcmeLink;
 @include DcmeLabel;
 @include DcmeMessage {
     background-color: #fef7f7;
 }
-@include DcmeNavigationList {
-    padding-top: 0;
-}
+@include DcmeNavigationList;
 @include DcmeOrderedList;
 @include DcmeTable;
 @include DcmeTerminal;
 @include DcmeText {
     &-superDuper {
-        text-shadow: -3px 3px 0px #c90055, -6px 6px 0px #59002f;
+        text-shadow: -3px 3px 0px #146c95, -6px 6px 0px #1e397a;
 
         @include BruceBreakpoint('medium') {
-            text-shadow: -4px 4px 0px #c90055, -8px 8px 0px #59002f;
+            text-shadow: -4px 4px 0px #146c95, -8px 8px 0px #1e397a;
         }
     }
 
@@ -73,10 +37,10 @@ $primary: #ff0048;
         color: #000;
         line-height: 4rem;
         padding-left: .5rem;
-        text-shadow: -3px 3px 0px #fb828f, -6px 6px 0px #e0ccd6;
+        text-shadow: -3px 3px 0px #146c95, -6px 6px 0px #1e397a;
 
         @include BruceBreakpoint('medium') {
-            text-shadow: -4px 4px 0px #fb828f, -8px 8px 0px #e0ccd6;
+            text-shadow: -4px 4px 0px #146c95, -8px 8px 0px #1e397a;
         }
     }
 
@@ -93,5 +57,3 @@ $primary: #ff0048;
 }
 @include DcmeTypography;
 @include DcmeWrapper;
-
-// #d75252

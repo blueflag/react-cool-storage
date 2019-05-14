@@ -11,6 +11,6 @@ React hooks and hocs with a common API for storing data outside of React. Query 
 
 ## Packages
 
-```sh
+```bash
 yarn add react-cool-storage 😎
 ```
