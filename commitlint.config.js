@@ -13,7 +13,7 @@ module.exports = {
             'always',
             [
                 'fix',
-                'add',
+                'feat',
                 'break',
                 'amend',
                 'refactor',

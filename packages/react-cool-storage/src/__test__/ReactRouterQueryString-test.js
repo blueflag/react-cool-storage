@@ -1,578 +1,390 @@
 // @flow
-import React from 'react';
-
-import ReactCoolStorageHoc from '../ReactCoolStorageHoc';
+import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReactRouterQueryString from '../ReactRouterQueryString';
-import ReactCoolStorageMessage from '../ReactCoolStorageMessage';
+import InvalidValueMarker from '../InvalidValueMarker';
 
-let shallowRenderHoc = (props, hock) => {
-    let Component = hock((props) => <div />);
-    return shallow(<Component {...props}/>);
+import {act} from 'react-hooks-testing-library';
+import {renderHook} from 'react-hooks-testing-library';
+//import {renderHoc} from './react-hoc-testing-library';
+
+let history = {
+    push: () => {},
+    replace: () => {}
 };
 
-//
-// Config errors
-//
+describe('ReactRouterQueryString config tests', () => {
 
-test('ReactRouterQueryString must throw error if passed an invalid method', () => {
-    // $FlowFixMe - intentional misuse of types
-    expect(() => ReactCoolStorageHoc("query", ReactRouterQueryString({
-        method: "foo"
-    }))).toThrow(`ReactRouterQueryString expects param "config.method" to be either "push" or "replace"`);
-});
-
-//
-// Resource errors
-//
-
-test('ReactRouterQueryString must pass available: false if not passed a history prop', () => {
-    let childProps = shallowRenderHoc(
-        {
-            location: {
-                search: "?abc=123&def=456"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
-    expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
-    expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
-    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
-});
-
-test('ReactRouterQueryString must pass available: false if not passed a location prop', () => {
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
-    expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
-    expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
-    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
-});
-
-test('ReactRouterQueryString must pass available: false if URLSearchParams is not available', () => {
-    let temp = window.URLSearchParams;
-    window.URLSearchParams = undefined;
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    window.URLSearchParams = temp;
-
-    expect(childProps.query.value).toBe(ReactCoolStorageMessage.unavailable.value);
-    expect(childProps.query.valid).toBe(ReactCoolStorageMessage.unavailable.valid);
-    expect(childProps.query.available).toBe(ReactCoolStorageMessage.unavailable.available);
-    expect(childProps.query.availabilityError).toBe(`ReactRouterQueryString requires URLSearchParams to be defined`);
-});
-
-//
-// Transparency
-//
-
-test('ReactRouterQueryString should pass through props', () => {
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            },
-            location: {
-                search: "?abc=123&def=456"
-            },
-            xyz: 789
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    expect(childProps.xyz).toBe(789);
-});
-
-//
-// Child props
-//
-
-test('ReactRouterQueryString should accept react router props and pass down its own correct child props (using JSON stringify)', () => {
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            },
-            location: {
-                search: "?abc=123&def=%22456%22&ghi=false"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    expect(childProps.query.value).toEqual({
-        abc: 123,
-        def: "456",
-        ghi: false
-    });
-    expect(childProps.query.available).toBe(true);
-    expect(childProps.query.valid).toBe(true);
-});
-
-test('ReactRouterQueryString should notify of invalid data', () => {
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            },
-            location: {
-                search: "?abc=123&def=1827L@H#HR*&@))($*$$$"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    expect(childProps.query.value).toEqual({});
-    expect(childProps.query.available).toBe(true);
-    expect(childProps.query.valid).toBe(false);
-});
-
-test('ReactRouterQueryString should pass its value through config.reconstruct', () => {
-    let date = new Date(0);
-
-    let reconstruct = jest.fn(({date, ...rest}) => ({
-        date: new Date(date),
-        ...rest
-    }));
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            },
-            location: {
-                search: "?date=%221970-01-01T00:00:00.000Z%22"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
-            reconstruct
-        }))
-    ).props();
-
-    expect(reconstruct.mock.calls[0][0]).toEqual({
-        date: "1970-01-01T00:00:00.000Z"
+    test('ReactRouterQueryString must throw error if passed an invalid method', () => {
+        // $FlowFixMe - intentional misuse of types
+        expect(() => ReactRouterQueryString({
+            method: "foo"
+        })).toThrow(`ReactRouterQueryString expects param "config.method" to be either "push" or "replace"`);
     });
 
-    expect(childProps.query.value.date.getTime()).toBe(date.getTime());
 });
 
-test('ReactRouterQueryString should pass value through config.parse', () => {
-    let parse = (str: string) => JSON.parse(str.replace("abc", "ABC"));
+describe('ReactRouterQueryString storage mechanism tests', () => {
 
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push: () => {},
-                replace: () => {}
-            },
-            location: {
-                search: "?abc=123&def=456"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
-            parse
-        }))
-    ).props();
+    test('ReactRouterQueryString cannot be accessed outside of React', () => {
+        const MyReactRouterQueryString = ReactRouterQueryString();
 
-    expect(childProps.query.available).toBe(true);
-    expect(childProps.query.valid).toBe(true);
+        expect(() => MyReactRouterQueryString.value).toThrow(`ReactRouterQueryString requires props and cannot be used outside of React`);
+        expect(() => MyReactRouterQueryString.onChange({})).toThrow(`ReactRouterQueryString requires props and cannot be used outside of React`);
 
-    expect(childProps.query.value).toEqual({
-        ABC: 123,
-        def: 456
     });
+
+    test('ReactRouterQueryString must pass available: false if not passed a location prop', () => {
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({}));
+
+        expect(result.current.available).toBe(false);
+        expect(result.current.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
+        expect(result.current.valid).toBe(false);
+        expect(result.current.value).toEqual({});
+    });
+
+    test('ReactRouterQueryString must pass available: false if not passed a history prop', () => {
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({}));
+
+        expect(result.current.available).toBe(false);
+        expect(result.current.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
+        expect(result.current.valid).toBe(false);
+        expect(result.current.value).toEqual({});
+    });
+
+    test('ReactRouterQueryString must pass available: false if URLSearchParams is not available', () => {
+
+        let temp = window.URLSearchParams;
+        window.URLSearchParams = undefined;
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({}));
+
+        window.URLSearchParams = temp;
+
+        expect(result.current.available).toBe(false);
+        expect(result.current.availabilityError).toBe(`ReactRouterQueryString requires URLSearchParams to be defined`);
+        expect(result.current.valid).toBe(false);
+        expect(result.current.value).toEqual({});
+    });
+
 });
 
-//
-// Changes
-//
+describe('ReactRouterQueryString storage mechanism tests', () => {
 
-test('ReactRouterQueryString should push by default', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
+    test('ReactRouterQueryString should read query string', () => {
 
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
-            },
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({
             location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    childProps.query.onChange({abc: 456});
-
-    expect(push).toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?abc=456");
-});
-
-test('ReactRouterQueryString should replace', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
+                pathname: "/abc",
+                search: "?abc=123&def=456"
             },
+            history
+        }));
+
+        expect(result.current.available).toBe(true);
+        expect(result.current.availabilityError).toBe(undefined);
+        expect(result.current.valid).toBe(true);
+        expect(result.current.value).toEqual({abc: 123, def: 456});
+    });
+
+    test('ReactRouterQueryString should write query string', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({
             location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
-            name: "query",
+                pathname: "/abc",
+                search: "?abc=100"
+            },
+            history
+        }));
+
+        act(() => {
+            result.current.onChange({abc: 200});
+        });
+
+        expect(history.push).toHaveBeenCalled();
+        expect(history.replace).not.toHaveBeenCalled();
+        expect(history.push.mock.calls[0][0]).toBe("?abc=200");
+    });
+
+    test('ReactRouterQueryString should write query string with replace: true', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
             method: "replace"
-        }))
-    ).props();
+        }));
 
-    childProps.query.onChange({abc: 456});
-
-    expect(replace).toHaveBeenCalled();
-    expect(push).not.toHaveBeenCalled();
-    expect(replace.mock.calls[0][0]).toBe("?abc=456");
-});
-
-test('ReactRouterQueryString should merge its keys', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
-            },
+        const {result} = renderHook(() => useReactCoolStorage({
             location: {
-                search: "?abc=123&def=789"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    childProps.query.onChange({abc: 456});
-
-    expect(push).toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?abc=456&def=789");
-});
-
-test('ReactRouterQueryString should merge its keys, deleting those which have been changed to undefined', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
+                pathname: "/abc",
+                search: "?abc=100"
             },
-            location: {
-                search: "?abc=123&def=789"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
+            history
+        }));
 
-    childProps.query.onChange({abc: undefined});
+        act(() => {
+            result.current.onChange({abc: 200});
+        });
 
-    expect(push).toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?def=789");
-});
-
-
-test('ReactRouterQueryString should error when called with non-keyed data types', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
-            },
-            location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    ).props();
-
-    let ERROR_MESSAGE = "ReactRouterQueryString onChange must be passed an object";
-
-    expect(() => {
-        childProps.query.onChange();
-    }).toThrow(ERROR_MESSAGE);
-
-    expect(() => {
-        childProps.query.onChange(123);
-    }).toThrow(ERROR_MESSAGE);
-
-    expect(() => {
-        childProps.query.onChange("abc");
-    }).toThrow(ERROR_MESSAGE);
-
-    expect(() => {
-        childProps.query.onChange([]);
-    }).toThrow(ERROR_MESSAGE);
-
-    expect(() => {
-        childProps.query.onChange(null);
-    }).toThrow(ERROR_MESSAGE);
-});
-
-test('ReactRouterQueryString should pass its changed value through config.deconstruct', () => {
-    let date = new Date(0);
-
-    let push = jest.fn();
-    let replace = jest.fn();
-    let deconstruct = jest.fn(({date, ...rest}) => ({
-        date: date.toJSON(),
-        ...rest
-    }));
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
-            },
-            location: {
-                search: ""
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
-            name: "query",
-            deconstruct
-        }))
-    ).props();
-
-    childProps.query.onChange({date});
-
-    expect(deconstruct.mock.calls[0][0]).toEqual({date});
-    expect(push).toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?date=%221970-01-01T00%3A00%3A00.000Z%22");
-});
-
-test('ReactRouterQueryString should pass each changed value through config.stringify', () => {
-    let push = jest.fn();
-    let replace = jest.fn();
-    let stringify = (data) => "A" + JSON.stringify(data);
-
-    let childProps = shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
-            },
-            location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
-            name: "query",
-            stringify
-        }))
-    ).props();
-
-    childProps.query.onChange({abc: 456, def: 789});
-
-    expect(push).toHaveBeenCalled();
-    expect(replace).not.toHaveBeenCalled();
-    expect(push.mock.calls[0][0]).toBe("?abc=A456&def=A789");
-});
-
-//
-// Memoization
-//
-
-let pushOnChange = (wrapper, push, prop, newValue) => {
-    wrapper.props()[prop].onChange(newValue);
-    wrapper.setProps({
-        history: {
-            push
-        },
-        location: {
-            search: push.mock.calls[push.mock.calls.length - 1][0]
-        }
+        expect(history.push).not.toHaveBeenCalled();
+        expect(history.replace).toHaveBeenCalled();
+        expect(history.replace.mock.calls[0][0]).toBe("?abc=200");
     });
-    wrapper.update();
-};
 
-test('ReactRouterQueryString should memoize properly', () => {
-    let push = jest.fn();
+    test('ReactRouterQueryString value should delete keys set to undefined', () => {
 
-    let wrapper = shallowRenderHoc(
-        {
-            history: {
-                push
-            },
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({
             location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    );
+                pathname: "/abc",
+                search: "?abc=100&def=200"
+            },
+            history
+        }));
 
-    let firstValue = wrapper.props().query.value;
+        act(() => {
+            result.current.onChange({abc: undefined});
+        });
 
-    pushOnChange(wrapper, push, "query", {abc: 123});
+        expect(history.push.mock.calls[0][0]).toBe("?def=200");
+    });
 
-    let secondValue = wrapper.props().query.value;
+    test('ReactRouterQueryString should notify of invalid data', () => {
 
-    expect(firstValue).toEqual(secondValue);
-    expect(firstValue).toBe(secondValue);
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useReactCoolStorage({
+            location: {
+                pathname: "/abc",
+                search: "?oBYN@87923828unm,.././df"
+            },
+            history
+        }));
 
-    pushOnChange(wrapper, push, "query", {abc: 123});
+        expect(result.current.available).toBe(true);
+        expect(result.current.availabilityError).toBe(undefined);
+        expect(result.current.valid).toBe(false);
+        expect(result.current.value).toBe(InvalidValueMarker);
+    });
 
-    let thirdValue = wrapper.props().query.value;
-
-    expect(secondValue).toEqual(thirdValue);
-    expect(secondValue).toBe(thirdValue);
 });
 
-test('ReactRouterQueryString should not memoize if config.memoize = false', () => {
-    let push = jest.fn();
+describe('ReactRouterQueryString data flow config tests', () => {
 
-    let wrapper = shallowRenderHoc(
-        {
-            history: {
-                push
-            },
+    test('ReactRouterQueryString should pass data through reconstruct and deconstruct', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+            reconstruct: ({date}) => ({date: new Date(date)}),
+            deconstruct: ({date}) => ({date: date.toISOString()})
+        }));
+
+        const {result} = renderHook(() => useReactCoolStorage({
             location: {
-                search: "?abc=123"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString({
+                pathname: "/abc",
+                search: `?date="1970-01-01T00:00:00.000Z"`
+            },
+            history
+        }));
+
+        expect(result.current.value.date.toISOString()).toBe("1970-01-01T00:00:00.000Z");
+
+        act(() => {
+            result.current.onChange({date: new Date('2000-01-01')});
+        });
+
+        expect(history.push.mock.calls[0][0]).toBe(`?date=%222000-01-01T00%3A00%3A00.000Z%22`);
+    });
+
+    test('ReactRouterQueryString should pass data through parse and stringify', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        let parse = jest.fn((str) => JSON.parse(str.slice(4)));
+        let stringify = jest.fn((obj) => `?foo${JSON.stringify(obj)}`);
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+            parse,
+            stringify
+        }));
+
+        const {result} = renderHook(() => useReactCoolStorage({
+            location: {
+                pathname: "/abc",
+                search: `?foo{"abc":123}`
+            },
+            history
+        }));
+
+        expect(parse.mock.calls[0][0]).toEqual(`?foo{"abc":123}`);
+        expect(result.current.value).toEqual({abc: 123});
+
+        act(() => {
+            result.current.onChange({abc: 456});
+        });
+
+        expect(history.push.mock.calls[0][0]).toBe(`?foo{"abc":456}`);
+    });
+
+});
+
+const renderHookWithProps = (initialProps, callback) => renderHook(callback, {initialProps});
+
+describe('ReactRouterQueryString memoization tests', () => {
+
+    test('ReactRouterQueryString should memoize value', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+
+        let initialProps = {
+            location: {
+                pathname: "/abc",
+                search: `?abc=100`
+            },
+            history
+        };
+
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+            location,
+            history
+        }));
+
+        const value1 = result.current.value;
+
+        act(() => {
+            result.current.onChange({abc: 100});
+            let search = history.push.mock.calls[0][0];
+
+            rerender({
+                location: {
+                    pathname: "/abc",
+                    search
+                }
+            });
+        });
+
+        const value2 = result.current.value;
+
+        expect(value1).toEqual(value2);
+        expect(value1).toBe(value2);
+    });
+
+    test('ReactRouterQueryString should not memoize value when memoize = false', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
             memoize: false
-        }))
-    );
+        }));
 
-    let firstValue = wrapper.props().query.value;
-
-    pushOnChange(wrapper, push, "query", {abc: 123});
-
-    let secondValue = wrapper.props().query.value;
-
-    expect(firstValue).toEqual(secondValue);
-    expect(firstValue).not.toBe(secondValue);
-});
-
-test('ReactRouterQueryString should memoize partially', () => {
-    let push = jest.fn();
-
-    let wrapper = shallowRenderHoc(
-        {
-            history: {
-                push
-            },
+        let initialProps = {
             location: {
-                search: "?abc=%5B123%2C456%5D&def=%5B100%2C200%5D"
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    );
-
-    let firstValue = wrapper.props().query.value;
-
-    pushOnChange(wrapper, push, "query", {abc: [123, 456], def: [100, 200]});
-
-    let secondValue = wrapper.props().query.value;
-
-    expect(firstValue.abc).toEqual(secondValue.abc);
-    expect(firstValue.abc).toBe(secondValue.abc);
-    expect(firstValue.def).toEqual(secondValue.def);
-    expect(firstValue.def).toBe(secondValue.def);
-
-    pushOnChange(wrapper, push, "query", {abc: [123, 789], def: [100, 200]});
-
-    let thirdValue = wrapper.props().query.value;
-
-    expect(secondValue.abc).not.toEqual(thirdValue.abc);
-    expect(secondValue.abc).not.toBe(thirdValue.abc);
-    expect(secondValue.def).toEqual(thirdValue.def);
-    expect(secondValue.def).toBe(thirdValue.def);
-});
-
-//
-// Data types
-//
-
-const setAndRefresh = (value: *) => {
-
-    let push = jest.fn();
-    let replace = jest.fn();
-
-    shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
+                pathname: "/abc",
+                search: `?abc=100`
             },
+            history
+        };
+
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+            location,
+            history
+        }));
+
+        const value1 = result.current.value;
+
+        act(() => {
+            result.current.onChange({abc: 100});
+            let search = history.push.mock.calls[0][0];
+
+            rerender({
+                location: {
+                    pathname: "/abc",
+                    search
+                }
+            });
+        });
+
+        const value2 = result.current.value;
+
+        expect(value1).toEqual(value2);
+    });
+
+    test('ReactRouterQueryString should memoize deep value', () => {
+
+        let history = {
+            push: jest.fn(),
+            replace: jest.fn()
+        };
+
+        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+
+        let initialProps = {
             location: {
-                search: ""
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    )
-        .props()
-        .query
-        .onChange(value);
-
-    let search = push.mock.calls[0][0];
-
-    return shallowRenderHoc(
-        {
-            history: {
-                push,
-                replace
+                pathname: "/abc",
+                search: `?abc=%5B100%2C200%5D&def=300`
             },
-            location: {
-                search
-            }
-        },
-        ReactCoolStorageHoc("query", ReactRouterQueryString())
-    )
-        .props()
-        .query
-        .value;
-};
+            history
+        };
 
-test('ReactRouterQueryString should cope with various data types', () => {
-    expect(setAndRefresh({abc: "def"})).toEqual({abc: "def"});
-    expect(setAndRefresh({abc: 123})).toEqual({abc: 123});
-    expect(setAndRefresh({abc: true})).toEqual({abc: true});
-    expect(setAndRefresh({abc: undefined})).toEqual({});
-    expect(setAndRefresh({abc: [1,2,3]})).toEqual({abc: [1,2,3]});
-    expect(setAndRefresh({abc: [1,2,null]})).toEqual({abc: [1,2,null]});
-    expect(setAndRefresh({abc: [1,2,undefined]})).toEqual({abc: [1,2,null]}); // undefined is cast to null due to json stringification
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+            location,
+            history
+        }));
+
+        const value1 = result.current.value;
+
+        act(() => {
+            result.current.onChange({abc: [400, 200]});
+            let search = history.push.mock.calls[0][0];
+
+            rerender({
+                location: {
+                    pathname: "/abc",
+                    search
+                }
+            });
+        });
+
+        const value2 = result.current.value;
+
+        expect(value1).not.toBe(value2);
+        expect(value1.def).toBe(value2.def);
+        expect(value1.abc).not.toBe(value2.abc);
+        expect(value1.abc[0]).not.toBe(value2.abc[0]);
+        expect(value1.abc[1]).toBe(value2.abc[1]);
+    });
+
 });
