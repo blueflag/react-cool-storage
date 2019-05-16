@@ -68,23 +68,27 @@ export default class StorageMechanism {
         }
 
         let value = this.valueFromProps(props);
-        if(value === InvalidValueMarker) {
-            return;
-        }
+        let valueIsInvalid = value === InvalidValueMarker;
 
-        let removedKeys = pipeWith(
-            newValue,
-            filter(_ => typeof _ === "undefined"),
-            keyArray()
-        );
+        let removedKeys = valueIsInvalid
+            ? []
+            : pipeWith(
+                newValue,
+                filter(_ => typeof _ === "undefined"),
+                keyArray()
+            );
 
-        let changedValues = omit(removedKeys)(newValue);
+        let changedValues = valueIsInvalid
+            ? newValue
+            : omit(removedKeys)(newValue);
 
-        let updatedValue = pipeWith(
-            props ? value : this.value,
-            merge(changedValues),
-            omit(removedKeys)
-        );
+        let updatedValue = valueIsInvalid
+            ? newValue
+            : pipeWith(
+                props ? value : this.value,
+                merge(changedValues),
+                omit(removedKeys)
+            );
 
         this._handleChange({
             updatedValue,

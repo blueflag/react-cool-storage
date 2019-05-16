@@ -117,26 +117,19 @@ class ReactRouterQueryString extends StorageMechanism {
         return this._defaultParse(`{${json}}`);
     }
 
-    _handleChange({updatedValue, changedValues, removedKeys, props}: any): void {
+    _handleChange({updatedValue, props}: any): void {
 
-        let raw = this._rawFromProps(props);
-        let searchParams = new window.URLSearchParams(raw);
+        let searchParams = new window.URLSearchParams();
 
         if(this._customStringify) {
             props.history[this._method](this._customStringify(updatedValue));
+            return;
         }
 
         pipeWith(
-            changedValues,
+            updatedValue,
             forEach((value, key) => {
                 searchParams.set(key, this._defaultStringify(value));
-            })
-        );
-
-        pipeWith(
-            removedKeys,
-            forEach((key) => {
-                searchParams.delete(key);
             })
         );
 
