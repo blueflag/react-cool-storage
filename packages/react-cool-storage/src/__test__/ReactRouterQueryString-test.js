@@ -35,8 +35,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
 
     test('ReactRouterQueryString must pass available: false if not passed a location prop', () => {
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({}));
 
         expect(result.current.available).toBe(false);
         expect(result.current.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
@@ -46,8 +46,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
 
     test('ReactRouterQueryString must pass available: false if not passed a history prop', () => {
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({}));
 
         expect(result.current.available).toBe(false);
         expect(result.current.availabilityError).toBe(`ReactRouterQueryString requires React Router history and location props`);
@@ -60,8 +60,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
         let temp = window.URLSearchParams;
         window.URLSearchParams = undefined;
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({}));
 
         window.URLSearchParams = temp;
 
@@ -77,8 +77,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
 
     test('ReactRouterQueryString should read query string', () => {
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: "?abc=123&def=456"
@@ -99,8 +99,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: "?abc=100"
@@ -124,11 +124,11 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString({
             method: "replace"
         }));
 
-        const {result} = renderHook(() => useReactCoolStorage({
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: "?abc=100"
@@ -152,8 +152,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: "?abc=100&def=200"
@@ -170,8 +170,8 @@ describe('ReactRouterQueryString storage mechanism tests', () => {
 
     test('ReactRouterQueryString should notify of invalid data', () => {
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
-        const {result} = renderHook(() => useReactCoolStorage({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: "?oBYN@87923828unm,.././df"
@@ -196,12 +196,12 @@ describe('ReactRouterQueryString data flow config tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString({
             reconstruct: ({date}) => ({date: new Date(date)}),
             deconstruct: ({date}) => ({date: date.toISOString()})
         }));
 
-        const {result} = renderHook(() => useReactCoolStorage({
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: `?date="1970-01-01T00:00:00.000Z"`
@@ -228,12 +228,12 @@ describe('ReactRouterQueryString data flow config tests', () => {
         let parse = jest.fn((str) => JSON.parse(str.slice(4)));
         let stringify = jest.fn((obj) => `?foo${JSON.stringify(obj)}`);
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString({
             parse,
             stringify
         }));
 
-        const {result} = renderHook(() => useReactCoolStorage({
+        const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
                 search: `?foo{"abc":123}`
@@ -264,7 +264,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
 
         let initialProps = {
             location: {
@@ -274,7 +274,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             history
         };
 
-        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useStorage({
             location,
             history
         }));
@@ -306,7 +306,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString({
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString({
             memoize: false
         }));
 
@@ -318,7 +318,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             history
         };
 
-        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useStorage({
             location,
             history
         }));
@@ -349,7 +349,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             replace: jest.fn()
         };
 
-        const useReactCoolStorage = ReactCoolStorageHook(ReactRouterQueryString());
+        const useStorage = ReactCoolStorageHook(ReactRouterQueryString());
 
         let initialProps = {
             location: {
@@ -359,7 +359,7 @@ describe('ReactRouterQueryString memoization tests', () => {
             history
         };
 
-        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useReactCoolStorage({
+        const {result, rerender} = renderHookWithProps(initialProps, ({location, history}) => useStorage({
             location,
             history
         }));

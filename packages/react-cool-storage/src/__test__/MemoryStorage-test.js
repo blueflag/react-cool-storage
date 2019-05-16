@@ -86,8 +86,8 @@ describe('MemoryStorage data flow config tests', () => {
 describe('Hook tests', () => {
 
     test('MemoryStorage hook should work', () => {
-        const useReactCoolStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(MemoryStorage());
+        const {result} = renderHook(() => useStorage({}));
         const memoryStorage = result.current;
 
         expect(memoryStorage.available).toBe(true);
@@ -98,8 +98,8 @@ describe('Hook tests', () => {
     });
 
     test('MemoryStorage hook should change', () => {
-        const useReactCoolStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(MemoryStorage());
+        const {result} = renderHook(() => useStorage({}));
 
         act(() => {
             result.current.onChange({abc: 123});
@@ -110,8 +110,8 @@ describe('Hook tests', () => {
 
     test('MemoryStorage hook should rerender based on change directly from MemoryStorage instance', () => {
         const MyMemoryStorage = MemoryStorage();
-        const useReactCoolStorage = ReactCoolStorageHook(MyMemoryStorage);
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(MyMemoryStorage);
+        const {result} = renderHook(() => useStorage({}));
 
         act(() => {
             MyMemoryStorage.onChange({abc: 123});

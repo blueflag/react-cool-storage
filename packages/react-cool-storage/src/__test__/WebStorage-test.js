@@ -260,8 +260,8 @@ describe('Hook tests', () => {
     test('WebStorage hook should work', () => {
         localStorage.setItem("localStorageKey", `{"abc":100}`);
 
-        const useReactCoolStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
+        const {result} = renderHook(() => useStorage({}));
         const memoryStorage = result.current;
 
         expect(memoryStorage.available).toBe(true);
@@ -274,8 +274,8 @@ describe('Hook tests', () => {
     test('WebStorage hook should change', () => {
         localStorage.setItem("localStorageKey", `{"abc":100}`);
 
-        const useReactCoolStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
+        const {result} = renderHook(() => useStorage({}));
 
         act(() => {
             result.current.onChange({abc: 200});
@@ -289,8 +289,8 @@ describe('Hook tests', () => {
     test('WebStorage hook should rerender based on change directly from WebStorage instance', () => {
         localStorage.setItem("localStorageKey", `{"abc":100}`);
         const MyWebStorage = WebStorage({key: "localStorageKey"});
-        const useReactCoolStorage = ReactCoolStorageHook(MyWebStorage);
-        const {result} = renderHook(() => useReactCoolStorage({}));
+        const useStorage = ReactCoolStorageHook(MyWebStorage);
+        const {result} = renderHook(() => useStorage({}));
 
         act(() => {
             MyWebStorage.onChange({abc: 200});
