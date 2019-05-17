@@ -9,7 +9,7 @@ import ReachRouterQueryStringMarkdown from './ReachRouterQueryString.mdx';
 export default ({location}) => {
     return <Layout>
         <ContentNav
-            content={() => <ReachRouterQueryStringMarkdown location={location} history={history} />}
+            content={() => <ReachRouterQueryStringMarkdown location={location} />}
             pageNav={[
                 '# ReachRouterQueryString',
                 'Config',
