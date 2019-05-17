@@ -1,24 +1,23 @@
 // @flow
 import React from 'react';
 import Layout from '../../layout/Layout';
-import PageLayout from '../../component/PageLayout';
-
-import {Box} from 'dcme-style';
-import {Typography} from 'dcme-style';
-import {Wrapper} from 'dcme-style';
+import ContentNav from '../../shape/ContentNav';
 
 import ReactCoolStorageHookMarkdown from './ReactCoolStorageHook.mdx';
 
 export default ({location}) => <Layout>
-    <Box modifier="paddingTopKilo">
-        <Wrapper modifier="marginBottom">
-            <PageLayout
-                content={() => <Box>
-                    <Typography>
-                        <ReactCoolStorageHookMarkdown location={location} />
-                    </Typography>
-                </Box>}
-            />
-        </Wrapper>
-    </Box>
+    <ContentNav
+        content={() => <ReactCoolStorageHookMarkdown location={location} />}
+        pageNav={[
+            '# ReactCoolStorageHook',
+            'Example usage',
+            'Arguments',
+            'Returns',
+            '# useStorage hook',
+            'Arguments',
+            'Returns',
+            '# ReactCoolStorageMessage',
+            'ReactCoolStorageMessage'
+        ]}
+    />
 </Layout>;

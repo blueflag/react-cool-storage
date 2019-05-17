@@ -1,12 +1,8 @@
 // @flow
 import React from 'react';
-import Layout from '../../layout/Layout';
-import PageLayout from '../../component/PageLayout';
 import {navigate} from 'gatsby';
-
-import {Box} from 'dcme-style';
-import {Typography} from 'dcme-style';
-import {Wrapper} from 'dcme-style';
+import Layout from '../../layout/Layout';
+import ContentNav from '../../shape/ContentNav';
 
 import ReactRouterQueryStringMarkdown from './ReactRouterQueryString.mdx';
 
@@ -17,16 +13,15 @@ export default ({location}) => {
     };
 
     return <Layout>
-        <Box modifier="paddingTopKilo">
-            <Wrapper modifier="marginBottom">
-                <PageLayout
-                    content={() => <Box>
-                        <Typography>
-                            <ReactRouterQueryStringMarkdown location={location} history={history} />
-                        </Typography>
-                    </Box>}
-                />
-            </Wrapper>
-        </Box>
+        <ContentNav
+            content={() => <ReactRouterQueryStringMarkdown location={location} history={history} />}
+            pageNav={[
+                '# ReactRouterQueryString',
+                'Config',
+                'Resources',
+                'Props',
+                'Example using hooks'
+            ]}
+        />
     </Layout>;
 };

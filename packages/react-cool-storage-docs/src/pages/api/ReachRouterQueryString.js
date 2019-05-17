@@ -1,24 +1,22 @@
 // @flow
 import React from 'react';
+import {navigate} from 'gatsby';
 import Layout from '../../layout/Layout';
-import PageLayout from '../../component/PageLayout';
-
-import {Box} from 'dcme-style';
-import {Typography} from 'dcme-style';
-import {Wrapper} from 'dcme-style';
+import ContentNav from '../../shape/ContentNav';
 
 import ReachRouterQueryStringMarkdown from './ReachRouterQueryString.mdx';
 
-export default ({location}) => <Layout>
-    <Box modifier="paddingTopKilo">
-        <Wrapper modifier="marginBottom">
-            <PageLayout
-                content={() => <Box>
-                    <Typography>
-                        <ReachRouterQueryStringMarkdown location={location} />
-                    </Typography>
-                </Box>}
-            />
-        </Wrapper>
-    </Box>
-</Layout>;
+export default ({location}) => {
+    return <Layout>
+        <ContentNav
+            content={() => <ReachRouterQueryStringMarkdown location={location} history={history} />}
+            pageNav={[
+                '# ReachRouterQueryString',
+                'Config',
+                'Resources',
+                'Props',
+                'Example using hooks'
+            ]}
+        />
+    </Layout>;
+};

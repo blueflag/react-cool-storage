@@ -2440,13 +2440,14 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
-dcme-gatsby@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/dcme-gatsby/-/dcme-gatsby-0.0.1.tgz#8e0a06d7d071a7371c2c766ea2b201cf38acf8f4"
+dcme-gatsby@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/dcme-gatsby/-/dcme-gatsby-0.2.0.tgz#c75067a3f150533d523fc9580004c76c6a665299"
+  integrity sha512-+p09ld5SIwBfcbCXQ4NG+zHQUuemXo6pC5gFdv+5lAmSLBEe6dxhvdDE6twLdvgktduBI4CEOrQXkBvBx04OTA==
   dependencies:
     "@babel/runtime" "^7.1.5"
     bruce "^4.0.0"
-    dcme-style "^0.25.1"
+    dcme-style "^0.26.1"
     gatsby "^2.0.19"
     gatsby-image "^2.0.15"
     gatsby-plugin-offline "^2.0.5"
@@ -2465,10 +2466,29 @@ dcme-gatsby@^0.0.1:
     react-spruce "^0.1.1"
     unmutable "^0.43.1"
 
-dcme-style@^0.25.1:
-  version "0.25.1"
-  resolved "https://registry.yarnpkg.com/dcme-style/-/dcme-style-0.25.1.tgz#12730c2a6527ca7570f0573cbf8c5bb7c400e183"
+dcme-style@^0.26.1:
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/dcme-style/-/dcme-style-0.26.1.tgz#6ec210d0f15e9d38185908e8516a09d5f34e0385"
+  integrity sha512-39ZSBBwzUX8//vXdLZCF0reWtylmOqr9OHvj9ES4wfKo3lQ5EomAz7Pn0OXbc61frpxEdPlVrj5tNMS95XPW/g==
   dependencies:
+    prismjs "1.15.0"
+    react "^16.8.6"
+    react-dom "^16.8.6"
+    react-goose "^0.6.1"
+    react-sane-contenteditable "^1.5.0"
+    react-select "^1.0.0-rc.4"
+    react-spruce "^0.1.0"
+    stampy "^0.43.3"
+    unmutable "^0.29.2"
+
+dcme-style@^0.27.0:
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/dcme-style/-/dcme-style-0.27.0.tgz#eadff4133702c7cdfb7ceddd299df9f1d09eabee"
+  integrity sha512-XsnS3wHIHy2aAyizcRg1lv4YexP/Pff5yDYqjzcJapheLuBzWtPaKpVr9/8WP4iGb4GF/oVTUdhwidqnOySqeQ==
+  dependencies:
+    prismjs "1.15.0"
+    react "^16.8.6"
+    react-dom "^16.8.6"
     react-goose "^0.6.1"
     react-sane-contenteditable "^1.5.0"
     react-select "^1.0.0-rc.4"
@@ -6667,7 +6687,7 @@ pretty-error@^2.1.1:
     renderkid "^2.0.1"
     utila "~0.4"
 
-prismjs@^1.6.0:
+prismjs@1.15.0, prismjs@^1.6.0:
   version "1.15.0"
   resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.15.0.tgz#8801d332e472091ba8def94976c8877ad60398d9"
   optionalDependencies:
@@ -6847,7 +6867,7 @@ react-cool-storage@^0.1.1:
     unmutable "^0.39.0"
 
 "react-cool-storage@file:.yalc/react-cool-storage":
-  version "2.1.0-677aa87e"
+  version "2.1.0-f3412c13"
   dependencies:
     "@babel/runtime" "^7.1.5"
     deep-memo "^0.1.2"

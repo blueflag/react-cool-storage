@@ -4,10 +4,10 @@ import ReactCoolStorageHook from 'react-cool-storage';
 import MemoryStorage from 'react-cool-storage/MemoryStorage';
 
 const MyMemoryStorage = MemoryStorage();
-const useReactCoolStorage = ReactCoolStorageHook(MyMemoryStorage);
+const useStorage = ReactCoolStorageHook(MyMemoryStorage);
 
 export default (props) => {
-    let memoryStorage = useReactCoolStorage(props);
+    let memoryStorage = useStorage(props);
 
     return <div>
         <label>Data stored under a key of "foo"</label>
@@ -30,6 +30,6 @@ export default (props) => {
 // also add this MemoryStorage instance to the window
 // to demonstrate usage outside of React
 
-// if(typeof window !== "undefined") {
-//     window.MyMemoryStorage = MyMemoryStorage;
-// }
+if(typeof window !== "undefined") {
+    window.MyMemoryStorage = MyMemoryStorage;
+}

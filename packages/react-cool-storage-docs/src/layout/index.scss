@@ -3,14 +3,22 @@
 @include BruceBoxSizing;
 @import '~dcme-style/lib/all';
 
+$bruce-zindex: (
+    'Select',
+    'Dropdown',
+    'Overlay'
+);
+
 $primary: #4ea3f6;
 
 @include DcmeConfig;
 @include DcmeBase;
 @include DcmeBox;
+@include DcmeBreak;
 @include DcmeBulletList;
 @include DcmeButton;
 @include DcmeCenteredLanding;
+@include DcmeContentNav;
 @include DcmeDivider;
 @include DcmeGrid;
 @include DcmeImage;
@@ -37,10 +45,10 @@ $primary: #4ea3f6;
         color: #000;
         line-height: 4rem;
         padding-left: .5rem;
-        text-shadow: -3px 3px 0px #146c95, -6px 6px 0px #1e397a;
+        text-shadow: -3px 3px 0px #6eb5e3, -6px 6px 0px #bcd3ec;
 
         @include BruceBreakpoint('medium') {
-            text-shadow: -4px 4px 0px #146c95, -8px 8px 0px #1e397a;
+            text-shadow: -4px 4px 0px #6eb5e3, -8px 8px 0px #bcd3ec;
         }
     }
 
@@ -51,7 +59,7 @@ $primary: #4ea3f6;
             font-size: 2.5rem;
         }
         @include BruceBreakpoint('medium') {
-            font-size: 3.2rem;
+            font-size: 4rem;
         }
     }
 }

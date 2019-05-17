@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import {Box, CenteredLanding, Text} from 'dcme-style';
-import Link from '../component/Link';
+import {Link} from 'dcme-gatsby';
 
 export default () => <Box>
     <CenteredLanding

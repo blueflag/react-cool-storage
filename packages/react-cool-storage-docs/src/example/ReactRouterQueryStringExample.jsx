@@ -3,14 +3,14 @@ import React from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
 import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
 
-const useReactCoolStorage = ReactCoolStorageHook(
+const useStorage = ReactCoolStorageHook(
     ReactRouterQueryString({
         method: "replace"
     })
 );
 
 export default (props) => {
-    let query = useReactCoolStorage(props);
+    let query = useStorage(props);
 
     return <div>
         <label>query string "foo"</label>

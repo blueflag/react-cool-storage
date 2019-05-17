@@ -5,7 +5,8 @@
   "version": "2.1.0",
   "author": "Damien Clarke",
   "dependencies": {
-    "dcme-gatsby": "^0.0.1",
+    "dcme-gatsby": "^0.2.0",
+    "dcme-style": "^0.27.0",
     "gatsby": "^2.0.19",
     "react-cool-storage": "file:.yalc/react-cool-storage"
   },

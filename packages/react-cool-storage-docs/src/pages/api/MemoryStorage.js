@@ -1,24 +1,21 @@
 // @flow
 import React from 'react';
+import {navigate} from 'gatsby';
 import Layout from '../../layout/Layout';
-import PageLayout from '../../component/PageLayout';
-
-import {Box} from 'dcme-style';
-import {Typography} from 'dcme-style';
-import {Wrapper} from 'dcme-style';
+import ContentNav from '../../shape/ContentNav';
 
 import MemoryStorageMarkdown from './MemoryStorage.mdx';
 
 export default () => <Layout>
-    <Box modifier="paddingTopKilo">
-        <Wrapper modifier="marginBottom">
-            <PageLayout
-                content={() => <Box>
-                    <Typography>
-                        <MemoryStorageMarkdown />
-                    </Typography>
-                </Box>}
-            />
-        </Wrapper>
-    </Box>
+    <ContentNav
+        content={() => <MemoryStorageMarkdown />}
+        pageNav={[
+            '# MemoryStorage',
+            'Config',
+            'Resources',
+            'Props',
+            'Outside React',
+            'Example using hooks'
+        ]}
+    />
 </Layout>;

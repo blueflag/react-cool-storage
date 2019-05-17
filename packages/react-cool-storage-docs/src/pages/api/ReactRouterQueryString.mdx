@@ -1,4 +1,4 @@
-import Code from '../../component/Code';
+import {Param} from 'dcme-style';
 import ReactRouterQueryStringExample from '../../example/ReactRouterQueryStringExample';
 prop location
 prop history
@@ -13,9 +13,13 @@ It can only store data that is **serializable** and stored as a string, such as 
 
 It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
 
-<Code language="jsx">{`
+```flow
 import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+```
 
+## Config
+
+```
 ReactRouterQueryString({
     // optional
     method?: string = "push",
@@ -24,14 +28,26 @@ ReactRouterQueryString({
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     memoize?: boolean = true
-})`}</Code>
+})
+```
 
-- `method` - The `history` method to use. Can be "push" or "replace". Defaults to "push".
-- `deconstruct` - Used to convert data into a serializable format. It is called before ReactRouterQueryString stringifies data when a change occurs. Defaults to a passthrough function.
-- `reconstruct` - Used to convert data from a serializable format into richer data types. It is called after ReactRouterQueryString has parsed its data. It is given the parsed object. Defaults to a passthrough function.- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
-- `parse` - A function that is called on the value of each key / value pair to turn it from a string into a data shape. Defaults to `JSON.parse()`.
-- `stringify` - A function that is called on the value of each key / value pair to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
-- `memoize` - When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
+* <Param name="method" type="string" default="push" optional />
+  The `history` method to use. Can be "push" or "replace". Defaults to "push".
+
+* <Param name="deconstruct" type="(data: any) => any" optional />
+  Can be used to convert data into a serializable format. It is called before ReactRouterQueryString stringifies data when a change occurs.
+
+* <Param name="reconstruct" type="(data: any) => any" optional />
+  Can be used to convert data from a serializable format into richer data types. It is called after ReactRouterQueryString has parsed its data. It is given the parsed object.
+
+* <Param name="parse" type="(data: string) => any" optional default="JSON.parse()" />
+  A function that is called on the value to turn it from a string into a data shape. Defaults to `JSON.parse()`.
+
+* <Param name="stringify" type="(data: any) => string" optional default="JSON.parse()" />
+  A function that is called on the value to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
+
+* <Param name="memoize" type="(data: any) => string" optional default="JSON.parse()" />
+  When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
 
 ## Resources
 
@@ -48,20 +64,19 @@ ReactRouterQueryString requires these props to be passed to it:
 
 ## Example using hooks
 
-<Code language="jsx">{`
-
+```jsx
 import React from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
 import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
 
-const useReactCoolStorage = ReactCoolStorageHook(
+const useStorage = ReactCoolStorageHook(
     ReactRouterQueryString({
         method: "replace"
     })
 );
 
 export default (props) => {
-    let query = useReactCoolStorage(props);
+    let query = useStorage(props);
 
     return <div>
         <label>query string "foo"</label>
@@ -80,42 +95,4 @@ export default (props) => {
         />
     </div>;
 };
-
-
-`}</Code>
-
-## Example using hocs
-
-<Code language="jsx">{`
-import React from 'react';
-import ReactCoolStorageHoc from 'react-cool-storage';
-import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
-
-const ReactRouterQueryStringExample = (props) => {
-    let {query} = props;
-    return <div>
-        <label>query string "foo"</label>
-        <input
-            value={query.value.foo || ""}
-            onChange={(event) => query.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>query string "bar"</label>
-        <input
-            value={query.value.bar || ""}
-            onChange={(event) => query.onChange({
-                bar: event.currentTarget.value
-            })}
-        />
-    </div>;
-};
-
-export default ReactCoolStorageHoc(
-    'query',
-    ReactRouterQueryString({
-        method: "replace"
-    })
-)(ReactRouterQueryStringExample);
-
-`}</Code>
+```

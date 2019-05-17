@@ -3,14 +3,14 @@ import React from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
 import WebStorage from 'react-cool-storage/WebStorage';
 
-const useReactCoolStorage = ReactCoolStorageHook(
+const useStorage = ReactCoolStorageHook(
     WebStorage({
         key: 'exampleStorage'
     })
 );
 
 export default (props) => {
-    let webStorage = useReactCoolStorage(props);
+    let webStorage = useStorage(props);
 
     return <div>
         <label>localStorage data stored under a key of "exampleStorage.foo"</label>
@@ -33,8 +33,8 @@ export default (props) => {
 // also add a WebStorage instance to the window
 // to demonstrate usage outside of React
 
-// if(typeof window !== "undefined") {
-//     window.MyWebStorage = WebStorage({
-//         key: 'exampleStorage'
-//     });
-// }
+if(typeof window !== "undefined") {
+    window.MyWebStorage = WebStorage({
+        key: 'exampleStorage'
+    });
+}

@@ -1,8 +1,17 @@
-import Link from '../component/Link';
+import {Link} from 'dcme-gatsby';
+import {Code} from 'dcme-style';
+import {Divider} from 'dcme-style';
+import ReactCoolStorageHookSource from '../example/ReactCoolStorageHookSource.txt';
 
 ## What is it?
 
 React Cool Storage is a collection of React hooks and higher order components that give you a consistent API for interacting with data stored outside of React.
+
+- All storage mechanisms can contain deeply nested data, and all JSON-compatible types will be retained.
+- React Cool Storage allows fallback storage mechanisms to be defined, so your apps can still operate if resources such as `localStorage` are not available.
+- All storage mechanisms that don't require props can be accessed and changed outside of React, and all hooks and hocs will update and remain in sync.
+
+<Divider />
 
 ## Getting Started
 
@@ -12,9 +21,15 @@ Do this:
 yarn add react-cool-storage 😎
 ```
 
-## API
+Then you can write something like this:
 
-### React bindings
+<Code language="jsx">{ReactCoolStorageHookSource}</Code>
+
+<Divider />
+
+## API Summary
+
+### React Bindings
 
 - Using a hook: <Link to="/api/ReactCoolStorageHook">ReactCoolStorageHook</Link>
 - Using a hoc: <Link to="/api/ReactCoolStorageHoc">ReactCoolStorageHoc</Link>
@@ -25,3 +40,17 @@ yarn add react-cool-storage 😎
 - <Link to="/api/ReactRouterQueryString">ReactRouterQueryString</Link>
 - <Link to="/api/WebStorage">WebStorage</Link>
 - <Link to="/api/MemoryStorage">MemoryStorage</Link>
+
+<Divider />
+
+## Development
+
+Dataparcels is written and maintained by [Damien Clarke](https://damienclarke.me/), with feedback from [Allan Hortle](https://github.com/allanhortle) and others at [Blueflag](https://blueflag.com.au/about-us/).
+All online library discussion happens over on [Github](https://github.com/blueflag/react-cool-storage).
+
+#### Ideas for the future
+
+- IndexedDB
+- Cookies
+- Google Sheets API
+- Any more?

@@ -1,4 +1,11 @@
-import Code from '../../component/Code';
+import {Break} from 'dcme-style';
+import {Code} from 'dcme-style';
+import {Divider} from 'dcme-style';
+import {Text} from 'dcme-style';
+import {DocsType} from 'dcme-style';
+import {Param} from 'dcme-style';
+import ReactCoolStorageHookSource from '../../example/ReactCoolStorageHookSource.txt';
+import ReactCoolStorageMessageDescription from './ReactCoolStorageMessageDescription.mdx';
 
 # ReactCoolStorageHook
 
@@ -6,72 +13,52 @@ ReactCoolStorageHook is a React hook that accepts a number of storage mechanisms
 
 This is also available [as a hoc](/api/ReactCoolStorageHoc).
 
-If more than one storage mechanism is provided, the first available one is used. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the hook will return a `ReactCoolStorageMessage` describing the error about why it's not available.
-
-<Code language="jsx">{`
+```flow
 import ReactCoolStorageHook from 'react-cool-storage';
+```
 
-let useReactCoolStorage = ReactCoolStorageHook(
+### Example usage
+
+<Code language="jsx">{ReactCoolStorageHookSource}</Code>
+
+<Break />
+
+### Arguments
+
+```flow
+const useStorage = ReactCoolStorageHook(
     ...storageMechanisms: StorageMechanism[]
 );
-`}</Code>
+```
 
-## Example usage
+* <Param name="...storageMechanisms" type="StorageMechanism[]" />
+  One or more storage mechanisms. If more than one storage mechanism is provided, the first available one is used on component mount. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the hook will return a `ReactCoolStorageMessage` describing the error about why it's not available.
 
-<Code language="jsx">{`
+### Returns
 
-import React from 'react';
-import ReactCoolStorageHook from 'react-cool-storage';
-import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+* <Param name="useStorage" type="Function / React hook" />
+  The returned `useStorage` hook can be used in one or more components [like any other React hook](https://reactjs.org/docs/hooks-intro.html).
 
-const useReactCoolStorage = ReactCoolStorageHook(
-    ReactRouterQueryString({
-        method: "replace"
-    })
-);
+<Divider />
 
-export default (props) => {
-    let query = useReactCoolStorage(props);
+## useStorage hook
 
-    return <div>
-        <label>query string "foo"</label>
-        <input
-            value={query.value.foo || ""}
-            onChange={(event) => query.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>query string "bar"</label>
-        <input
-            value={query.value.bar || ""}
-            onChange={(event) => query.onChange({
-                bar: event.currentTarget.value
-            })}
-        />
-    </div>;
-};
+### Arguments
 
+```flow
+let message = useStorage(props);
+```
 
-`}</Code>
+* <Param name="props" type="Object / React props" />
+  All `useStorage` hooks expect to be passed all props. These may or may not be used depending on the available storage mechanisms.
 
-## Returns
+### Returns
 
-ReactCoolStorageHook returns a `ReactCoolStorageMessage`.
+* <Param name="ReactCoolStorageMessage" type="ReactCoolStorageMessage" />
+  The `useStorage` hook returns a `ReactCoolStorageMessage`, which is used to get and set the value in storage.
 
-<Code language="jsx">{`
-ReactCoolStorageMessage {
-    value: any;
-    onChange: (newValue: any) => void,
-    available: boolean;
-    availabilityError: ?string;
-    storageType: string;
-    valid: boolean;
-}
-`}</Code>
+<Divider />
 
-- `value` - The current value. Defaults to an object with keys and values.
-- `onChange` - A callback to change the value. Defaults to requiring an object with keys and values. Values are merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
-- `available` - Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `onChange` has no effect.
-- `availableError` - If no storage mechanisms are available, this contains the error message describing why.
-- `storageType` - The name of the current storage mechanism.
-- `valid` - Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
+## ReactCoolStorageMessage
+
+<ReactCoolStorageMessageDescription />
