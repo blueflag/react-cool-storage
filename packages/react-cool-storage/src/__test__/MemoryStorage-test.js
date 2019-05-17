@@ -120,6 +120,20 @@ describe('Hook tests', () => {
         expect(result.current.value).toEqual({abc: 123});
     });
 
+    test('MemoryStorage hook should unmount and remove sync listeners', () => {
+        const MyMemoryStorage = MemoryStorage();
+        const useStorage = ReactCoolStorageHook(MyMemoryStorage);
+        const {unmount} = renderHook(() => useStorage({}));
+
+        expect(MyMemoryStorage._synchronizer.syncListeners.length).toBe(1);
+
+        act(() => {
+            unmount();
+        });
+
+        expect(MyMemoryStorage._synchronizer.syncListeners.length).toBe(0);
+    });
+
 });
 
 describe('Hoc tests', () => {

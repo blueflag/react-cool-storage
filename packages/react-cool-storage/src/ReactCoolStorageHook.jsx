@@ -100,7 +100,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             return new ReactCoolStorageMessage({
                 ...ReactCoolStorageMessage.unavailable,
                 availabilityError,
-                onChange: () => {}
+                onChange:  /* istanbul ignore next */ () => {}
             });
         }
 
