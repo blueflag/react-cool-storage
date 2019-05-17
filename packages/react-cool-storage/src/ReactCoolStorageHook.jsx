@@ -146,7 +146,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
         // remove sync listener when unmount happens
         useEffect(() => () => {
             storageMechanism._removeSyncListener(ref);
-        });
+        }, []);
 
         const onChange = (newValue: any) => {
             let updatedValue = storageMechanism._onChangeWithOptions(
