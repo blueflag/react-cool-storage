@@ -18,8 +18,8 @@
     "MemoryStorage.js",
     "ReactCoolStorageHoc.js",
     "ReactCoolStorageMessage.js",
-    "ReachRouterQueryString.js",
-    "ReactRouterQueryString.js",
+    "ReachRouterStorage.js",
+    "ReactRouterStorage.js",
     "WebStorage.js"
   ],
   "private": false,

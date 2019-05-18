@@ -1,12 +1,14 @@
 // @flow
-import forEach from 'unmutable/forEach';
-import pipeWith from 'unmutable/pipeWith';
+import reduce from 'unmutable/reduce';
+import remove from 'unmutable/remove';
 import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
 
 type Config = {
+    navigate: Function,
     method?: "push"|"replace",
+    pathname?: boolean,
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
@@ -15,20 +17,19 @@ type Config = {
 };
 
 type Props = {
-    history: {
-        push: Function,
-        replace: Function
-    },
     location: {
+        pathname: string,
         search: string
     }
 };
 
-class ReactRouterQueryString extends StorageMechanism {
+class ReachRouterStorage extends StorageMechanism {
 
-    constructor(config: Config = {}) {
+    constructor(config: Config) {
         let {
+            navigate,
             method = "push",
+            pathname = false,
             parse,
             stringify,
             deconstruct,
@@ -36,7 +37,11 @@ class ReactRouterQueryString extends StorageMechanism {
             memoize = true
         } = config;
 
-        const type = 'ReactRouterQueryString';
+        const type = 'ReachRouterStorage';
+
+        if(typeof navigate !== "function") {
+            throw new Error(`${type} expects param "config.navigate" to be a Reach Router navigate function`);
+        }
 
         if(method !== "push" && method !== "replace") {
             throw new Error(`${type} expects param "config.method" to be either "push" or "replace"`);
@@ -50,7 +55,9 @@ class ReactRouterQueryString extends StorageMechanism {
             updateFromProps: true
         });
 
+        this._navigate = navigate;
         this._method = method;
+        this._pathname = pathname;
         this._defaultParse = (str) => {
             try {
                 return JSON.parse(str);
@@ -65,6 +72,7 @@ class ReactRouterQueryString extends StorageMechanism {
         if(memoize) {
             this._defaultParse = deepMemo(this._defaultParse);
         }
+
     }
 
     //
@@ -73,6 +81,7 @@ class ReactRouterQueryString extends StorageMechanism {
 
     _navigate: Function;
     _method: "push"|"replace";
+    _pathname: boolean;
     _defaultParse: (data: string) => any;
     _defaultStringify: (data: any) => string;
     _customParse: ?(data: string) => any;
@@ -87,55 +96,72 @@ class ReactRouterQueryString extends StorageMechanism {
             return `${this._type} requires URLSearchParams to be defined`;
         }
 
-        if(!props.history || !props.location) {
-            return `${this._type} requires React Router history and location props`;
+        if(!props.location) {
+            return `${this._type} requires a Reach Router location prop`;
         }
     }
 
     _rawFromProps(props: Props): any {
-        return props.location.search;
+        return props.location.search.slice(1); // remove question mark
     }
 
     _valueFromProps(props: Props): any {
         let raw = this._rawFromProps(props);
+        let value;
 
         if(this._customParse) {
-            return this._customParse(raw);
+            value = this._customParse(raw);
+
+        } else {
+            let searchParams = new window.URLSearchParams(raw);
+
+            let params = [];
+            for (let searchParam of searchParams) {
+                params.push(searchParam);
+            }
+
+            let json = params
+                .map(([key, value]) => `"${key}": ${value}`)
+                .join(",");
+
+            value = this._defaultParse(`{${json}}`);
         }
 
-        let searchParams = new window.URLSearchParams(raw);
-
-        let params = [];
-        for (let searchParam of searchParams) {
-            params.push(searchParam);
-        }
-
-        let json = params
-            .map(([key, value]) => `"${key}": ${value}`)
-            .join(",");
-
-        return this._defaultParse(`{${json}}`);
+        return this._pathname
+            ? {
+                ...value,
+                pathname: props.location.pathname
+            }
+            : value;
     }
 
     _handleChange({updatedValue, props}: any): void {
 
-        let searchParams = new window.URLSearchParams();
+        let {pathname} = props.location;
 
-        if(this._customStringify) {
-            props.history[this._method](this._customStringify(updatedValue));
-            return;
+        if(this._pathname) {
+            pathname = updatedValue.pathname;
+            updatedValue = remove('pathname')(updatedValue);
         }
 
-        pipeWith(
-            updatedValue,
-            forEach((value, key) => {
-                searchParams.set(key, this._defaultStringify(value));
-            })
-        );
+        let queryString = this._customStringify
+            ? this._customStringify(updatedValue)
+            : reduce(
+                (searchParams, value, key) => {
+                    searchParams.set(key, this._defaultStringify(value));
+                    return searchParams;
+                },
+                new window.URLSearchParams()
+            )(updatedValue);
 
-        props.history[this._method]("?" + searchParams.toString());
+        this._navigate(
+            `${pathname}?` + queryString,
+            {
+                replace: this._method === "replace"
+            }
+        );
     }
 }
 
-export default (config: ?Config): StorageMechanism => new ReactRouterQueryString(config || {});
+export default (config: Config): StorageMechanism => new ReachRouterStorage(config || {});
 
