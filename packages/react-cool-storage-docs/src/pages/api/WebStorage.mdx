@@ -41,10 +41,10 @@ WebStorage({
   The Web Storage method to use. Can be "localStorage" or "sessionStorage". Defaults to "localStorage".
 
 * <Param name="deconstruct" type="(data: any) => any" optional />
-  Can be used to convert data into a serializable format. It is called before ReactRouterQueryString stringifies data when a change occurs.
+  Can be used to convert data into a serializable format. It is called before ReactRouterStorage stringifies data when a change occurs.
 
 * <Param name="reconstruct" type="(data: any) => any" optional />
-  Can be used to convert data from a serializable format into richer data types. It is called after ReactRouterQueryString has parsed its data. It is given the parsed object.
+  Can be used to convert data from a serializable format into richer data types. It is called after ReactRouterStorage has parsed its data. It is given the parsed object.
 
 * <Param name="parse" type="(data: string) => any" optional default="JSON.parse()" />
   A function that is called on the value to turn it from a string into a data shape. Defaults to `JSON.parse()`.

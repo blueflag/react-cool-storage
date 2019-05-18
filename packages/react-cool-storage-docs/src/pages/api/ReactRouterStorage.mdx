@@ -1,28 +1,29 @@
 import {Param} from 'dcme-style';
-import ReactRouterQueryStringExample from '../../example/ReactRouterQueryStringExample';
+import ReactRouterStorageExample from '../../example/ReactRouterStorageExample';
 prop location
 prop history
 
-# ReactRouterQueryString
+# ReactRouterStorage
 
-<ReactRouterQueryStringExample location={location} history={history} />
+<ReactRouterStorageExample location={location} history={history} />
 
-ReactRouterQueryString gives you an easy to use binding for working with React Router v4's query string.
+ReactRouterStorage gives you an easy to use binding for working with React Router v4. By default it stores your data in the query string, but can be configured to also get and set `pathname`.
 
 It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
 
 It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
 
 ```flow
-import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
 ```
 
 ## Config
 
 ```
-ReactRouterQueryString({
+ReactRouterStorage({
     // optional
     method?: string = "push",
+    pathname?: boolean = false,
     deconstruct?: (data: any) => any,
     reconstruct?: (data: any) => any,
     parse?: (data: string) => any,
@@ -31,14 +32,17 @@ ReactRouterQueryString({
 })
 ```
 
-* <Param name="method" type="string" default="push" optional />
-  The `history` method to use. Can be "push" or "replace". Defaults to "push".
+* <Param name="method" type="string" default={`"push"`} optional />
+  The `history` method to use. Can be "push" or "replace". Defaults to `"push"`.
+
+* <Param name="pathname" type="boolean" default="false" optional />
+  When set to `true`, the React Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `onChange({pathname: "???"})`. Defaults to `false`.
 
 * <Param name="deconstruct" type="(data: any) => any" optional />
-  Can be used to convert data into a serializable format. It is called before ReactRouterQueryString stringifies data when a change occurs.
+  Can be used to convert data into a serializable format. It is called before ReactRouterStorage stringifies data when a change occurs.
 
 * <Param name="reconstruct" type="(data: any) => any" optional />
-  Can be used to convert data from a serializable format into richer data types. It is called after ReactRouterQueryString has parsed its data. It is given the parsed object.
+  Can be used to convert data from a serializable format into richer data types. It is called after ReactRouterStorage has parsed its data. It is given the parsed object.
 
 * <Param name="parse" type="(data: string) => any" optional default="JSON.parse()" />
   A function that is called on the value to turn it from a string into a data shape. Defaults to `JSON.parse()`.
@@ -51,14 +55,14 @@ ReactRouterQueryString({
 
 ## Resources
 
-ReactRouterQueryString requires three resources:
+ReactRouterStorage requires three resources:
 - `window.URLSearchParams` must exist. Polyfills are available if you need to support older browsers.
 - A React Router v4 `history` object as a prop
 - A React Router v4 `location` object as a prop
 
 ## Props
 
-ReactRouterQueryString requires these props to be passed to it:
+ReactRouterStorage requires these props to be passed to it:
 - A React Router v4 `history` object as a prop
 - A React Router v4 `location` object as a prop
 
@@ -67,10 +71,10 @@ ReactRouterQueryString requires these props to be passed to it:
 ```jsx
 import React from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
-import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
 
 const useStorage = ReactCoolStorageHook(
-    ReactRouterQueryString({
+    ReactRouterStorage({
         method: "replace"
     })
 );

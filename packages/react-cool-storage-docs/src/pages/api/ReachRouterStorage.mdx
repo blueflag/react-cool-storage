@@ -1,27 +1,28 @@
 import {Param} from 'dcme-style';
-import ReachRouterQueryStringExample from '../../example/ReachRouterQueryStringExample';
+import ReachRouterStorageExample from '../../example/ReachRouterStorageExample';
 prop location
 
-# ReachRouterQueryString
+# ReachRouterStorage
 
-<ReachRouterQueryStringExample location={location} />
+<ReachRouterStorageExample location={location} />
 
-ReachRouterQueryString gives you an easy to use binding for working with Reach Router's query string.
+ReachRouterStorage gives you an easy to use binding for working with Reach Router. By default it stores your data in the query string, but can be configured to also get and set `pathname`.
 
 It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
 
 It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
 
 ```flow
-import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
+import ReachRouterStorage from 'react-cool-storage/ReachRouterStorage';
 ```
 
 ## Config
 
 ```flow
-ReachRouterQueryString({
+ReachRouterStorage({
     // optional
     method?: string = "push",
+    pathname?: boolean = false,
     deconstruct?: (data: any) => any,
     reconstruct?: (data: any) => any,
     parse?: (data: string) => any,
@@ -30,14 +31,17 @@ ReachRouterQueryString({
 })
 ```
 
-* <Param name="method" type="string" default="push" optional />
-  The `history` method to use. Can be "push" or "replace". Defaults to "push".
+* <Param name="method" type="string" default={`"push"`} optional />
+  The `history` method to use. Can be "push" or "replace". Defaults to `"push"`.
+
+* <Param name="pathname" type="boolean" default="false" optional />
+  When set to `true`, the Reach Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `onChange({pathname: "???"})`. Defaults to `false`.
 
 * <Param name="deconstruct" type="(data: any) => any" optional />
-  Can be used to convert data into a serializable format. It is called before ReachRouterQueryString stringifies data when a change occurs.
+  Can be used to convert data into a serializable format. It is called before ReachRouterStorage stringifies data when a change occurs.
 
 * <Param name="reconstruct" type="(data: any) => any" optional />
-  Can be used to convert data from a serializable format into richer data types. It is called after ReachRouterQueryString has parsed its data. It is given the parsed object.
+  Can be used to convert data from a serializable format into richer data types. It is called after ReachRouterStorage has parsed its data. It is given the parsed object.
 
 * <Param name="parse" type="(data: string) => any" optional default="JSON.parse()" />
   A function that is called on the value to turn it from a string into a data shape. Defaults to `JSON.parse()`.
@@ -50,14 +54,14 @@ ReachRouterQueryString({
 
 ## Resources
 
-ReachRouterQueryString requires three resources:
+ReachRouterStorage requires three resources:
 - `window.URLSearchParams` must exist. Polyfills are available if you need to support older browsers.
 - A Reach Router `navigation` function to be passed into config
 - A Reach Router `location` object as a prop
 
 ## Props
 
-ReachRouterQueryString requires these props to be passed to it:
+ReachRouterStorage requires these props to be passed to it:
 - A Reach Router `location` object as a prop
 
 ## Example using hooks
@@ -66,11 +70,11 @@ ReachRouterQueryString requires these props to be passed to it:
 import React from 'react';
 import {useState} from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
-import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
+import ReachRouterStorage from 'react-cool-storage/ReachRouterStorage';
 import {navigate} from 'gatsby';
 
 const useStorage = ReactCoolStorageHook(
-    ReachRouterQueryString({
+    ReachRouterStorage({
         navigate,
         method: "replace"
     })

@@ -4,14 +4,19 @@ import {navigate} from 'gatsby';
 import Layout from '../../layout/Layout';
 import ContentNav from '../../shape/ContentNav';
 
-import ReachRouterQueryStringMarkdown from './ReachRouterQueryString.mdx';
+import ReactRouterStorageMarkdown from './ReactRouterStorage.mdx';
 
 export default ({location}) => {
+    let history = {
+        push: (to) => navigate(`${location.pathname}${to}`),
+        replace: (to) => navigate(`${location.pathname}${to}`, {replace: true})
+    };
+
     return <Layout>
         <ContentNav
-            content={() => <ReachRouterQueryStringMarkdown location={location} />}
+            content={() => <ReactRouterStorageMarkdown location={location} history={history} />}
             pageNav={[
-                '# ReachRouterQueryString',
+                '# ReactRouterStorage',
                 'Config',
                 'Resources',
                 'Props',

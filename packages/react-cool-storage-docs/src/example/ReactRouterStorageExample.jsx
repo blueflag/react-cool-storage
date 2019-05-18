@@ -1,12 +1,10 @@
 // @flow
 import React from 'react';
 import ReactCoolStorageHook from 'react-cool-storage';
-import ReachRouterQueryString from 'react-cool-storage/ReachRouterQueryString';
-import {navigate} from 'gatsby';
+import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
 
 const useStorage = ReactCoolStorageHook(
-    ReachRouterQueryString({
-        navigate,
+    ReactRouterStorage({
         method: "replace"
     })
 );
