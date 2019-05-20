@@ -1,40 +1,50 @@
-import Code from '../../component/Code';
+import {Break} from 'dcme-style';
+import {Code} from 'dcme-style';
+import {Divider} from 'dcme-style';
+import {Text} from 'dcme-style';
+import {DocsType} from 'dcme-style';
+import {Param} from 'dcme-style';
+import ReactCoolStorageHocSource from '../../example/ReactCoolStorageHocSource.txt';
+import ReactCoolStorageMessageDescription from './ReactCoolStorageMessageDescription.mdx';
 
 # ReactCoolStorageHoc
 
 ReactCoolStorageHoc is a React higher order component that accepts a name and a number of storage mechanisms, providing access to storage mechanisms via props.
 
-If more than one storage mechanism is provided, the first available one is used. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the `name` child prop will contain a `ReactCoolStorageMessage` describing the error about why it's not available.
+This is also available [as a hook](/api/ReactCoolStorageHook).
 
-It passes down a prop with a name of the `name` provided in the first argument, which holds a ReactCoolStorageMessage containing the value and a function to change the value.
-
-<Code language="jsx">{`
+```flow
 import ReactCoolStorageHoc from 'react-cool-storage/ReactCoolStorageHoc';
+```
 
+### Example usage
+
+<Code language="jsx">{ReactCoolStorageHocSource}</Code>
+
+<Break />
+
+### Arguments
+
+```flow
 ReactCoolStorageHoc(
     name: string,
     ...storageMechanisms: StorageMechanism[]
 );
-`}</Code>
+```
 
-## Child Props
+* <Param name="name" type="string" />
+  The name of the prop that ReactCoolStorageHoc will provide.
 
-ReactCoolStorageHoc passes down a prop of `name` containing a `ReactCoolStorageMessage`.
+* <Param name="...storageMechanisms" type="StorageMechanism[]" />
+  One or more storage mechanisms. If more than one storage mechanism is provided, the first available one is used on component mount. This allows you to set fallback storage mechanisms. If none are available, the last one will be used, and the hook will return a `ReactCoolStorageMessage` describing the error about why it's not available.
 
-<Code language="jsx">{`
-ReactCoolStorageMessage {
-    value: any;
-    onChange: (newValue: any) => void,
-    available: boolean;
-    availabilityError: ?string;
-    storageType: string;
-    valid: boolean;
-}
-`}</Code>
+### Returns
 
-- `value` - The current value. Defaults to an object with keys and values.
-- `onChange` - A callback to change the value. Defaults to requiring an object with keys and values. Values are merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
-- `available` - Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `onChange` has no effect.
-- `availableError` - If no storage mechanisms are available, this contains the error message describing why.
-- `storageType` - The name of the current storage mechanism.
-- `valid` - Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
+* <Param name="withStorage" type="(Component: ComponentType) => ComponentType" />
+  Returns a function ready to accept a component. ReactCoolStorageHoc passes down a prop of `name` containing a `ReactCoolStorageMessage` to the component.
+
+<Divider />
+
+## ReactCoolStorageMessage
+
+<ReactCoolStorageMessageDescription />

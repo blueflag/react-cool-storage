@@ -1,6 +1,6 @@
 // @flow
-import forEach from 'unmutable/forEach';
-import pipeWith from 'unmutable/pipeWith';
+import reduce from 'unmutable/reduce';
+import remove from 'unmutable/remove';
 import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
@@ -8,6 +8,7 @@ import deepMemo from 'deep-memo';
 type Config = {
     navigate: Function,
     method?: "push"|"replace",
+    pathname?: boolean,
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
@@ -22,12 +23,13 @@ type Props = {
     }
 };
 
-class ReachRouterQueryString extends StorageMechanism {
+class ReachRouterStorage extends StorageMechanism {
 
     constructor(config: Config) {
         let {
             navigate,
             method = "push",
+            pathname = false,
             parse,
             stringify,
             deconstruct,
@@ -35,7 +37,7 @@ class ReachRouterQueryString extends StorageMechanism {
             memoize = true
         } = config;
 
-        const type = 'ReachRouterQueryString';
+        const type = 'ReachRouterStorage';
 
         if(typeof navigate !== "function") {
             throw new Error(`${type} expects param "config.navigate" to be a Reach Router navigate function`);
@@ -55,6 +57,7 @@ class ReachRouterQueryString extends StorageMechanism {
 
         this._navigate = navigate;
         this._method = method;
+        this._pathname = pathname;
         this._defaultParse = (str) => {
             try {
                 return JSON.parse(str);
@@ -78,6 +81,7 @@ class ReachRouterQueryString extends StorageMechanism {
 
     _navigate: Function;
     _method: "push"|"replace";
+    _pathname: boolean;
     _defaultParse: (data: string) => any;
     _defaultStringify: (data: any) => string;
     _customParse: ?(data: string) => any;
@@ -98,61 +102,60 @@ class ReachRouterQueryString extends StorageMechanism {
     }
 
     _rawFromProps(props: Props): any {
-        return props.location.search;
+        return props.location.search.slice(1); // remove question mark
     }
 
     _valueFromProps(props: Props): any {
         let raw = this._rawFromProps(props);
+        let value;
 
         if(this._customParse) {
-            return this._customParse(raw);
+            value = this._customParse(raw);
+
+        } else {
+            let searchParams = new window.URLSearchParams(raw);
+
+            let params = [];
+            for (let searchParam of searchParams) {
+                params.push(searchParam);
+            }
+
+            let json = params
+                .map(([key, value]) => `"${key}": ${value}`)
+                .join(",");
+
+            value = this._defaultParse(`{${json}}`);
         }
 
-        let searchParams = new window.URLSearchParams(raw);
-
-        let params = [];
-        for (let searchParam of searchParams) {
-            params.push(searchParam);
-        }
-
-        let json = params
-            .map(([key, value]) => `"${key}": ${value}`)
-            .join(",");
-
-        return this._defaultParse(`{${json}}`);
+        return this._pathname
+            ? {
+                ...value,
+                pathname: props.location.pathname
+            }
+            : value;
     }
 
-    _handleChange({updatedValue, changedValues, removedKeys, props}: any): void {
+    _handleChange({updatedValue, props}: any): void {
 
         let {pathname} = props.location;
-        let raw = this._rawFromProps(props);
-        let searchParams = new window.URLSearchParams(raw);
 
-        if(this._customStringify) {
-            this._navigate(
-                `${pathname}` + this._customStringify(updatedValue),
-                {
-                    replace: this._method === "replace"
-                }
-            );
+        if(this._pathname) {
+            pathname = updatedValue.pathname;
+            updatedValue = remove('pathname')(updatedValue);
         }
 
-        pipeWith(
-            changedValues,
-            forEach((value, key) => {
-                searchParams.set(key, this._defaultStringify(value));
-            })
-        );
-
-        pipeWith(
-            removedKeys,
-            forEach((key) => {
-                searchParams.delete(key);
-            })
-        );
+        let queryString = this._customStringify
+            ? this._customStringify(updatedValue)
+            : reduce(
+                (searchParams, value, key) => {
+                    searchParams.set(key, this._defaultStringify(value));
+                    return searchParams;
+                },
+                new window.URLSearchParams()
+            )(updatedValue);
 
         this._navigate(
-            `${pathname}?` + searchParams.toString(),
+            `${pathname}?` + queryString,
             {
                 replace: this._method === "replace"
             }
@@ -160,5 +163,5 @@ class ReachRouterQueryString extends StorageMechanism {
     }
 }
 
-export default (config: Config): StorageMechanism => new ReachRouterQueryString(config || {});
+export default (config: Config): StorageMechanism => new ReachRouterStorage(config || {});
 

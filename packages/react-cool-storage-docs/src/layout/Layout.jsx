@@ -15,7 +15,7 @@ export default ({children}: Props): Node => <div>
     <Helmet
         title="React Cool Storage"
         meta={[
-            {name: "description", content: "React hocs with a common API for storing state outside of React. Query string, local storage etc. 😎"}
+            {name: "description", content: "React hooks and hocs with a common API for storing state outside of React. Query string, local storage etc. 😎"}
         ]}
     />
     <Head />

@@ -11,11 +11,11 @@ export default (name: string, ...storageMechanisms: StorageMechanism[]): Functio
         throw new Error(`ReactCoolStorageHoc expects first param to be a string, but got ${typeof name}`);
     }
 
-    const useReactCoolStorage = ReactCoolStorageHook(...storageMechanisms);
+    const useStorage = ReactCoolStorageHook(...storageMechanisms);
 
     return (Component) => (props): Node => {
 
-        let coolStorageMessage = useReactCoolStorage(props);
+        let coolStorageMessage = useStorage(props);
 
         let childProps = {
             ...props,

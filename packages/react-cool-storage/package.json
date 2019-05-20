@@ -18,13 +18,14 @@
     "MemoryStorage.js",
     "ReactCoolStorageHoc.js",
     "ReactCoolStorageMessage.js",
-    "ReachRouterQueryString.js",
-    "ReactRouterQueryString.js",
+    "ReachRouterStorage.js",
+    "ReactRouterStorage.js",
     "WebStorage.js"
   ],
   "private": false,
   "scripts": {
-    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib --ignore '**/__test__/*.js'",
+    "yalc-publish": "../../node_modules/.bin/yalc publish --push --force",
+    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib --ignore '**/__test__/*.js' && yarn yalc-publish",
     "build-all": "yarn build",
     "flow": "blueflag-test flow",
     "flow-coverage": "blueflag-test flow-coverage",

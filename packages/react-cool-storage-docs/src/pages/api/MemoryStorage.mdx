@@ -1,4 +1,4 @@
-import Code from '../../component/Code';
+import {Param} from 'dcme-style';
 import MemoryStorageExample from '../../example/MemoryStorageExample';
 
 # MemoryStorage
@@ -11,15 +11,25 @@ Each instanciation of `MemoryStorage()` contains its own unique data store. You 
 
 There are no limitations on the kind of data it can store.
 
+Because MemoryStorage doesn't require any props, you can also access and change a MemoryStorage instance's value outside of React. All ReactCoolStorageHocs that use the MemoryStorage will update and stay in sync, so this makes MemoryStorage particularly suitable for variables that are used inside and outside of React.
+
 It is **controlled**, meaning that it will update immediately whenever the data source changes.
 
-<Code language="jsx">{`
+```flow
 import MemoryStorage from 'react-cool-storage/MemoryStorage';
+```
 
-MemoryStorage()
-`}</Code>
+## Config
 
-MemoryStorage has no config.
+```flow
+MemoryStorage({
+    // optional
+    initialValue?: Object|() => Object
+})
+```
+
+* <Param name="initialValue" type="Object|() => Object" optional />
+  If provided a object, or a function that returns an object, `initialValue` will set the value when the storage mechanism is instanciated.
 
 ## Resources
 
@@ -35,15 +45,19 @@ MemoryStorage doesn't require any props, so you can also access and change a Mem
 
 A `MyMemoryStorage` instance has been added to the window. Try running `MyMemoryStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
 
-## Example
+## Example using hooks
 
-<Code language="jsx">{`
+```jsx
 import React from 'react';
-import ReactCoolStorageHoc from 'react-cool-storage';
+import ReactCoolStorageHook from 'react-cool-storage';
 import MemoryStorage from 'react-cool-storage/MemoryStorage';
 
-const MemoryStorageExample = (props) => {
-    let {memoryStorage} = props;
+const MyMemoryStorage = MemoryStorage();
+const useStorage = ReactCoolStorageHook(MyMemoryStorage);
+
+export default (props) => {
+    let memoryStorage = useStorage(props);
+
     return <div>
         <label>Data stored under a key of "foo"</label>
         <input
@@ -62,18 +76,8 @@ const MemoryStorageExample = (props) => {
     </div>;
 };
 
-const MyMemoryStorage = MemoryStorage();
-
-export default ReactCoolStorageHoc(
-    'memoryStorage',
-    MyMemoryStorage
-)(MemoryStorageExample);
-
 // also add this MemoryStorage instance to the window
 // to demonstrate usage outside of React
 
-if(typeof window !== "undefined") {
-    window.MyMemoryStorage = MyMemoryStorage;
-}
-
-`}</Code>
+window.MyMemoryStorage = MyMemoryStorage;
+```

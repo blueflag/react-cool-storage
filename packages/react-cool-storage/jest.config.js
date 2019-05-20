@@ -12,10 +12,10 @@ module.exports = {
     setupFiles: ["jest-localstorage-mock"],
     coverageThreshold: {
         global: {
-            statements: 99,
+            statements: 100,
             branches: 97,
             functions: 94,
-            lines: 99
+            lines: 100
         }
     }
 };

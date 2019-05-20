@@ -1,12 +1,13 @@
 // @flow
-import forEach from 'unmutable/forEach';
-import pipeWith from 'unmutable/pipeWith';
+import reduce from 'unmutable/reduce';
+import remove from 'unmutable/remove';
 import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
 
 type Config = {
     method?: "push"|"replace",
+    pathname?: boolean,
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     deconstruct?: Function,
@@ -20,15 +21,17 @@ type Props = {
         replace: Function
     },
     location: {
+        pathname: string,
         search: string
     }
 };
 
-class ReactRouterQueryString extends StorageMechanism {
+class ReactRouterStorage extends StorageMechanism {
 
     constructor(config: Config = {}) {
         let {
             method = "push",
+            pathname = false,
             parse,
             stringify,
             deconstruct,
@@ -36,7 +39,7 @@ class ReactRouterQueryString extends StorageMechanism {
             memoize = true
         } = config;
 
-        const type = 'ReactRouterQueryString';
+        const type = 'ReactRouterStorage';
 
         if(method !== "push" && method !== "replace") {
             throw new Error(`${type} expects param "config.method" to be either "push" or "replace"`);
@@ -51,6 +54,7 @@ class ReactRouterQueryString extends StorageMechanism {
         });
 
         this._method = method;
+        this._pathname = pathname;
         this._defaultParse = (str) => {
             try {
                 return JSON.parse(str);
@@ -73,6 +77,7 @@ class ReactRouterQueryString extends StorageMechanism {
 
     _navigate: Function;
     _method: "push"|"replace";
+    _pathname: boolean;
     _defaultParse: (data: string) => any;
     _defaultStringify: (data: any) => string;
     _customParse: ?(data: string) => any;
@@ -93,56 +98,60 @@ class ReactRouterQueryString extends StorageMechanism {
     }
 
     _rawFromProps(props: Props): any {
-        return props.location.search;
+        return props.location.search.slice(1); // remove question mark
     }
 
     _valueFromProps(props: Props): any {
         let raw = this._rawFromProps(props);
+        let value;
 
         if(this._customParse) {
-            return this._customParse(raw);
+            value = this._customParse(raw);
+
+        } else {
+            let searchParams = new window.URLSearchParams(raw);
+
+            let params = [];
+            for (let searchParam of searchParams) {
+                params.push(searchParam);
+            }
+
+            let json = params
+                .map(([key, value]) => `"${key}": ${value}`)
+                .join(",");
+
+            value = this._defaultParse(`{${json}}`);
         }
 
-        let searchParams = new window.URLSearchParams(raw);
-
-        let params = [];
-        for (let searchParam of searchParams) {
-            params.push(searchParam);
-        }
-
-        let json = params
-            .map(([key, value]) => `"${key}": ${value}`)
-            .join(",");
-
-        return this._defaultParse(`{${json}}`);
+        return this._pathname
+            ? {
+                ...value,
+                pathname: props.location.pathname
+            }
+            : value;
     }
 
-    _handleChange({updatedValue, changedValues, removedKeys, props}: any): void {
+    _handleChange({updatedValue, props}: any): void {
 
-        let raw = this._rawFromProps(props);
-        let searchParams = new window.URLSearchParams(raw);
-
-        if(this._customStringify) {
-            props.history[this._method](this._customStringify(updatedValue));
+        let pathname = "";
+        if(this._pathname) {
+            pathname = updatedValue.pathname;
+            updatedValue = remove('pathname')(updatedValue);
         }
 
-        pipeWith(
-            changedValues,
-            forEach((value, key) => {
-                searchParams.set(key, this._defaultStringify(value));
-            })
-        );
+        let queryString = this._customStringify
+            ? this._customStringify(updatedValue)
+            : reduce(
+                (searchParams, value, key) => {
+                    searchParams.set(key, this._defaultStringify(value));
+                    return searchParams;
+                },
+                new window.URLSearchParams()
+            )(updatedValue);
 
-        pipeWith(
-            removedKeys,
-            forEach((key) => {
-                searchParams.delete(key);
-            })
-        );
-
-        props.history[this._method]("?" + searchParams.toString());
+        props.history[this._method](pathname + "?" + queryString);
     }
 }
 
-export default (config: ?Config): StorageMechanism => new ReactRouterQueryString(config || {});
+export default (config: ?Config): StorageMechanism => new ReactRouterStorage(config || {});
 
