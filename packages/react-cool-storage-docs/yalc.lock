@@ -2,7 +2,7 @@
   "version": "v1",
   "packages": {
     "react-cool-storage": {
-      "signature": "677afb8e0b2d2969cfc4558e1e7f996a",
+      "signature": "d9983ea1a7a7208f69f09e134d626325",
       "file": true,
       "replaced": "^2.1.0"
     }
