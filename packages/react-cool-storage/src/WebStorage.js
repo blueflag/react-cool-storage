@@ -13,7 +13,8 @@ type Config = {
     stringify?: (data: any) => string,
     deconstruct?: Function,
     reconstruct?: Function,
-    memoize?: boolean
+    memoize?: boolean,
+    initialValue?: any
 };
 
 const synchronizerMap: {[key: string]: Synchronizer} = {}; // create a global map of synchronizers
@@ -28,8 +29,9 @@ class WebStorage extends StorageMechanism {
             stringify = (data: any): string => JSON.stringify(data),
             deconstruct,
             reconstruct,
-            memoize = true
-        } = config;
+            memoize = true,
+            initialValue
+        } = config || {};
 
         const type = 'WebStorage';
 
@@ -68,6 +70,8 @@ class WebStorage extends StorageMechanism {
         if(memoize) {
             this._parse = deepMemo(this._parse);
         }
+
+        this._setInitialValue(initialValue);
     }
 
     //
@@ -106,10 +110,7 @@ class WebStorage extends StorageMechanism {
     }
 
     _handleChange({updatedValue, origin}: any): void {
-        let storage = typeof window !== "undefined" && window[this._method];
-        if(!storage) {
-            return;
-        }
+        let storage = window[this._method];
 
         pipeWith(
             updatedValue,

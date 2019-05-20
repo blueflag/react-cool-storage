@@ -1,0 +1,33 @@
+import React from 'react';
+import ReactCoolStorageHoc from 'react-cool-storage/ReactCoolStorageHoc';
+import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
+
+const withStorage = ReactCoolStorageHoc(
+    "query",
+    ReactRouterStorage({
+        method: "replace"
+    })
+);
+
+const MyComponent = (props) => {
+    let {query} = props;
+
+    return <div>
+        <label>query string "foo"</label>
+        <input
+            value={query.value.foo || ""}
+            onChange={(event) => query.onChange({
+                foo: event.currentTarget.value
+            })}
+        />
+        <label>query string "bar"</label>
+        <input
+            value={query.value.bar || ""}
+            onChange={(event) => query.onChange({
+                bar: event.currentTarget.value
+            })}
+        />
+    </div>;
+};
+
+export default withStorage(MyComponent);

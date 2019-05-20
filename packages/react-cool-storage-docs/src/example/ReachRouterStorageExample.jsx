@@ -1,10 +1,19 @@
 // @flow
 import React from 'react';
-import ReactCoolStorageHoc from 'react-cool-storage';
-import ReactRouterQueryString from 'react-cool-storage/ReactRouterQueryString';
+import ReactCoolStorageHook from 'react-cool-storage';
+import ReachRouterStorage from 'react-cool-storage/ReachRouterStorage';
+import {navigate} from 'gatsby';
 
-const ReactRouterQueryStringExample = (props) => {
-    let {query} = props;
+const useStorage = ReactCoolStorageHook(
+    ReachRouterStorage({
+        navigate,
+        method: "replace"
+    })
+);
+
+export default (props) => {
+    let query = useStorage(props);
+
     return <div>
         <label>query string "foo"</label>
         <input
@@ -22,10 +31,3 @@ const ReactRouterQueryStringExample = (props) => {
         />
     </div>;
 };
-
-export default ReactCoolStorageHoc(
-    'query',
-    ReactRouterQueryString({
-        method: "replace"
-    })
-)(ReactRouterQueryStringExample);

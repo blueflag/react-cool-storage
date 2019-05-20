@@ -1,26 +1,65 @@
-import Link from '../component/Link';
+import {Link} from 'dcme-gatsby';
+import {Code} from 'dcme-style';
+import {Divider} from 'dcme-style';
+import ReactCoolStorageHookSource from '../example/ReactCoolStorageHookSource.txt';
 
 ## What is it?
 
-React Cool Storage is a collection of React higher order components that give you a consistent API for interacting with data stored outside of React.
+React Cool Storage is a collection of React hooks and higher order components that give you a consistent API for interacting with data stored outside of React.
+
+- All storage mechanisms can contain deeply nested data, and all JSON-compatible types will be retained.
+- React Cool Storage allows fallback storage mechanisms to be defined, so your apps can still operate if resources such as `localStorage` are not available.
+- All storage mechanisms that don't require props can be accessed and changed outside of React, and all hooks and hocs will update and remain in sync.
+
+### How do you use it?
+
+- Choose your [storage mechanism(s)](#Storage-Mechanisms)
+- Put them in a [ReactCoolStorageHook](/api/ReactCoolStorageHook) or a [ReactCoolStorageHoc](/api/ReactCoolStorageHoc)
+  - Use the hook in a component and it'll return a [ReactCoolStorageMessage](/api/ReactCoolStorageHook/#ReactCoolStorageMessage), or
+  - Wrap your component in the hoc and it'll pass down a [ReactCoolStorageMessage](/api/ReactCoolStorageHoc/#ReactCoolStorageMessage) as a prop
+- Get your value using `ReactCoolStorageMessage.value`. This is always an object, which you can fill with whatever data you like.
+- Set your value using `ReactCoolStorageMessage.onChange(newPartialValue)`. This always expects an object, which you can fill with whatever data you like. The new object is shallowly merged onto any existing data.
+
+<Divider />
 
 ## Getting Started
 
 Do this:
 
-```sh
+```bash
 yarn add react-cool-storage 😎
 ```
 
-## API
+Then you can write something like this:
 
-### Hocs
+<Code language="jsx">{ReactCoolStorageHookSource}</Code>
 
-- <Link to="/api/ReactCoolStorageHoc">ReactCoolStorageHoc</Link>
+<Divider />
+
+## API Summary
+
+### React Bindings
+
+- Using a hook: [ReactCoolStorageHook](/api/ReactCoolStorageHook)
+- Using a hoc: [ReactCoolStorageHoc](/api/ReactCoolStorageHoc)
 
 ### Storage Mechanisms
 
-- <Link to="/api/ReachRouterQueryString">ReachRouterQueryString</Link>
-- <Link to="/api/ReactRouterQueryString">ReactRouterQueryString</Link>
-- <Link to="/api/WebStorage">WebStorage</Link>
-- <Link to="/api/MemoryStorage">MemoryStorage</Link>
+- [ReachRouterStorage](/api/ReachRouterStorage)
+- [ReactRouterStorage](/api/ReactRouterStorage)
+- [WebStorage](/api/WebStorage)
+- [MemoryStorage](/api/MemoryStorage)
+
+<Divider />
+
+## Development
+
+Dataparcels is written and maintained by [Damien Clarke](https://damienclarke.me/), with feedback from [Allan Hortle](https://github.com/allanhortle) and others at [Blueflag](https://blueflag.com.au/about-us/).
+All online library discussion happens over on [Github](https://github.com/blueflag/react-cool-storage).
+
+#### Ideas for the future
+
+- IndexedDB
+- Cookies
+- Google Sheets API
+- Any more?

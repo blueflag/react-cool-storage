@@ -3,7 +3,7 @@
   "scripts": {
     "preversion": "yarn build-all",
     "bootstrap": "yarn prep",
-    "prep": "yarn lerna bootstrap",
+    "prep": "yarn && yarn lerna run yalc-publish && yarn lerna run yalc-update && yarn lerna bootstrap",
     "bump": "yarn lerna publish",
     "build": "yarn lerna run build --parallel",
     "build-all": "yarn lerna run build-all --parallel",
@@ -15,14 +15,16 @@
     "test-all": "yarn lerna run test-all --parallel",
     "deploy-docs": "yarn lerna --scope react-cool-storage-docs run deploy",
     "view-coverage": "yarn run coverage; open ./coverage/lcov-report/index.html",
-    "watch": "yarn lerna run watch --parallel"
+    "watch": "yarn lerna run watch --parallel",
+    "reinstall": "rm -rf node_modules && rm -rf packages/*/node_modules && rm -rf packages/*/.yalc && yarn prep"
   },
   "dependencies": {
     "lerna": "^3.10.7"
   },
   "devDependencies": {
     "@commitlint/cli": "^7.2.1",
-    "husky": "^1.1.2"
+    "husky": "^1.1.2",
+    "yalc": "^1.0.0-pre.27"
   },
   "husky": {
     "hooks": {

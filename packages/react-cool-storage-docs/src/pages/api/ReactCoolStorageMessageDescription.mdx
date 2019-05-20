@@ -1,0 +1,30 @@
+import {Param} from 'dcme-style';
+
+```flow
+ReactCoolStorageMessage {
+    value: Object;
+    onChange: (newPartialValue: Object) => void,
+    valid: boolean;
+    available: boolean;
+    availabilityError: ?string;
+    storageType: string;
+}
+```
+
+* <Param name="value" type="Object" default="{}" />
+  The current value. Defaults to an object with keys and values.
+
+* <Param name="onChange" type="(newPartialValue: Object) => void" />
+  A callback to change the value. Defaults to requiring an object with keys and values. Values are shallowly merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
+
+* <Param name="valid" type="boolean" />
+  Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
+
+* <Param name="available" type="boolean" />
+  Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `onChange` has no effect.
+
+* <Param name="availableError" optional type="string" />
+  If no storage mechanisms are available, this contains the error message describing why.
+
+* <Param name="storageType" type="string" />
+  The type of the storage mechanism currently active.

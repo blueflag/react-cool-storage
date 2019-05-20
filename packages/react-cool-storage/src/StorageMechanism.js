@@ -7,6 +7,7 @@ import merge from 'unmutable/lib/merge';
 import omit from 'unmutable/lib/omit';
 import pipeWith from 'unmutable/lib/pipeWith';
 
+import InvalidValueMarker from './InvalidValueMarker';
 import Synchronizer from './Synchronizer';
 
 type Config = {
@@ -32,6 +33,7 @@ export default class StorageMechanism {
         this._synchronizer = config.synchronizer;
         this._type = config.type;
         this._updateFromProps = config.updateFromProps;
+        this._requiresPropsErrorMessage = `${config.type} requires props and cannot be used outside of React`;
     }
 
     //
@@ -45,6 +47,7 @@ export default class StorageMechanism {
     _synchronizer: ?Synchronizer;
     _type: string;
     _updateFromProps: boolean;
+    _requiresPropsErrorMessage: string;
 
     _syncListeners: SyncListener[] = [];
 
@@ -58,25 +61,34 @@ export default class StorageMechanism {
 
     _onChangeWithOptions(newValue: any, {origin, props}: any = {}): any {
 
-        let value = this._deconstruct(newValue);
+        newValue = this._deconstruct(newValue);
 
-        if(!isKeyed(value)) {
-            throw new Error(`${this.type} onChange must be passed an object`);
+        if(!isKeyed(newValue)) {
+            throw new Error(`${this._type} onChange must be passed an object`);
         }
 
-        let removedKeys = pipeWith(
-            newValue,
-            filter(_ => typeof _ === "undefined"),
-            keyArray()
-        );
+        let value = this.valueFromProps(props);
+        let valueIsInvalid = value === InvalidValueMarker;
 
-        let changedValues = omit(removedKeys)(value);
+        let removedKeys = valueIsInvalid
+            ? []
+            : pipeWith(
+                newValue,
+                filter(_ => typeof _ === "undefined"),
+                keyArray()
+            );
 
-        let updatedValue = pipeWith(
-            props ? this._valueFromProps(props) : this.value,
-            merge(changedValues),
-            omit(removedKeys)
-        );
+        let changedValues = valueIsInvalid
+            ? newValue
+            : omit(removedKeys)(newValue);
+
+        let updatedValue = valueIsInvalid
+            ? newValue
+            : pipeWith(
+                props ? value : this.value,
+                merge(changedValues),
+                omit(removedKeys)
+            );
 
         this._handleChange({
             updatedValue,
@@ -89,11 +101,31 @@ export default class StorageMechanism {
         return updatedValue;
     }
 
+    _setInitialValue(initialValue: any) {
+        if(typeof initialValue === "function") {
+            initialValue = initialValue(this.value);
+        }
+
+        if(initialValue) {
+            if(!isKeyed(initialValue)) {
+                throw new Error(`${this.storageType} initialValue must be passed an object`);
+            }
+
+            this._handleChange({
+                updatedValue: initialValue,
+                origin: this
+            });
+        }
+    }
+
     //
     // private overridables
     //
 
     _availableFromProps(props: any /* eslint-disable-line */): ?string {
+    }
+
+    _rawFromProps(props: any /* eslint-disable-line */): any {
     }
 
     _valueFromProps(props: any /* eslint-disable-line */): any {
@@ -112,24 +144,33 @@ export default class StorageMechanism {
 
     get availabilityError(): ?string {
         return this._requiresProps
-            ? `${this._type} requires props and cannot be accessed outside of React`
+            ? this._requiresPropsErrorMessage
             : this._availableFromProps();
     }
 
-    get type(): any {
+    get valid(): boolean {
+        return this.value !== InvalidValueMarker;
+    }
+
+    get storageType(): any {
         return this._type;
     }
 
     get value(): any {
-        return this._requiresProps
-            ? {}
-            : this._valueFromProps();
+        if(this._requiresProps) {
+            throw new Error(this._requiresPropsErrorMessage);
+        }
+        return this.valueFromProps();
     }
 
     onChange(newValue: any): void {
         if(this._requiresProps) {
-            throw new Error(`${this._type} requires props and cannot be changed outside of React`);
+            throw new Error(this._requiresPropsErrorMessage);
         }
         this._onChangeWithOptions(newValue);
+    }
+
+    valueFromProps(props: any): any {
+        return this._reconstruct(this._valueFromProps(props));
     }
 }

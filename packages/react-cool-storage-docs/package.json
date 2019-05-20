@@ -5,28 +5,10 @@
   "version": "2.1.0",
   "author": "Damien Clarke",
   "dependencies": {
-    "bruce": "4.0.0",
-    "dcme-style": "^0.25.0",
+    "dcme-gatsby": "^0.2.0",
+    "dcme-style": "^0.27.0",
     "gatsby": "^2.0.19",
-    "gatsby-image": "^2.0.15",
-    "gatsby-plugin-offline": "^2.0.5",
-    "gatsby-plugin-react-helmet": "^3.0.0",
-    "gatsby-plugin-sass": "^2.0.0-rc.2",
-    "gatsby-remark-prismjs": "^3.2.4",
-    "gatsby-source-filesystem": "^2.0.4",
-    "gatsby-transformer-remark": "^2.3.0",
-    "mdx-loader": "^1.0.0-beta.3",
-    "mdxc": "1.1.1",
-    "node-sass": "^4.9.4",
-    "prismjs": "^1.11.0",
-    "react": "^16.5.1",
-    "react-cool-storage": "^0.1.1",
-    "react-dataparcels": "^0.18.2",
-    "react-dom": "^16.5.1",
-    "react-helmet": "^5.2.0",
-    "react-markdown": "^4.0.6",
-    "react-spruce": "^0.1.0",
-    "unmutable": "^0.43.0"
+    "react-cool-storage": "file:.yalc/react-cool-storage"
   },
   "keywords": [
     "react-cool-storage"
@@ -34,7 +16,8 @@
   "license": "MIT",
   "scripts": {
     "build": "gatsby build",
-    "watch": "gatsby develop"
+    "watch": "gatsby develop",
+    "yalc-update": "../../node_modules/.bin/yalc update"
   },
   "repository": {
     "type": "git",

@@ -3,14 +3,17 @@ import React from 'react';
 import Layout from '../../layout/Layout';
 import ContentNav from '../../shape/ContentNav';
 
-import ReactCoolStorageHocMarkdown from './ReactCoolStorageHoc.mdx';
+import ReactCoolStorageHookMarkdown from './ReactCoolStorageHook.mdx';
 
 export default ({location}) => <Layout>
     <ContentNav
-        content={() => <ReactCoolStorageHocMarkdown location={location} />}
+        content={() => <ReactCoolStorageHookMarkdown location={location} />}
         pageNav={[
-            '# ReactCoolStorageHoc',
+            '# ReactCoolStorageHook',
             'Example usage',
+            'Arguments',
+            'Returns',
+            '# useStorage hook',
             'Arguments',
             'Returns',
             '# ReactCoolStorageMessage',
