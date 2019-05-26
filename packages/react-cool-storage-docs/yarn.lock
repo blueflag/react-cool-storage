@@ -2481,10 +2481,10 @@ dcme-style@^0.26.1:
     stampy "^0.43.3"
     unmutable "^0.29.2"
 
-dcme-style@^0.27.0:
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/dcme-style/-/dcme-style-0.27.0.tgz#eadff4133702c7cdfb7ceddd299df9f1d09eabee"
-  integrity sha512-XsnS3wHIHy2aAyizcRg1lv4YexP/Pff5yDYqjzcJapheLuBzWtPaKpVr9/8WP4iGb4GF/oVTUdhwidqnOySqeQ==
+dcme-style@^0.27.1:
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/dcme-style/-/dcme-style-0.27.1.tgz#08a0589c67265cc4a736d1184fad2fde27a0d7a8"
+  integrity sha512-akQ+dK1jsG3dvhQcoNj5lguylWeu9QnOJeZVISMIeo+4rnkFllOWrLnyrr+5sMzD5eWyex3F+vbYwDZKezMyaA==
   dependencies:
     prismjs "1.15.0"
     react "^16.8.6"
@@ -6867,7 +6867,7 @@ react-cool-storage@^0.1.1:
     unmutable "^0.39.0"
 
 "react-cool-storage@file:.yalc/react-cool-storage":
-  version "2.1.0-f3412c13"
+  version "2.1.0-677afb8e"
   dependencies:
     "@babel/runtime" "^7.1.5"
     deep-memo "^0.1.2"
