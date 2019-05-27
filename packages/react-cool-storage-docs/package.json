@@ -5,8 +5,8 @@
   "version": "3.0.0",
   "author": "Damien Clarke",
   "dependencies": {
-    "dcme-gatsby": "^0.2.0",
-    "dcme-style": "^0.27.1",
+    "dcme-gatsby": "^0.5.0",
+    "dcme-style": "^0.27.3",
     "gatsby": "^2.0.19",
     "react-cool-storage": "file:.yalc/react-cool-storage"
   },
@@ -22,8 +22,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/blueflag/react-cool-storage"
-  },
-  "devDependencies": {
-    "babel-preset-blueflag": "^1.0.0"
   }
 }
