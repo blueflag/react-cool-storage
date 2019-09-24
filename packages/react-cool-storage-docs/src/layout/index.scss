@@ -20,6 +20,7 @@ $primary: #499c6f;
 @include DcmeCenteredLanding;
 @include DcmeContentNav;
 @include DcmeDivider;
+@include DcmeDocsHeader;
 @include DcmeGrid;
 @include DcmeImage;
 @include DcmeInput;
@@ -59,7 +60,7 @@ $primary: #499c6f;
             font-size: 2.5rem;
         }
         @include BruceBreakpoint('medium') {
-            font-size: 4rem;
+            font-size: 3.3rem;
         }
     }
 }
