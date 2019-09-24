@@ -1,11 +1,10 @@
 // @flow
-import filter from 'unmutable/lib/filter';
-import identity from 'unmutable/identity';
-import keyArray from 'unmutable/lib/keyArray';
-import isKeyed from 'unmutable/lib/isKeyed';
-import merge from 'unmutable/lib/merge';
-import omit from 'unmutable/lib/omit';
-import pipeWith from 'unmutable/lib/pipeWith';
+import filter from 'unmutable/filter';
+import keyArray from 'unmutable/keyArray';
+import isKeyed from 'unmutable/isKeyed';
+import merge from 'unmutable/merge';
+import omit from 'unmutable/omit';
+import pipeWith from 'unmutable/pipeWith';
 
 import InvalidValueMarker from './InvalidValueMarker';
 import Synchronizer from './Synchronizer';
@@ -27,8 +26,9 @@ type SyncListener = {
 export default class StorageMechanism {
 
     constructor(config: Config) {
-        this._deconstruct = config.deconstruct || identity();
-        this._reconstruct = config.reconstruct || identity();
+        let passthrough = ii => ii;
+        this._deconstruct = config.deconstruct || passthrough;
+        this._reconstruct = config.reconstruct || passthrough;
         this._requiresProps = config.requiresProps;
         this._synchronizer = config.synchronizer;
         this._type = config.type;

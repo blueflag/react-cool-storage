@@ -12,7 +12,7 @@ import {useRef} from 'react';
 import InvalidValueMarker from './InvalidValueMarker';
 
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
-import last from 'unmutable/lib/last';
+import last from 'unmutable/last';
 
 type Props = {};
 
