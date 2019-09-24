@@ -9,7 +9,7 @@ $bruce-zindex: (
     'Overlay'
 );
 
-$primary: #4ea3f6;
+$primary: #499c6f;
 
 @include DcmeConfig;
 @include DcmeBase;
@@ -26,7 +26,7 @@ $primary: #4ea3f6;
 @include DcmeLink;
 @include DcmeLabel;
 @include DcmeMessage {
-    background-color: #fef7f7;
+    background-color: #f7fef7;
 }
 @include DcmeNavigationList;
 @include DcmeOrderedList;
@@ -34,10 +34,10 @@ $primary: #4ea3f6;
 @include DcmeTerminal;
 @include DcmeText {
     &-superDuper {
-        text-shadow: -3px 3px 0px #146c95, -6px 6px 0px #1e397a;
+        text-shadow: -3px 3px 0px #536958, -6px 6px 0px #064a44;
 
         @include BruceBreakpoint('medium') {
-            text-shadow: -4px 4px 0px #146c95, -8px 8px 0px #1e397a;
+            text-shadow: -4px 4px 0px #536958, -8px 8px 0px #064a44;
         }
     }
 
@@ -45,10 +45,10 @@ $primary: #4ea3f6;
         color: #000;
         line-height: 4rem;
         padding-left: .5rem;
-        text-shadow: -3px 3px 0px #6eb5e3, -6px 6px 0px #bcd3ec;
+        text-shadow: -3px 3px 0px #536958, -6px 6px 0px #064a44;
 
         @include BruceBreakpoint('medium') {
-            text-shadow: -4px 4px 0px #6eb5e3, -8px 8px 0px #bcd3ec;
+            text-shadow: -4px 4px 0px #536958, -8px 8px 0px #064a44;
         }
     }
 
