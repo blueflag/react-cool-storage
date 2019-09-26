@@ -16,16 +16,18 @@ export default (props) => {
         <label>query string "foo"</label>
         <input
             value={query.value.foo || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.onChange((prev) => ({
+                ...prev,
                 foo: event.currentTarget.value
-            })}
+            }))}
         />
         <label>query string "bar"</label>
         <input
             value={query.value.bar || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.onChange((prev) => ({
+                ...prev,
                 bar: event.currentTarget.value
-            })}
+            }))}
         />
     </div>;
 };

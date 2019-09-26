@@ -17,8 +17,8 @@ React Cool Storage is a collection of React hooks and higher order components th
 - Put them in a [ReactCoolStorageHook](/api/ReactCoolStorageHook) or a [ReactCoolStorageHoc](/api/ReactCoolStorageHoc)
   - Use the hook in a component and it'll return a [ReactCoolStorageMessage](/api/ReactCoolStorageHook/#ReactCoolStorageMessage), or
   - Wrap your component in the hoc and it'll pass down a [ReactCoolStorageMessage](/api/ReactCoolStorageHoc/#ReactCoolStorageMessage) as a prop
-- Get your value using `ReactCoolStorageMessage.value`. This is always an object, which you can fill with whatever data you like.
-- Set your value using `ReactCoolStorageMessage.onChange(newPartialValue)`. This always expects an object, which you can fill with whatever data you like. The new object is shallowly merged onto any existing data.
+- Get your value using `ReactCoolStorageMessage.value`.
+- Set your value using `ReactCoolStorageMessage.onChange(newValue)`. If you pass `newValue` a function, it will call it with the current value and use the result as the new value.
 
 <Divider />
 

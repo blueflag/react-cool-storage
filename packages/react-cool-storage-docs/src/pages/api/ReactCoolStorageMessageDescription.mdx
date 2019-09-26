@@ -2,8 +2,8 @@ import {Param} from 'dcme-style';
 
 ```flow
 ReactCoolStorageMessage {
-    value: Object;
-    onChange: (newPartialValue: Object) => void,
+    value: any;
+    onChange: (newValue: any) => void,
     valid: boolean;
     available: boolean;
     availabilityError: ?string;
@@ -11,12 +11,11 @@ ReactCoolStorageMessage {
 }
 ```
 
-* <Param name="value" type="Object" default="{}" />
+* <Param name="value" type="any" />
   The current value. Defaults to an object with keys and values.
 
-* <Param name="onChange" type="(newPartialValue: Object) => void" />
-  A callback to change the value. Defaults to requiring an object with keys and values. Values are shallowly merged into the exisiting `value`. Setting any key to undefined will remove that key / value pair.
-
+* <Param name="onChange" type="(newValue: any) => void" />
+  A callback to change the value. If you pass `newValue` a function, it will call it with the current value and use the result as the new value.
 * <Param name="valid" type="boolean" />
   Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
 
