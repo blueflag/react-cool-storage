@@ -7,7 +7,7 @@ const MyMemoryStorage = MemoryStorage();
 const useStorage = ReactCoolStorageHook(MyMemoryStorage);
 
 export default (props) => {
-    let memoryStorage = useStorage(props);
+    let memoryStorage = useStorage();
 
     return <div>
         <label>Data stored in memory</label>

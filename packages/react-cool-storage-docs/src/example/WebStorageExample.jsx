@@ -10,7 +10,7 @@ const useStorage = ReactCoolStorageHook(
 );
 
 export default (props) => {
-    let webStorage = useStorage(props);
+    let webStorage = useStorage();
 
     return <div>
         <label>Data stored in localStorage</label>
