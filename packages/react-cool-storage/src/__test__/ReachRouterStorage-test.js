@@ -105,6 +105,18 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         expect(navigate.mock.calls[0][1]).toEqual({replace: false});
     });
 
+    test('ReachRouterStorage onChange should throw error if given non object', () => {
+        const useStorage = ReactCoolStorageHook(ReachRouterStorage({navigate}));
+        const {result} = renderHook(() => useStorage({
+            location: {
+                pathname: "/abc",
+                search: "?abc=123&def=456"
+            }
+        }));
+
+        expect(() => result.current.onChange(123)).toThrowError(`ReachRouterStorage onChange must be passed an object`);
+    });
+
     test('ReachRouterStorage should write query string with replace: true', () => {
         let navigate = jest.fn();
 
@@ -136,12 +148,12 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
-                search: "?abc=100&def=200"
+                search: ""
             }
         }));
 
         act(() => {
-            result.current.onChange({abc: undefined});
+            result.current.onChange({abc: undefined, def: 200});
         });
 
         expect(navigate.mock.calls[0][0]).toBe("/abc?def=200");
@@ -289,12 +301,11 @@ describe('ReachRouterStorage memoization tests', () => {
         expect(value1).toBe(value2);
     });
 
-    test('ReachRouterStorage should not memoize value when memoize = false', () => {
+    test('ReachRouterStorage should not memoize value normally', () => {
         let navigate = jest.fn();
 
         const useStorage = ReactCoolStorageHook(ReachRouterStorage({
-            navigate,
-            memoize: false
+            navigate
         }));
 
         let initialProps = {
@@ -327,11 +338,12 @@ describe('ReachRouterStorage memoization tests', () => {
         expect(value1).toEqual(value2);
     });
 
-    test('ReachRouterStorage should memoize deep value', () => {
+    test('ReachRouterStorage should memoize deep value when memoize = true', () => {
         let navigate = jest.fn();
 
         const useStorage = ReactCoolStorageHook(ReachRouterStorage({
-            navigate
+            navigate,
+            memoize: true
         }));
 
         let initialProps = {
@@ -348,7 +360,11 @@ describe('ReachRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: [400, 200]});
+            result.current.onChange((prev) => ({
+                ...prev,
+                abc: [400, 200]
+            }));
+
             let url = navigate.mock.calls[0][0];
 
             rerender({

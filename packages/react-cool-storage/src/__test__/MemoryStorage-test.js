@@ -28,23 +28,22 @@ describe('MemoryStorage storage mechanism tests', () => {
 
 describe('Behaviour tests that should apply to all storage mechanisms', () => {
 
-    test('MemoryStorage value should merge', () => {
+    test('MemoryStorage onChange should accept new value', () => {
+        const MyMemoryStorage = MemoryStorage();
+        MyMemoryStorage.onChange(100);
+        expect(MyMemoryStorage.value).toBe(100);
+    });
+
+    test('MemoryStorage onChange should accept new keyed value', () => {
+        let updater = jest.fn((prev) => ({...prev, def: 300, ghi: 400}));
+
         const MyMemoryStorage = MemoryStorage();
         MyMemoryStorage.onChange({abc: 100, def: 200});
-        MyMemoryStorage.onChange({def: 300, ghi: 400});
+        MyMemoryStorage.onChange(updater);
+
+        expect(updater).toHaveBeenCalledTimes(1);
+        expect(updater.mock.calls[0][0]).toEqual({abc: 100, def: 200});
         expect(MyMemoryStorage.value).toEqual({abc: 100, def: 300, ghi: 400});
-    });
-
-    test('MemoryStorage value should delete keys set to undefined', () => {
-        const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100, def: 200});
-        MyMemoryStorage.onChange({abc: undefined});
-        expect(MyMemoryStorage.value).toEqual({def: 200});
-    });
-
-    test('MemoryStorage onChange should throw error if given non object', () => {
-        const MyMemoryStorage = MemoryStorage();
-        expect(() => MyMemoryStorage.onChange(123)).toThrowError(`MemoryStorage onChange must be passed an object`);
     });
 
 });
@@ -61,6 +60,14 @@ describe('MemoryStorage data flow config tests', () => {
         expect(MyMemoryStorage.value).toEqual({def: 600});
     });
 
+    test('MemoryStorage should accept non-keyed initialValue', () => {
+        const MyMemoryStorage = MemoryStorage({
+            initialValue: 600
+        });
+
+        expect(MyMemoryStorage.value).toEqual(600);
+    });
+
     test('MemoryStorage should set initialValue as function', () => {
         let initialValue = jest.fn(() => ({def: 200}));
 
@@ -69,18 +76,6 @@ describe('MemoryStorage data flow config tests', () => {
         expect(MyMemoryStorage.value).toEqual({def: 200});
         expect(initialValue.mock.calls[0][0]).toEqual({});
     });
-
-    test('MemoryStorage should not set initialValue if function returns falsey', () => {
-
-        const MyMemoryStorage = MemoryStorage({initialValue: () => false});
-
-        expect(MyMemoryStorage.value).toEqual({});
-    });
-
-    test('MemoryStorage should throw error if initialValue is not keyed', () => {
-        expect(() => MemoryStorage({initialValue: 600})).toThrowError(`MemoryStorage initialValue must be passed an object`);
-    });
-
 });
 
 describe('Hook tests', () => {

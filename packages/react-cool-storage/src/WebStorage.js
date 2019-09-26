@@ -1,5 +1,6 @@
 // @flow
 import storageAvailable from 'storage-available';
+import has from 'unmutable/has';
 import pipeWith from 'unmutable/pipeWith';
 import InvalidValueMarker from './InvalidValueMarker';
 import StorageMechanism from './StorageMechanism';
@@ -29,7 +30,7 @@ class WebStorage extends StorageMechanism {
             stringify = (data: any): string => JSON.stringify(data),
             deconstruct,
             reconstruct,
-            memoize = true,
+            memoize = false,
             initialValue
         } = config || {};
 
@@ -51,6 +52,7 @@ class WebStorage extends StorageMechanism {
             deconstruct,
             reconstruct,
             requiresProps: false,
+            requiresKeyed: false,
             synchronizer: synchronizerMap[key],
             type,
             updateFromProps: false
@@ -71,7 +73,9 @@ class WebStorage extends StorageMechanism {
             this._parse = deepMemo(this._parse);
         }
 
-        this._setInitialValue(initialValue);
+        if(has('initialValue')(config)) {
+            this._setInitialValue(initialValue);
+        }
     }
 
     //
@@ -84,7 +88,7 @@ class WebStorage extends StorageMechanism {
     _stringify: (data: any) => string;
 
     _stringFromProps = (props: any /* eslint-disable-line */): string => {
-        let storage = typeof window !== "undefined" && window[this._method];
+        let storage = window !== undefined && window[this._method];
         if(!storage) {
             return "";
         }

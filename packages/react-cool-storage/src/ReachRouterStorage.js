@@ -34,7 +34,7 @@ class ReachRouterStorage extends StorageMechanism {
             stringify,
             deconstruct,
             reconstruct,
-            memoize = true
+            memoize = false
         } = config;
 
         const type = 'ReachRouterStorage';
@@ -51,6 +51,7 @@ class ReachRouterStorage extends StorageMechanism {
             deconstruct,
             reconstruct,
             requiresProps: true,
+            requiresKeyed: true,
             type,
             updateFromProps: true
         });

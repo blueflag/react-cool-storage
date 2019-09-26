@@ -117,6 +117,19 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         expect(history.push.mock.calls[0][0]).toBe("?abc=200");
     });
 
+    test('ReactRouterStorage onChange should throw error if given non object', () => {
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
+        const {result} = renderHook(() => useStorage({
+            location: {
+                pathname: "/abc",
+                search: "?abc=123&def=456"
+            },
+            history
+        }));
+
+        expect(() => result.current.onChange(123)).toThrowError(`ReactRouterStorage onChange must be passed an object`);
+    });
+
     test('ReactRouterStorage should write query string with replace: true', () => {
 
         let history = {
@@ -156,13 +169,13 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
-                search: "?abc=100&def=200"
+                search: ""
             },
             history
         }));
 
         act(() => {
-            result.current.onChange({abc: undefined});
+            result.current.onChange({abc: undefined, def: 200});
         });
 
         expect(history.push.mock.calls[0][0]).toBe("?def=200");
@@ -326,16 +339,14 @@ describe('ReactRouterStorage memoization tests', () => {
         expect(value1).toBe(value2);
     });
 
-    test('ReactRouterStorage should not memoize value when memoize = false', () => {
+    test('ReactRouterStorage should not memoize value normally', () => {
 
         let history = {
             push: jest.fn(),
             replace: jest.fn()
         };
 
-        const useStorage = ReactCoolStorageHook(ReactRouterStorage({
-            memoize: false
-        }));
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
 
         let initialProps = {
             location: {
@@ -369,14 +380,16 @@ describe('ReactRouterStorage memoization tests', () => {
         expect(value1).toEqual(value2);
     });
 
-    test('ReactRouterStorage should memoize deep value', () => {
+    test('ReactRouterStorage should memoize deep value when memoize = true', () => {
 
         let history = {
             push: jest.fn(),
             replace: jest.fn()
         };
 
-        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage({
+            memoize: true
+        }));
 
         let initialProps = {
             location: {
@@ -394,7 +407,11 @@ describe('ReactRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: [400, 200]});
+            result.current.onChange((prev) => ({
+                ...prev,
+                abc: [400, 200]
+            }));
+
             let search = history.push.mock.calls[0][0];
 
             rerender({

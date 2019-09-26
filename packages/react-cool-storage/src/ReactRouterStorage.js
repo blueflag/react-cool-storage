@@ -36,7 +36,7 @@ class ReactRouterStorage extends StorageMechanism {
             stringify,
             deconstruct,
             reconstruct,
-            memoize = true
+            memoize = false
         } = config;
 
         const type = 'ReactRouterStorage';
@@ -49,6 +49,7 @@ class ReactRouterStorage extends StorageMechanism {
             deconstruct,
             reconstruct,
             requiresProps: true,
+            requiresKeyed: true,
             type,
             updateFromProps: true
         });

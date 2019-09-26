@@ -42,20 +42,20 @@ describe('WebStorage storage mechanism tests', () => {
         window.localStorage = temp;
     });
 
-    // test('WebStorage must make no change or error if localStorage doesnt exist', () => {
-    //     let temp = window.localStorage;
-    //     delete window.localStorage;
+    test('WebStorage must make no change or error if localStorage doesnt exist', () => {
+        let temp = window.localStorage;
+        delete window.localStorage;
 
-    //     expect(() => WebStorage({key: "localStorageKey"}).onChange({abc: 123})).not.toThrow();
+        expect(() => WebStorage({key: "localStorageKey"}).onChange({abc: 123})).not.toThrow();
 
-    //     window.localStorage = temp;
-    // });
+        window.localStorage = temp;
+    });
 });
 
 describe('WebStorage storage mechanism tests', () => {
 
     test('WebStorage should read localStorage', () => {
-        localStorage.setItem("localStorageKey", `{"abc":123}`);
+        window.localStorage.setItem("localStorageKey", `{"abc":123}`);
 
         const MyWebStorage = WebStorage({key: "localStorageKey"});
 
@@ -66,7 +66,7 @@ describe('WebStorage storage mechanism tests', () => {
     });
 
     test('WebStorage should write localStorage', () => {
-        localStorage.setItem("localStorageKey", `{"abc":123}`);
+        window.localStorage.setItem("localStorageKey", `{"abc":123}`);
 
         const MyWebStorage = WebStorage({key: "localStorageKey"});
         MyWebStorage.onChange({abc: 100});
@@ -110,7 +110,7 @@ describe('WebStorage storage mechanism tests', () => {
     });
 
     test('WebStorage should notify of invalid data', () => {
-        localStorage.setItem("localStorageKey", `{1231*(&@@&#Y(223423423}`);
+        window.localStorage.setItem("localStorageKey", `{1231*(&@@&#Y(223423423}`);
 
         const MyWebStorage = WebStorage({key: "localStorageKey"});
 
@@ -121,7 +121,7 @@ describe('WebStorage storage mechanism tests', () => {
     });
 
     test('WebStorage should be able to change after invalid data', () => {
-        localStorage.setItem("localStorageKey", `{1231*(&@@&#Y(223423423}`);
+        window.localStorage.setItem("localStorageKey", `{1231*(&@@&#Y(223423423}`);
 
         const MyWebStorage = WebStorage({key: "localStorageKey"});
 
@@ -137,7 +137,7 @@ describe('WebStorage storage mechanism tests', () => {
 describe('WebStorage data flow config tests', () => {
 
     test('WebStorage should pass data through reconstruct and deconstruct', () => {
-        localStorage.setItem("localStorageKey", `{"date":"1970-01-01T00:00:00.000Z"}`);
+        window.localStorage.setItem("localStorageKey", `{"date":"1970-01-01T00:00:00.000Z"}`);
 
         const MyWebStorage = WebStorage({
             key: "localStorageKey",
@@ -153,7 +153,7 @@ describe('WebStorage data flow config tests', () => {
     });
 
     test('WebStorage should pass data through parse and stringify', () => {
-        localStorage.setItem("localStorageKey", `foo{"abc":123}`);
+        window.localStorage.setItem("localStorageKey", `foo{"abc":123}`);
 
         const MyWebStorage = WebStorage({
             key: "localStorageKey",
@@ -169,7 +169,7 @@ describe('WebStorage data flow config tests', () => {
     });
 
     test('WebStorage should set initialValue', () => {
-        localStorage.setItem("localStorageKey", `{"abc": 100}`);
+        window.localStorage.setItem("localStorageKey", `{"abc": 100}`);
 
         const MyWebStorage = WebStorage({
             key: "localStorageKey",
@@ -183,7 +183,7 @@ describe('WebStorage data flow config tests', () => {
     });
 
     test('WebStorage should set initialValue as function', () => {
-        localStorage.setItem("localStorageKey", `{"abc": 100}`);
+        window.localStorage.setItem("localStorageKey", `{"abc": 100}`);
 
         let initialValue = jest.fn(() => ({def: 200}));
 
@@ -197,46 +197,28 @@ describe('WebStorage data flow config tests', () => {
         expect(initialValue.mock.calls[0][0]).toEqual({abc: 100});
     });
 
-    test('WebStorage should not set initialValue if function returns falsey', () => {
-        localStorage.setItem("localStorageKey", `{"abc": 100}`);
+    test('WebStorage should not error if using initialValue while unavailable', () => {
+        let temp = window.localStorage;
+        delete window.localStorage;
 
-        const MyWebStorage = WebStorage({
+        expect(() => WebStorage({
             key: "localStorageKey",
-            initialValue: () => false
-        });
+            initialValue: {
+                def: 200
+            }
+        })).not.toThrow();
 
-        expect(MyWebStorage.value).toEqual({abc: 100});
-        expect(localStorage.getItem("localStorageKey")).toBe(`{"abc": 100}`);
-    });
-
-    test('WebStorage should throw error if initialValue is not keyed', () => {
-        expect(() => WebStorage({key: "localStorageKey", initialValue: 600})).toThrowError(`WebStorage initialValue must be passed an object`);
+        window.localStorage = temp;
     });
 });
 
 describe('WebStorage memoization tests', () => {
 
-    test('WebStorage should memoize value', () => {
-        localStorage.setItem("localStorageKey", `{"abc":100}`);
+    test('WebStorage should not memoize value normally', () => {
+        window.localStorage.setItem("localStorageKey", `{"abc":100}`);
 
         const MyWebStorage = WebStorage({
             key: "localStorageKey"
-        });
-
-        const value1 = MyWebStorage.value;
-        MyWebStorage.onChange({abc: 100});
-        const value2 = MyWebStorage.value;
-
-        expect(value1).toEqual(value2);
-        expect(value1).toBe(value2);
-    });
-
-    test('WebStorage should not memoize value if memoize = false', () => {
-        localStorage.setItem("localStorageKey", `{"abc":100}`);
-
-        const MyWebStorage = WebStorage({
-            key: "localStorageKey",
-            memoize: false
         });
 
         const value1 = MyWebStorage.value;
@@ -247,15 +229,16 @@ describe('WebStorage memoization tests', () => {
         expect(value1).not.toBe(value2);
     });
 
-    test('WebStorage should memoize deep value', () => {
-        localStorage.setItem("localStorageKey", `{"abc":[100,200],"def":300}`);
+    test('WebStorage should memoize deep value if memoize = true', () => {
+        window.localStorage.setItem("localStorageKey", `{"abc":[100,200],"def":300}`);
 
         const MyWebStorage = WebStorage({
-            key: "localStorageKey"
+            key: "localStorageKey",
+            memoize: true
         });
 
         const value1 = MyWebStorage.value;
-        MyWebStorage.onChange({abc: [400,200]});
+        MyWebStorage.onChange({abc: [400,200],def:300});
         const value2 = MyWebStorage.value;
 
         expect(value1).not.toBe(value2);
@@ -270,7 +253,7 @@ describe('WebStorage memoization tests', () => {
 describe('Hook tests', () => {
 
     test('WebStorage hook should work', () => {
-        localStorage.setItem("localStorageKey", `{"abc":100}`);
+        window.localStorage.setItem("localStorageKey", `{"abc":100}`);
 
         const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
         const {result} = renderHook(() => useStorage({}));
@@ -284,7 +267,7 @@ describe('Hook tests', () => {
     });
 
     test('WebStorage hook should change', () => {
-        localStorage.setItem("localStorageKey", `{"abc":100}`);
+        window.localStorage.setItem("localStorageKey", `{"abc":100}`);
 
         const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
         const {result} = renderHook(() => useStorage({}));
@@ -299,7 +282,7 @@ describe('Hook tests', () => {
     });
 
     test('WebStorage hook should rerender based on change directly from WebStorage instance', () => {
-        localStorage.setItem("localStorageKey", `{"abc":100}`);
+        window.localStorage.setItem("localStorageKey", `{"abc":100}`);
         const MyWebStorage = WebStorage({key: "localStorageKey"});
         const useStorage = ReactCoolStorageHook(MyWebStorage);
         const {result} = renderHook(() => useStorage({}));
