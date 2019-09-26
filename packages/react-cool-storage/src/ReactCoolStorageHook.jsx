@@ -100,7 +100,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             return new ReactCoolStorageMessage({
                 ...ReactCoolStorageMessage.unavailable,
                 availabilityError,
-                onChange:  /* istanbul ignore next */ () => {}
+                set:  /* istanbul ignore next */ () => {}
             });
         }
 
@@ -148,8 +148,8 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             storageMechanism._removeSyncListener(ref);
         }, []);
 
-        const onChange = (newValue: any) => {
-            let updatedValue = storageMechanism._onChangeWithOptions(
+        const set = (newValue: any) => {
+            let updatedValue = storageMechanism._setWithOptions(
                 newValue,
                 {
                     origin: ref,
@@ -168,7 +168,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
 
         return new ReactCoolStorageMessage({
             ...message,
-            onChange
+            set
         });
     };
 };

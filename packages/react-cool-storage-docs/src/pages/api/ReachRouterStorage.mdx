@@ -12,7 +12,7 @@ Its value is always an object, and can only store data that is **serializable** 
 
 It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
 
-When calling `onChange()`, setting any key to undefined will remove that key / value pair.
+When calling `set()`, setting any key to undefined will remove that key / value pair.
 
 ```flow
 import ReachRouterStorage from 'react-cool-storage/ReachRouterStorage';
@@ -37,7 +37,7 @@ ReachRouterStorage({
   The `history` method to use. Can be "push" or "replace". Defaults to `"push"`.
 
 * <Param name="pathname" type="boolean" default="false" optional />
-  When set to `true`, the Reach Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `onChange({pathname: "???"})`. Defaults to `false`.
+  When set to `true`, the Reach Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `set({pathname: "???"})`. Defaults to `false`.
 
 * <Param name="deconstruct" type="(data: any) => any" optional />
   Can be used to convert data into a serializable format. It is called before ReachRouterStorage stringifies data when a change occurs.
@@ -89,7 +89,7 @@ export default (props) => {
         <label>query string "foo"</label>
         <input
             value={query.value.foo || ""}
-            onChange={(event) => query.onChange((prev) => ({
+            onChange={(event) => query.set((prev) => ({
                 ...prev,
                 foo: event.currentTarget.value
             }))}
@@ -97,7 +97,7 @@ export default (props) => {
         <label>query string "bar"</label>
         <input
             value={query.value.bar || ""}
-            onChange={(event) => query.onChange((prev) => ({
+            onChange={(event) => query.set((prev) => ({
                 ...prev,
                 bar: event.currentTarget.value
             }))}

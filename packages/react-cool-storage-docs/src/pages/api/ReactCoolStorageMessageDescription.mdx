@@ -3,7 +3,7 @@ import {Param} from 'dcme-style';
 ```flow
 ReactCoolStorageMessage {
     value: any;
-    onChange: (newValue: any) => void,
+    set: (newValue: any) => void,
     valid: boolean;
     available: boolean;
     availabilityError: ?string;
@@ -14,13 +14,13 @@ ReactCoolStorageMessage {
 * <Param name="value" type="any" />
   The current value. Defaults to an object with keys and values.
 
-* <Param name="onChange" type="(newValue: any) => void" />
+* <Param name="set" type="(newValue: any) => void" />
   A callback to change the value. If you pass `newValue` a function, it will call it with the current value and use the result as the new value.
 * <Param name="valid" type="boolean" />
   Indicates whether the value in the chosen storage is able to be parsed correctly. When false, `value` defaults to an empty object.
 
 * <Param name="available" type="boolean" />
-  Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `onChange` has no effect.
+  Indicates whether any storage mechanism is available to use. When false, `value` defaults to an empty object and `set` has no effect.
 
 * <Param name="availableError" optional type="string" />
   If no storage mechanisms are available, this contains the error message describing why.

@@ -59,7 +59,7 @@ export default class StorageMechanism {
         this._synchronizer && this._synchronizer.removeSyncListener(originToRemove);
     }
 
-    _onChangeWithOptions(newValue: any, {origin, props}: any = {}): any {
+    _setWithOptions(newValue: any, {origin, props}: any = {}): any {
 
         // if _availableFromProps returns an error string, quit
         if(this._availableFromProps(props)) {
@@ -79,7 +79,7 @@ export default class StorageMechanism {
             );
 
         if(this._requiresKeyed && !isKeyed(updatedValue)) {
-            throw new Error(`${this.storageType} onChange must be passed an object`);
+            throw new Error(`${this.storageType} set must be passed an object`);
         }
 
         if(this._requiresKeyed) {
@@ -164,11 +164,11 @@ export default class StorageMechanism {
         return this.valueFromProps();
     }
 
-    onChange(newValue: any): void {
+    set(newValue: any): void {
         if(this._requiresProps) {
             throw new Error(this._requiresPropsErrorMessage);
         }
-        this._onChangeWithOptions(newValue);
+        this._setWithOptions(newValue);
     }
 
     valueFromProps(props: any): any {

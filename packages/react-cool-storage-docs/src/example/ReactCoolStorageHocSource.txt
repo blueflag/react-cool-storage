@@ -16,14 +16,14 @@ const MyComponent = (props) => {
         <label>query string "foo"</label>
         <input
             value={query.value.foo || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.set({
                 foo: event.currentTarget.value
             })}
         />
         <label>query string "bar"</label>
         <input
             value={query.value.bar || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.set({
                 bar: event.currentTarget.value
             })}
         />

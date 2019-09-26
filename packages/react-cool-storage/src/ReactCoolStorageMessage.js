@@ -1,11 +1,11 @@
 // @flow
 
-export type OnChange = (newValue: any) => void;
+export type SetFunction = (newValue: any) => void;
 
 export type ReactCoolStorageMessageConfig = {
     available: boolean,
     availabilityError: ?string,
-    onChange: OnChange,
+    set: SetFunction,
     storageType: string,
     valid: boolean,
     value: any
@@ -23,7 +23,7 @@ export default class ReactCoolStorageMessage {
 
     available: boolean;
     availabilityError: ?string;
-    onChange: OnChange;
+    set: SetFunction;
     storageType: string;
     valid: boolean;
     value: any;
@@ -31,7 +31,7 @@ export default class ReactCoolStorageMessage {
     constructor(config: ReactCoolStorageMessageConfig) {
         this.available = config.available;
         this.availabilityError = config.availabilityError;
-        this.onChange = config.onChange;
+        this.set = config.set;
         this.storageType = config.storageType;
         this.valid = config.valid;
         this.value = config.value;

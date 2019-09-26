@@ -46,7 +46,7 @@ describe('WebStorage storage mechanism tests', () => {
         let temp = window.localStorage;
         delete window.localStorage;
 
-        expect(() => WebStorage({key: "localStorageKey"}).onChange({abc: 123})).not.toThrow();
+        expect(() => WebStorage({key: "localStorageKey"}).set({abc: 123})).not.toThrow();
 
         window.localStorage = temp;
     });
@@ -69,7 +69,7 @@ describe('WebStorage storage mechanism tests', () => {
         window.localStorage.setItem("localStorageKey", `{"abc":123}`);
 
         const MyWebStorage = WebStorage({key: "localStorageKey"});
-        MyWebStorage.onChange({abc: 100});
+        MyWebStorage.set({abc: 100});
         expect(localStorage.getItem("localStorageKey")).toEqual(`{"abc":100}`);
     });
 
@@ -94,7 +94,7 @@ describe('WebStorage storage mechanism tests', () => {
             key: "sessionStorageKey",
             method: "sessionStorage"
         });
-        MyWebStorage.onChange({def: 100});
+        MyWebStorage.set({def: 100});
         expect(sessionStorage.getItem("sessionStorageKey")).toEqual(`{"def":100}`);
     });
 
@@ -127,7 +127,7 @@ describe('WebStorage storage mechanism tests', () => {
 
         expect(MyWebStorage.valid).toBe(false);
 
-        MyWebStorage.onChange({abc: 123});
+        MyWebStorage.set({abc: 123});
         expect(MyWebStorage.valid).toBe(true);
         expect(MyWebStorage.value).toEqual({abc: 123});
     });
@@ -147,7 +147,7 @@ describe('WebStorage data flow config tests', () => {
 
         expect(MyWebStorage.value.date.toISOString()).toBe("1970-01-01T00:00:00.000Z");
 
-        MyWebStorage.onChange({date: new Date('2000-01-01')});
+        MyWebStorage.set({date: new Date('2000-01-01')});
 
         expect(localStorage.getItem("localStorageKey")).toBe(`{"date":"2000-01-01T00:00:00.000Z"}`);
     });
@@ -163,7 +163,7 @@ describe('WebStorage data flow config tests', () => {
 
         expect(MyWebStorage.value).toEqual({abc:123});
 
-        MyWebStorage.onChange({abc: 456});
+        MyWebStorage.set({abc: 456});
 
         expect(localStorage.getItem("localStorageKey")).toBe(`foo{"abc":456}`);
     });
@@ -222,7 +222,7 @@ describe('WebStorage memoization tests', () => {
         });
 
         const value1 = MyWebStorage.value;
-        MyWebStorage.onChange({abc: 100});
+        MyWebStorage.set({abc: 100});
         const value2 = MyWebStorage.value;
 
         expect(value1).toEqual(value2);
@@ -238,7 +238,7 @@ describe('WebStorage memoization tests', () => {
         });
 
         const value1 = MyWebStorage.value;
-        MyWebStorage.onChange({abc: [400,200],def:300});
+        MyWebStorage.set({abc: [400,200],def:300});
         const value2 = MyWebStorage.value;
 
         expect(value1).not.toBe(value2);
@@ -273,7 +273,7 @@ describe('Hook tests', () => {
         const {result} = renderHook(() => useStorage({}));
 
         act(() => {
-            result.current.onChange({abc: 200});
+            result.current.set({abc: 200});
         });
 
         expect(result.current.value).toEqual({abc: 200});
@@ -288,7 +288,7 @@ describe('Hook tests', () => {
         const {result} = renderHook(() => useStorage({}));
 
         act(() => {
-            MyWebStorage.onChange({abc: 200});
+            MyWebStorage.set({abc: 200});
         });
 
         expect(result.current.value).toEqual({abc: 200});

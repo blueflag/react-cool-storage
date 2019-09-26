@@ -18,7 +18,7 @@ export default (props) => {
         <label>query string "foo"</label>
         <input
             value={query.value.foo || ""}
-            onChange={(event) => query.onChange((prev) => ({
+            onChange={(event) => query.set((prev) => ({
                 ...prev,
                 foo: event.currentTarget.value
             }))}
@@ -26,7 +26,7 @@ export default (props) => {
         <label>query string "bar"</label>
         <input
             value={query.value.bar || ""}
-            onChange={(event) => query.onChange((prev) => ({
+            onChange={(event) => query.set((prev) => ({
                 ...prev,
                 bar: event.currentTarget.value
             }))}

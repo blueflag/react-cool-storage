@@ -20,7 +20,7 @@ describe('MemoryStorage storage mechanism tests', () => {
 
     test('MemoryStorage value should be set and get', () => {
         const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100});
+        MyMemoryStorage.set({abc: 100});
         expect(MyMemoryStorage.value).toEqual({abc: 100});
     });
 
@@ -28,18 +28,18 @@ describe('MemoryStorage storage mechanism tests', () => {
 
 describe('Behaviour tests that should apply to all storage mechanisms', () => {
 
-    test('MemoryStorage onChange should accept new value', () => {
+    test('MemoryStorage set should accept new value', () => {
         const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange(100);
+        MyMemoryStorage.set(100);
         expect(MyMemoryStorage.value).toBe(100);
     });
 
-    test('MemoryStorage onChange should accept new keyed value', () => {
+    test('MemoryStorage set should accept new keyed value', () => {
         let updater = jest.fn((prev) => ({...prev, def: 300, ghi: 400}));
 
         const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100, def: 200});
-        MyMemoryStorage.onChange(updater);
+        MyMemoryStorage.set({abc: 100, def: 200});
+        MyMemoryStorage.set(updater);
 
         expect(updater).toHaveBeenCalledTimes(1);
         expect(updater.mock.calls[0][0]).toEqual({abc: 100, def: 200});
@@ -97,7 +97,7 @@ describe('Hook tests', () => {
         const {result} = renderHook(() => useStorage({}));
 
         act(() => {
-            result.current.onChange({abc: 123});
+            result.current.set({abc: 123});
         });
 
         expect(result.current.value).toEqual({abc: 123});
@@ -109,7 +109,7 @@ describe('Hook tests', () => {
         const {result} = renderHook(() => useStorage({}));
 
         act(() => {
-            MyMemoryStorage.onChange({abc: 123});
+            MyMemoryStorage.set({abc: 123});
         });
 
         expect(result.current.value).toEqual({abc: 123});
@@ -150,7 +150,7 @@ describe('Hoc tests', () => {
         const {result, act} = renderHoc(hoc, {});
 
         act(() => {
-            result.current.foo.onChange({abc: 123});
+            result.current.foo.set({abc: 123});
         });
 
         expect(result.current.foo.value).toEqual({abc: 123});
@@ -162,7 +162,7 @@ describe('Hoc tests', () => {
         const {result, act} = renderHoc(hoc, {});
 
         act(() => {
-            MyMemoryStorage.onChange({abc: 123});
+            MyMemoryStorage.set({abc: 123});
         });
 
         expect(result.current.foo.value).toEqual({abc: 123});
