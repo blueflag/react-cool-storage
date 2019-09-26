@@ -106,7 +106,7 @@ describe('WebStorage storage mechanism tests', () => {
         expect(MyWebStorage.available).toBe(true);
         expect(MyWebStorage.availabilityError).toBe(undefined);
         expect(MyWebStorage.valid).toBe(true);
-        expect(MyWebStorage.value).toEqual({});
+        expect(MyWebStorage.value).toEqual(null);
     });
 
     test('WebStorage should notify of invalid data', () => {
@@ -256,7 +256,7 @@ describe('Hook tests', () => {
         window.localStorage.setItem("localStorageKey", `{"abc":100}`);
 
         const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
         const memoryStorage = result.current;
 
         expect(memoryStorage.available).toBe(true);
@@ -270,7 +270,7 @@ describe('Hook tests', () => {
         window.localStorage.setItem("localStorageKey", `{"abc":100}`);
 
         const useStorage = ReactCoolStorageHook(WebStorage({key: "localStorageKey"}));
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
             result.current.set({abc: 200});
@@ -285,7 +285,7 @@ describe('Hook tests', () => {
         window.localStorage.setItem("localStorageKey", `{"abc":100}`);
         const MyWebStorage = WebStorage({key: "localStorageKey"});
         const useStorage = ReactCoolStorageHook(MyWebStorage);
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
             MyWebStorage.set({abc: 200});

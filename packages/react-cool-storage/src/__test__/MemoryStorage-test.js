@@ -15,7 +15,7 @@ describe('MemoryStorage storage mechanism tests', () => {
         expect(MyMemoryStorage.availabilityError).toBe(undefined);
         expect(MyMemoryStorage.valid).toBe(true);
         expect(MyMemoryStorage.storageType).toBe("MemoryStorage");
-        expect(MyMemoryStorage.value).toEqual({});
+        expect(MyMemoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage value should be set and get', () => {
@@ -74,7 +74,7 @@ describe('MemoryStorage data flow config tests', () => {
         const MyMemoryStorage = MemoryStorage({initialValue});
 
         expect(MyMemoryStorage.value).toEqual({def: 200});
-        expect(initialValue.mock.calls[0][0]).toEqual({});
+        expect(initialValue.mock.calls[0][0]).toEqual(undefined);
     });
 });
 
@@ -82,19 +82,19 @@ describe('Hook tests', () => {
 
     test('MemoryStorage hook should work', () => {
         const useStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
         const memoryStorage = result.current;
 
         expect(memoryStorage.available).toBe(true);
         expect(memoryStorage.availabilityError).toBe(undefined);
         expect(memoryStorage.storageType).toBe("MemoryStorage");
         expect(memoryStorage.valid).toBe(true);
-        expect(memoryStorage.value).toEqual({});
+        expect(memoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage hook should change', () => {
         const useStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
             result.current.set({abc: 123});
@@ -106,7 +106,7 @@ describe('Hook tests', () => {
     test('MemoryStorage hook should rerender based on change directly from MemoryStorage instance', () => {
         const MyMemoryStorage = MemoryStorage();
         const useStorage = ReactCoolStorageHook(MyMemoryStorage);
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
             MyMemoryStorage.set({abc: 123});
@@ -118,7 +118,7 @@ describe('Hook tests', () => {
     test('MemoryStorage hook should unmount and remove sync listeners', () => {
         const MyMemoryStorage = MemoryStorage();
         const useStorage = ReactCoolStorageHook(MyMemoryStorage);
-        const {unmount} = renderHook(() => useStorage({}));
+        const {unmount} = renderHook(() => useStorage());
 
         expect(MyMemoryStorage._synchronizer.syncListeners.length).toBe(1);
 
@@ -142,7 +142,7 @@ describe('Hoc tests', () => {
         expect(memoryStorage.availabilityError).toBe(undefined);
         expect(memoryStorage.storageType).toBe("MemoryStorage");
         expect(memoryStorage.valid).toBe(true);
-        expect(memoryStorage.value).toEqual({});
+        expect(memoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage hoc should change', () => {

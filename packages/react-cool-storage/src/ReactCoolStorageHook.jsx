@@ -82,7 +82,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
     // function component
     //
 
-    return (props: Props): ReactCoolStorageMessage => {
+    return (props: ?Props = {}): ReactCoolStorageMessage => {
 
         // use a ref as a component instance identifier in synchroniser
         const ref = useRef(null);
