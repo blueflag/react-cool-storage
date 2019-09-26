@@ -21,7 +21,7 @@ class MemoryStorage extends StorageMechanism {
             updateFromProps: false
         });
 
-        this._valueStore = {};
+        this._valueStore = undefined;
 
         if(has('initialValue')(config)) {
             this._setInitialValue(config.initialValue);

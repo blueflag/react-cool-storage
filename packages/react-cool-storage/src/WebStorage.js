@@ -2,7 +2,7 @@
 import storageAvailable from 'storage-available';
 import has from 'unmutable/has';
 import pipeWith from 'unmutable/pipeWith';
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 import StorageMechanism from './StorageMechanism';
 import Synchronizer from './Synchronizer';
 import deepMemo from 'deep-memo';
@@ -62,9 +62,9 @@ class WebStorage extends StorageMechanism {
         this._method = method;
         this._parse = (str) => {
             try {
-                return parse(str) || {};
+                return parse(str);
             } catch(e) {
-                return InvalidValueMarker;
+                return invalid;
             }
         };
         this._stringify = stringify;
