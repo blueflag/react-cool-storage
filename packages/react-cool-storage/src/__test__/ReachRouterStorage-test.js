@@ -1,7 +1,7 @@
 // @flow
 import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReachRouterStorage from '../ReachRouterStorage';
-import InvalidValueMarker from '../InvalidValueMarker';
+import invalid from '../invalid';
 
 import {act} from 'react-hooks-testing-library';
 import {renderHook} from 'react-hooks-testing-library';
@@ -172,7 +172,7 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         expect(result.current.available).toBe(true);
         expect(result.current.availabilityError).toBe(undefined);
         expect(result.current.valid).toBe(false);
-        expect(result.current.value).toBe(InvalidValueMarker);
+        expect(result.current.value).toBe(invalid);
     });
 
     test('ReactRouterStorage should write pathname', () => {

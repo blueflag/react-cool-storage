@@ -14,7 +14,7 @@
   },
   "files": [
     "lib",
-    "InvalidValueMarker.js",
+    "invalid.js",
     "MemoryStorage.js",
     "ReactCoolStorageHoc.js",
     "ReactCoolStorageMessage.js",

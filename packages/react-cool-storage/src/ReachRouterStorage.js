@@ -1,7 +1,7 @@
 // @flow
 import reduce from 'unmutable/reduce';
 import remove from 'unmutable/remove';
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 import StorageMechanism from './StorageMechanism';
 import deepMemo from 'deep-memo';
 
@@ -63,7 +63,7 @@ class ReachRouterStorage extends StorageMechanism {
             try {
                 return JSON.parse(str);
             } catch(e) {
-                return InvalidValueMarker;
+                return invalid;
             }
         };
         this._defaultStringify = (data: any): string => JSON.stringify(data);

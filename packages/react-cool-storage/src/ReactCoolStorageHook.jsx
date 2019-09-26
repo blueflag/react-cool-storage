@@ -9,7 +9,7 @@ import {useEffect} from 'react';
 // $FlowFixMe - react does export this
 import {useRef} from 'react';
 
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
 import last from 'unmutable/last';
@@ -67,7 +67,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             ? options.value
             : storageMechanism.valueFromProps(props);
 
-        let valid = value !== InvalidValueMarker;
+        let valid = value !== invalid;
 
         return {
             available: true,

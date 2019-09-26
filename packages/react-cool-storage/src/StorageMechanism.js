@@ -3,7 +3,7 @@ import filter from 'unmutable/filter';
 import isKeyed from 'unmutable/isKeyed';
 import pipeWith from 'unmutable/pipeWith';
 
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 import Synchronizer from './Synchronizer';
 
 type Config = {
@@ -150,7 +150,7 @@ export default class StorageMechanism {
     }
 
     get valid(): boolean {
-        return this.value !== InvalidValueMarker;
+        return this.value !== invalid;
     }
 
     get storageType(): any {

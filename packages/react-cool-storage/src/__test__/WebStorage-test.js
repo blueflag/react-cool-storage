@@ -2,7 +2,7 @@
 import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReactCoolStorageHoc from '../ReactCoolStorageHoc';
 import WebStorage from '../WebStorage';
-import InvalidValueMarker from '../InvalidValueMarker';
+import invalid from '../invalid';
 
 import {act} from 'react-hooks-testing-library';
 import {renderHook} from 'react-hooks-testing-library';
@@ -37,7 +37,7 @@ describe('WebStorage storage mechanism tests', () => {
         expect(MyWebStorage.availabilityError).toBe(`WebStorage requires localStorage to be available`);
         expect(MyWebStorage.valid).toBe(false);
         expect(MyWebStorage.storageType).toBe("WebStorage");
-        expect(MyWebStorage.value).toBe(InvalidValueMarker);
+        expect(MyWebStorage.value).toBe(invalid);
 
         window.localStorage = temp;
     });
@@ -117,7 +117,7 @@ describe('WebStorage storage mechanism tests', () => {
         expect(MyWebStorage.available).toBe(true);
         expect(MyWebStorage.availabilityError).toBe(undefined);
         expect(MyWebStorage.valid).toBe(false);
-        expect(MyWebStorage.value).toBe(InvalidValueMarker);
+        expect(MyWebStorage.value).toBe(invalid);
     });
 
     test('WebStorage should be able to change after invalid data', () => {
