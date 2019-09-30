@@ -15,12 +15,12 @@ describe('MemoryStorage storage mechanism tests', () => {
         expect(MyMemoryStorage.availabilityError).toBe(undefined);
         expect(MyMemoryStorage.valid).toBe(true);
         expect(MyMemoryStorage.storageType).toBe("MemoryStorage");
-        expect(MyMemoryStorage.value).toEqual({});
+        expect(MyMemoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage value should be set and get', () => {
         const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100});
+        MyMemoryStorage.set({abc: 100});
         expect(MyMemoryStorage.value).toEqual({abc: 100});
     });
 
@@ -28,23 +28,22 @@ describe('MemoryStorage storage mechanism tests', () => {
 
 describe('Behaviour tests that should apply to all storage mechanisms', () => {
 
-    test('MemoryStorage value should merge', () => {
+    test('MemoryStorage set should accept new value', () => {
         const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100, def: 200});
-        MyMemoryStorage.onChange({def: 300, ghi: 400});
+        MyMemoryStorage.set(100);
+        expect(MyMemoryStorage.value).toBe(100);
+    });
+
+    test('MemoryStorage set should accept new keyed value', () => {
+        let updater = jest.fn((prev) => ({...prev, def: 300, ghi: 400}));
+
+        const MyMemoryStorage = MemoryStorage();
+        MyMemoryStorage.set({abc: 100, def: 200});
+        MyMemoryStorage.set(updater);
+
+        expect(updater).toHaveBeenCalledTimes(1);
+        expect(updater.mock.calls[0][0]).toEqual({abc: 100, def: 200});
         expect(MyMemoryStorage.value).toEqual({abc: 100, def: 300, ghi: 400});
-    });
-
-    test('MemoryStorage value should delete keys set to undefined', () => {
-        const MyMemoryStorage = MemoryStorage();
-        MyMemoryStorage.onChange({abc: 100, def: 200});
-        MyMemoryStorage.onChange({abc: undefined});
-        expect(MyMemoryStorage.value).toEqual({def: 200});
-    });
-
-    test('MemoryStorage onChange should throw error if given non object', () => {
-        const MyMemoryStorage = MemoryStorage();
-        expect(() => MyMemoryStorage.onChange(123)).toThrowError(`MemoryStorage onChange must be passed an object`);
     });
 
 });
@@ -61,48 +60,44 @@ describe('MemoryStorage data flow config tests', () => {
         expect(MyMemoryStorage.value).toEqual({def: 600});
     });
 
+    test('MemoryStorage should accept non-keyed initialValue', () => {
+        const MyMemoryStorage = MemoryStorage({
+            initialValue: 600
+        });
+
+        expect(MyMemoryStorage.value).toEqual(600);
+    });
+
     test('MemoryStorage should set initialValue as function', () => {
         let initialValue = jest.fn(() => ({def: 200}));
 
         const MyMemoryStorage = MemoryStorage({initialValue});
 
         expect(MyMemoryStorage.value).toEqual({def: 200});
-        expect(initialValue.mock.calls[0][0]).toEqual({});
+        expect(initialValue.mock.calls[0][0]).toEqual(undefined);
     });
-
-    test('MemoryStorage should not set initialValue if function returns falsey', () => {
-
-        const MyMemoryStorage = MemoryStorage({initialValue: () => false});
-
-        expect(MyMemoryStorage.value).toEqual({});
-    });
-
-    test('MemoryStorage should throw error if initialValue is not keyed', () => {
-        expect(() => MemoryStorage({initialValue: 600})).toThrowError(`MemoryStorage initialValue must be passed an object`);
-    });
-
 });
 
 describe('Hook tests', () => {
 
     test('MemoryStorage hook should work', () => {
         const useStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
         const memoryStorage = result.current;
 
         expect(memoryStorage.available).toBe(true);
         expect(memoryStorage.availabilityError).toBe(undefined);
         expect(memoryStorage.storageType).toBe("MemoryStorage");
         expect(memoryStorage.valid).toBe(true);
-        expect(memoryStorage.value).toEqual({});
+        expect(memoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage hook should change', () => {
         const useStorage = ReactCoolStorageHook(MemoryStorage());
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
-            result.current.onChange({abc: 123});
+            result.current.set({abc: 123});
         });
 
         expect(result.current.value).toEqual({abc: 123});
@@ -111,10 +106,10 @@ describe('Hook tests', () => {
     test('MemoryStorage hook should rerender based on change directly from MemoryStorage instance', () => {
         const MyMemoryStorage = MemoryStorage();
         const useStorage = ReactCoolStorageHook(MyMemoryStorage);
-        const {result} = renderHook(() => useStorage({}));
+        const {result} = renderHook(() => useStorage());
 
         act(() => {
-            MyMemoryStorage.onChange({abc: 123});
+            MyMemoryStorage.set({abc: 123});
         });
 
         expect(result.current.value).toEqual({abc: 123});
@@ -123,7 +118,7 @@ describe('Hook tests', () => {
     test('MemoryStorage hook should unmount and remove sync listeners', () => {
         const MyMemoryStorage = MemoryStorage();
         const useStorage = ReactCoolStorageHook(MyMemoryStorage);
-        const {unmount} = renderHook(() => useStorage({}));
+        const {unmount} = renderHook(() => useStorage());
 
         expect(MyMemoryStorage._synchronizer.syncListeners.length).toBe(1);
 
@@ -147,7 +142,7 @@ describe('Hoc tests', () => {
         expect(memoryStorage.availabilityError).toBe(undefined);
         expect(memoryStorage.storageType).toBe("MemoryStorage");
         expect(memoryStorage.valid).toBe(true);
-        expect(memoryStorage.value).toEqual({});
+        expect(memoryStorage.value).toEqual(undefined);
     });
 
     test('MemoryStorage hoc should change', () => {
@@ -155,7 +150,7 @@ describe('Hoc tests', () => {
         const {result, act} = renderHoc(hoc, {});
 
         act(() => {
-            result.current.foo.onChange({abc: 123});
+            result.current.foo.set({abc: 123});
         });
 
         expect(result.current.foo.value).toEqual({abc: 123});
@@ -167,7 +162,7 @@ describe('Hoc tests', () => {
         const {result, act} = renderHoc(hoc, {});
 
         act(() => {
-            MyMemoryStorage.onChange({abc: 123});
+            MyMemoryStorage.set({abc: 123});
         });
 
         expect(result.current.foo.value).toEqual({abc: 123});

@@ -1,2 +1,2 @@
 /* eslint-disable */
-module.exports = require('./lib/InvalidValueMarker.js');
+module.exports = require('./lib/invalid.js');

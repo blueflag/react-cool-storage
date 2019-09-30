@@ -10,22 +10,13 @@ const useStorage = ReactCoolStorageHook(
 );
 
 export default (props) => {
-    let webStorage = useStorage(props);
+    let webStorage = useStorage();
 
     return <div>
-        <label>localStorage data stored under a key of "exampleStorage.foo"</label>
+        <label>Data stored in localStorage</label>
         <input
-            value={webStorage.value.foo || ""}
-            onChange={(event) => webStorage.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>localStorage data stored under a key of "exampleStorage.bar"</label>
-        <input
-            value={webStorage.value.bar || ""}
-            onChange={(event) => webStorage.onChange({
-                bar: event.currentTarget.value
-            })}
+            value={webStorage.value || ""}
+            onChange={(event) => webStorage.set(event.currentTarget.value)}
         />
     </div>;
 };

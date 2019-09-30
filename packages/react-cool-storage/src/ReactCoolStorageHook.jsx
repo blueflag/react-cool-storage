@@ -9,10 +9,10 @@ import {useEffect} from 'react';
 // $FlowFixMe - react does export this
 import {useRef} from 'react';
 
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 
 import ReactCoolStorageMessage from './ReactCoolStorageMessage';
-import last from 'unmutable/lib/last';
+import last from 'unmutable/last';
 
 type Props = {};
 
@@ -67,7 +67,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             ? options.value
             : storageMechanism.valueFromProps(props);
 
-        let valid = value !== InvalidValueMarker;
+        let valid = value !== invalid;
 
         return {
             available: true,
@@ -82,7 +82,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
     // function component
     //
 
-    return (props: Props): ReactCoolStorageMessage => {
+    return (props: ?Props = {}): ReactCoolStorageMessage => {
 
         // use a ref as a component instance identifier in synchroniser
         const ref = useRef(null);
@@ -100,7 +100,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             return new ReactCoolStorageMessage({
                 ...ReactCoolStorageMessage.unavailable,
                 availabilityError,
-                onChange:  /* istanbul ignore next */ () => {}
+                set:  /* istanbul ignore next */ () => {}
             });
         }
 
@@ -148,8 +148,8 @@ export default (...storageMechanisms: StorageMechanism[]) => {
             storageMechanism._removeSyncListener(ref);
         }, []);
 
-        const onChange = (newValue: any) => {
-            let updatedValue = storageMechanism._onChangeWithOptions(
+        const set = (newValue: any) => {
+            let updatedValue = storageMechanism._setWithOptions(
                 newValue,
                 {
                     origin: ref,
@@ -168,7 +168,7 @@ export default (...storageMechanisms: StorageMechanism[]) => {
 
         return new ReactCoolStorageMessage({
             ...message,
-            onChange
+            set
         });
     };
 };

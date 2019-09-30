@@ -1,4 +1,6 @@
 // @flow
+import has from 'unmutable/has';
+
 import StorageMechanism from './StorageMechanism';
 import Synchronizer from './Synchronizer';
 
@@ -9,20 +11,21 @@ type Config = {
 class MemoryStorage extends StorageMechanism {
 
     constructor(config: Config) {
-        let {initialValue} = config;
-
         let type = 'MemoryStorage';
 
         super({
             requiresProps: false,
+            requiresKeyed: false,
             synchronizer: new Synchronizer(),
             type,
             updateFromProps: false
         });
 
-        this._valueStore = {};
+        this._valueStore = undefined;
 
-        this._setInitialValue(initialValue);
+        if(has('initialValue')(config)) {
+            this._setInitialValue(config.initialValue);
+        }
     }
 
     //

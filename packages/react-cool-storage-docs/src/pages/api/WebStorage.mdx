@@ -30,7 +30,7 @@ WebStorage({
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
     memoize?: boolean = true,
-    initialValue?: Object|() => Object
+    initialValue?: any|() => any
 })
 ```
 
@@ -55,8 +55,8 @@ WebStorage({
 * <Param name="memoize" type="(data: any) => string" optional default="JSON.parse()" />
   When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
 
-* <Param name="initialValue" type="Object|() => Object" optional />
-  If provided a object, or a function that returns an object, `initialValue` will set the value when the storage mechanism is instanciated.
+* <Param name="initialValue" type="any|() => any" optional />
+  If provided, `initialValue` will set the value when the storage mechanism is instanciated.
 
 ## Resources
 WebStorage requires `window.localStorage` or `window.sessionStorage` to be available, depending on the `method` you choose.
@@ -70,7 +70,7 @@ WebStorage requires no props.
 
 WebStorage doesn't require any props, so you can also access and change WebStorage data outside of React. All ReactCoolStorageHocs that use the WebStorage with the same key will update and stay in sync.
 
-`MyWebStorage` has been added to the window on this page. Try running `MyWebStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
+`MyWebStorage` has been added to the window on this page. Try running `MyWebStorage.set("foo");` in the console and watch the example update at the top of this page.
 
 
 ## Example using hooks
@@ -87,22 +87,13 @@ const useStorage = ReactCoolStorageHook(
 );
 
 export default (props) => {
-    let webStorage = useStorage(props);
+    let webStorage = useStorage();
 
     return <div>
-        <label>localStorage data stored under a key of "exampleStorage.foo"</label>
+        <label>Data stored in local storage</label>
         <input
-            value={webStorage.value.foo || ""}
-            onChange={(event) => webStorage.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>localStorage data stored under a key of "exampleStorage.bar"</label>
-        <input
-            value={webStorage.value.bar || ""}
-            onChange={(event) => webStorage.onChange({
-                bar: event.currentTarget.value
-            })}
+            value={webStorage.value || ""}
+            onChange={(event) => webStorage.set(event.currentTarget.value)}
         />
     </div>;
 };

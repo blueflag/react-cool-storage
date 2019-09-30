@@ -1,7 +1,7 @@
 // @flow
 import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReachRouterStorage from '../ReachRouterStorage';
-import InvalidValueMarker from '../InvalidValueMarker';
+import invalid from '../invalid';
 
 import {act} from 'react-hooks-testing-library';
 import {renderHook} from 'react-hooks-testing-library';
@@ -34,7 +34,7 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         const MyReachRouterStorage = ReachRouterStorage({navigate});
 
         expect(() => MyReachRouterStorage.value).toThrow(`ReachRouterStorage requires props and cannot be used outside of React`);
-        expect(() => MyReachRouterStorage.onChange({})).toThrow(`ReachRouterStorage requires props and cannot be used outside of React`);
+        expect(() => MyReachRouterStorage.set({})).toThrow(`ReachRouterStorage requires props and cannot be used outside of React`);
 
     });
 
@@ -97,12 +97,24 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         }));
 
         act(() => {
-            result.current.onChange({abc: 200});
+            result.current.set({abc: 200});
         });
 
         expect(navigate).toHaveBeenCalled();
         expect(navigate.mock.calls[0][0]).toBe("/abc?abc=200");
         expect(navigate.mock.calls[0][1]).toEqual({replace: false});
+    });
+
+    test('ReachRouterStorage set should throw error if given non object', () => {
+        const useStorage = ReactCoolStorageHook(ReachRouterStorage({navigate}));
+        const {result} = renderHook(() => useStorage({
+            location: {
+                pathname: "/abc",
+                search: "?abc=123&def=456"
+            }
+        }));
+
+        expect(() => result.current.set(123)).toThrowError(`ReachRouterStorage set must be passed an object`);
     });
 
     test('ReachRouterStorage should write query string with replace: true', () => {
@@ -121,7 +133,7 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         }));
 
         act(() => {
-            result.current.onChange({abc: 200});
+            result.current.set({abc: 200});
         });
 
         expect(navigate).toHaveBeenCalled();
@@ -136,12 +148,12 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
-                search: "?abc=100&def=200"
+                search: ""
             }
         }));
 
         act(() => {
-            result.current.onChange({abc: undefined});
+            result.current.set({abc: undefined, def: 200});
         });
 
         expect(navigate.mock.calls[0][0]).toBe("/abc?def=200");
@@ -160,7 +172,7 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         expect(result.current.available).toBe(true);
         expect(result.current.availabilityError).toBe(undefined);
         expect(result.current.valid).toBe(false);
-        expect(result.current.value).toBe(InvalidValueMarker);
+        expect(result.current.value).toBe(invalid);
     });
 
     test('ReactRouterStorage should write pathname', () => {
@@ -179,7 +191,7 @@ describe('ReachRouterStorage storage mechanism tests', () => {
         expect(result.current.value).toEqual({pathname: "/abc", abc: 100});
 
         act(() => {
-            result.current.onChange({abc: 200, pathname: "/flee"});
+            result.current.set({abc: 200, pathname: "/flee"});
         });
 
         expect(navigate.mock.calls[0][0]).toBe("/flee?abc=200");
@@ -210,7 +222,7 @@ describe('ReachRouterStorage data flow config tests', () => {
         expect(result.current.value.date.toISOString()).toBe("1970-01-01T00:00:00.000Z");
 
         act(() => {
-            result.current.onChange({date: new Date('2000-01-01')});
+            result.current.set({date: new Date('2000-01-01')});
         });
 
         expect(navigate.mock.calls[0][0]).toBe(`/abc?date=%222000-01-01T00%3A00%3A00.000Z%22`);
@@ -239,7 +251,7 @@ describe('ReachRouterStorage data flow config tests', () => {
         expect(result.current.value).toEqual({abc: 123});
 
         act(() => {
-            result.current.onChange({abc: 456});
+            result.current.set({abc: 456});
         });
 
         expect(navigate.mock.calls[0][0]).toBe(`/abc?foo{"abc":456}`);
@@ -272,7 +284,7 @@ describe('ReachRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: 100});
+            result.current.set({abc: 100});
             let url = navigate.mock.calls[0][0];
 
             rerender({
@@ -289,12 +301,11 @@ describe('ReachRouterStorage memoization tests', () => {
         expect(value1).toBe(value2);
     });
 
-    test('ReachRouterStorage should not memoize value when memoize = false', () => {
+    test('ReachRouterStorage should not memoize value normally', () => {
         let navigate = jest.fn();
 
         const useStorage = ReactCoolStorageHook(ReachRouterStorage({
-            navigate,
-            memoize: false
+            navigate
         }));
 
         let initialProps = {
@@ -311,7 +322,7 @@ describe('ReachRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: 100});
+            result.current.set({abc: 100});
             let url = navigate.mock.calls[0][0];
 
             rerender({
@@ -327,11 +338,12 @@ describe('ReachRouterStorage memoization tests', () => {
         expect(value1).toEqual(value2);
     });
 
-    test('ReachRouterStorage should memoize deep value', () => {
+    test('ReachRouterStorage should memoize deep value when memoize = true', () => {
         let navigate = jest.fn();
 
         const useStorage = ReactCoolStorageHook(ReachRouterStorage({
-            navigate
+            navigate,
+            memoize: true
         }));
 
         let initialProps = {
@@ -348,7 +360,11 @@ describe('ReachRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: [400, 200]});
+            result.current.set((prev) => ({
+                ...prev,
+                abc: [400, 200]
+            }));
+
             let url = navigate.mock.calls[0][0];
 
             rerender({

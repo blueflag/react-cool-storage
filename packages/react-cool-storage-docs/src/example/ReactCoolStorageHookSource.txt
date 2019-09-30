@@ -15,14 +15,14 @@ export default (props) => {
         <label>localStorage foo</label>
         <input
             value={localStorage.value.foo || ""}
-            onChange={(event) => localStorage.onChange({
+            onChange={(event) => localStorage.set({
                 foo: event.currentTarget.value
             })}
         />
         <label>localStorage bar</label>
         <input
             value={localStorage.value.bar || ""}
-            onChange={(event) => localStorage.onChange({
+            onChange={(event) => localStorage.set({
                 bar: event.currentTarget.value
             })}
         />

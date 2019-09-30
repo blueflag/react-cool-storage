@@ -1,7 +1,7 @@
 // @flow
 import ReactCoolStorageHook from '../ReactCoolStorageHook';
 import ReactRouterStorage from '../ReactRouterStorage';
-import InvalidValueMarker from '../InvalidValueMarker';
+import invalid from '../invalid';
 
 import {act} from 'react-hooks-testing-library';
 import {renderHook} from 'react-hooks-testing-library';
@@ -29,7 +29,7 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         const MyReactRouterStorage = ReactRouterStorage();
 
         expect(() => MyReactRouterStorage.value).toThrow(`ReactRouterStorage requires props and cannot be used outside of React`);
-        expect(() => MyReactRouterStorage.onChange({})).toThrow(`ReactRouterStorage requires props and cannot be used outside of React`);
+        expect(() => MyReactRouterStorage.set({})).toThrow(`ReactRouterStorage requires props and cannot be used outside of React`);
 
     });
 
@@ -109,12 +109,25 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         }));
 
         act(() => {
-            result.current.onChange({abc: 200});
+            result.current.set({abc: 200});
         });
 
         expect(history.push).toHaveBeenCalled();
         expect(history.replace).not.toHaveBeenCalled();
         expect(history.push.mock.calls[0][0]).toBe("?abc=200");
+    });
+
+    test('ReactRouterStorage set should throw error if given non object', () => {
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
+        const {result} = renderHook(() => useStorage({
+            location: {
+                pathname: "/abc",
+                search: "?abc=123&def=456"
+            },
+            history
+        }));
+
+        expect(() => result.current.set(123)).toThrowError(`ReactRouterStorage set must be passed an object`);
     });
 
     test('ReactRouterStorage should write query string with replace: true', () => {
@@ -137,7 +150,7 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         }));
 
         act(() => {
-            result.current.onChange({abc: 200});
+            result.current.set({abc: 200});
         });
 
         expect(history.push).not.toHaveBeenCalled();
@@ -156,13 +169,13 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         const {result} = renderHook(() => useStorage({
             location: {
                 pathname: "/abc",
-                search: "?abc=100&def=200"
+                search: ""
             },
             history
         }));
 
         act(() => {
-            result.current.onChange({abc: undefined});
+            result.current.set({abc: undefined, def: 200});
         });
 
         expect(history.push.mock.calls[0][0]).toBe("?def=200");
@@ -182,7 +195,7 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         expect(result.current.available).toBe(true);
         expect(result.current.availabilityError).toBe(undefined);
         expect(result.current.valid).toBe(false);
-        expect(result.current.value).toBe(InvalidValueMarker);
+        expect(result.current.value).toBe(invalid);
     });
 
     test('ReactRouterStorage should write pathname', () => {
@@ -204,7 +217,7 @@ describe('ReactRouterStorage storage mechanism tests', () => {
         expect(result.current.value).toEqual({pathname: "/abc", abc: 100});
 
         act(() => {
-            result.current.onChange({abc: 200, pathname: "/flee"});
+            result.current.set({abc: 200, pathname: "/flee"});
         });
 
         expect(history.push).toHaveBeenCalled();
@@ -239,7 +252,7 @@ describe('ReactRouterStorage data flow config tests', () => {
         expect(result.current.value.date.toISOString()).toBe("1970-01-01T00:00:00.000Z");
 
         act(() => {
-            result.current.onChange({date: new Date('2000-01-01')});
+            result.current.set({date: new Date('2000-01-01')});
         });
 
         expect(history.push.mock.calls[0][0]).toBe(`?date=%222000-01-01T00%3A00%3A00.000Z%22`);
@@ -272,7 +285,7 @@ describe('ReactRouterStorage data flow config tests', () => {
         expect(result.current.value).toEqual({abc: 123});
 
         act(() => {
-            result.current.onChange({abc: 456});
+            result.current.set({abc: 456});
         });
 
         expect(history.push.mock.calls[0][0]).toBe(`?foo{"abc":456}`);
@@ -309,7 +322,7 @@ describe('ReactRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: 100});
+            result.current.set({abc: 100});
             let search = history.push.mock.calls[0][0];
 
             rerender({
@@ -326,16 +339,14 @@ describe('ReactRouterStorage memoization tests', () => {
         expect(value1).toBe(value2);
     });
 
-    test('ReactRouterStorage should not memoize value when memoize = false', () => {
+    test('ReactRouterStorage should not memoize value normally', () => {
 
         let history = {
             push: jest.fn(),
             replace: jest.fn()
         };
 
-        const useStorage = ReactCoolStorageHook(ReactRouterStorage({
-            memoize: false
-        }));
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
 
         let initialProps = {
             location: {
@@ -353,7 +364,7 @@ describe('ReactRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: 100});
+            result.current.set({abc: 100});
             let search = history.push.mock.calls[0][0];
 
             rerender({
@@ -369,14 +380,16 @@ describe('ReactRouterStorage memoization tests', () => {
         expect(value1).toEqual(value2);
     });
 
-    test('ReactRouterStorage should memoize deep value', () => {
+    test('ReactRouterStorage should memoize deep value when memoize = true', () => {
 
         let history = {
             push: jest.fn(),
             replace: jest.fn()
         };
 
-        const useStorage = ReactCoolStorageHook(ReactRouterStorage());
+        const useStorage = ReactCoolStorageHook(ReactRouterStorage({
+            memoize: true
+        }));
 
         let initialProps = {
             location: {
@@ -394,7 +407,11 @@ describe('ReactRouterStorage memoization tests', () => {
         const value1 = result.current.value;
 
         act(() => {
-            result.current.onChange({abc: [400, 200]});
+            result.current.set((prev) => ({
+                ...prev,
+                abc: [400, 200]
+            }));
+
             let search = history.push.mock.calls[0][0];
 
             rerender({

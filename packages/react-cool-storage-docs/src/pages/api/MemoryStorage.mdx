@@ -24,12 +24,12 @@ import MemoryStorage from 'react-cool-storage/MemoryStorage';
 ```flow
 MemoryStorage({
     // optional
-    initialValue?: Object|() => Object
+    initialValue?: any|() => any
 })
 ```
 
-* <Param name="initialValue" type="Object|() => Object" optional />
-  If provided a object, or a function that returns an object, `initialValue` will set the value when the storage mechanism is instanciated.
+* <Param name="initialValue" type="any|() => any" optional />
+  If provided, this will set the value when the storage mechanism is instanciated.
 
 ## Resources
 
@@ -43,7 +43,7 @@ MemoryStorage requires no props.
 
 MemoryStorage doesn't require any props, so you can also access and change a MemoryStorage instance's value outside of React. All ReactCoolStorageHocs that use the MemoryStorage will update and stay in sync.
 
-A `MyMemoryStorage` instance has been added to the window. Try running `MyMemoryStorage.onChange({foo: "foo"});` in the console and watch the example update at the top of this page.
+A `MyMemoryStorage` instance has been added to the window. Try running `MyMemoryStorage.set("foo");` in the console and watch the example update at the top of this page.
 
 ## Example using hooks
 
@@ -56,22 +56,13 @@ const MyMemoryStorage = MemoryStorage();
 const useStorage = ReactCoolStorageHook(MyMemoryStorage);
 
 export default (props) => {
-    let memoryStorage = useStorage(props);
+    let memoryStorage = useStorage();
 
     return <div>
-        <label>Data stored under a key of "foo"</label>
+        <label>Data stored in memory</label>
         <input
             value={memoryStorage.value.foo || ""}
-            onChange={(event) => memoryStorage.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>Data stored under a key of "bar"</label>
-        <input
-            value={memoryStorage.value.bar || ""}
-            onChange={(event) => memoryStorage.onChange({
-                bar: event.currentTarget.value
-            })}
+            onChange={(event) => memoryStorage.set(event.currentTarget.value)}
         />
     </div>;
 };

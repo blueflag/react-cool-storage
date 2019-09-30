@@ -1,19 +1,16 @@
 // @flow
-import filter from 'unmutable/lib/filter';
-import identity from 'unmutable/identity';
-import keyArray from 'unmutable/lib/keyArray';
-import isKeyed from 'unmutable/lib/isKeyed';
-import merge from 'unmutable/lib/merge';
-import omit from 'unmutable/lib/omit';
-import pipeWith from 'unmutable/lib/pipeWith';
+import filter from 'unmutable/filter';
+import isKeyed from 'unmutable/isKeyed';
+import pipeWith from 'unmutable/pipeWith';
 
-import InvalidValueMarker from './InvalidValueMarker';
+import invalid from './invalid';
 import Synchronizer from './Synchronizer';
 
 type Config = {
     deconstruct?: Function,
     reconstruct?: Function,
     requiresProps: boolean,
+    requiresKeyed: boolean,
     synchronizer?: Synchronizer,
     type: string,
     updateFromProps: boolean
@@ -27,9 +24,11 @@ type SyncListener = {
 export default class StorageMechanism {
 
     constructor(config: Config) {
-        this._deconstruct = config.deconstruct || identity();
-        this._reconstruct = config.reconstruct || identity();
+        let passthrough = ii => ii;
+        this._deconstruct = config.deconstruct || passthrough;
+        this._reconstruct = config.reconstruct || passthrough;
         this._requiresProps = config.requiresProps;
+        this._requiresKeyed = config.requiresKeyed;
         this._synchronizer = config.synchronizer;
         this._type = config.type;
         this._updateFromProps = config.updateFromProps;
@@ -44,6 +43,7 @@ export default class StorageMechanism {
     _props: any;
     _reconstruct: Function;
     _requiresProps: boolean;
+    _requiresKeyed: boolean;
     _synchronizer: ?Synchronizer;
     _type: string;
     _updateFromProps: boolean;
@@ -59,41 +59,35 @@ export default class StorageMechanism {
         this._synchronizer && this._synchronizer.removeSyncListener(originToRemove);
     }
 
-    _onChangeWithOptions(newValue: any, {origin, props}: any = {}): any {
+    _setWithOptions(newValue: any, {origin, props}: any = {}): any {
 
-        newValue = this._deconstruct(newValue);
-
-        if(!isKeyed(newValue)) {
-            throw new Error(`${this._type} onChange must be passed an object`);
+        // if _availableFromProps returns an error string, quit
+        if(this._availableFromProps(props)) {
+            return;
         }
 
-        let value = this.valueFromProps(props);
-        let valueIsInvalid = value === InvalidValueMarker;
-
-        let removedKeys = valueIsInvalid
-            ? []
+        let updatedValue = typeof newValue === 'function'
+            ? pipeWith(
+                this._valueFromProps(props),
+                this._reconstruct,
+                newValue,
+                this._deconstruct
+            )
             : pipeWith(
                 newValue,
-                filter(_ => typeof _ === "undefined"),
-                keyArray()
+                this._deconstruct
             );
 
-        let changedValues = valueIsInvalid
-            ? newValue
-            : omit(removedKeys)(newValue);
+        if(this._requiresKeyed && !isKeyed(updatedValue)) {
+            throw new Error(`${this.storageType} set must be passed an object`);
+        }
 
-        let updatedValue = valueIsInvalid
-            ? newValue
-            : pipeWith(
-                props ? value : this.value,
-                merge(changedValues),
-                omit(removedKeys)
-            );
+        if(this._requiresKeyed) {
+            updatedValue = filter(value => value !== undefined)(updatedValue);
+        }
 
         this._handleChange({
             updatedValue,
-            changedValues,
-            removedKeys,
             props,
             origin
         });
@@ -102,20 +96,27 @@ export default class StorageMechanism {
     }
 
     _setInitialValue(initialValue: any) {
-        if(typeof initialValue === "function") {
-            initialValue = initialValue(this.value);
+
+        // if _availableFromProps returns an error string, quit
+        if(this._availableFromProps()) {
+            return;
         }
 
-        if(initialValue) {
-            if(!isKeyed(initialValue)) {
-                throw new Error(`${this.storageType} initialValue must be passed an object`);
-            }
+        let updatedValue = typeof initialValue === 'function'
+            ? initialValue(this.value)
+            : initialValue;
 
-            this._handleChange({
-                updatedValue: initialValue,
-                origin: this
-            });
-        }
+        // we dont have any storage mechanisms that need to be keyed and also allow initialValues
+        // but if we do then we'll need this:
+
+        // if(this._requiresKeyed && !isKeyed(updatedValue)) {
+        //     throw new Error(`${this.storageType} initialValue must be passed an object`);
+        // }
+
+        this._handleChange({
+            updatedValue,
+            origin: this
+        });
     }
 
     //
@@ -135,7 +136,7 @@ export default class StorageMechanism {
     }
 
     //
-    // public
+    // public for when the storage mechanism is used outside of react
     //
 
     get available(): ?boolean {
@@ -149,7 +150,7 @@ export default class StorageMechanism {
     }
 
     get valid(): boolean {
-        return this.value !== InvalidValueMarker;
+        return this.value !== invalid;
     }
 
     get storageType(): any {
@@ -163,11 +164,11 @@ export default class StorageMechanism {
         return this.valueFromProps();
     }
 
-    onChange(newValue: any): void {
+    set(newValue: any): void {
         if(this._requiresProps) {
             throw new Error(this._requiresPropsErrorMessage);
         }
-        this._onChangeWithOptions(newValue);
+        this._setWithOptions(newValue);
     }
 
     valueFromProps(props: any): any {

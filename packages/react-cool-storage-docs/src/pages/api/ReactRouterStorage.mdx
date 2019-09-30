@@ -9,9 +9,11 @@ prop history
 
 ReactRouterStorage gives you an easy to use binding for working with React Router v4. By default it stores your data in the query string, but can be configured to also get and set `pathname`.
 
-It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
+Its value is always an object, It can only store data that is **serializable** and stored as a string, such as via `JSON.stringify()`.
 
 It is **controlled**, meaning that it will update immediately whenever the data source (the query string) changes.
+
+When calling `set()`, setting any key to undefined will remove that key / value pair.
 
 ```flow
 import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
@@ -19,7 +21,7 @@ import ReactRouterStorage from 'react-cool-storage/ReactRouterStorage';
 
 ## Config
 
-```
+```flow
 ReactRouterStorage({
     // optional
     method?: string = "push",
@@ -28,7 +30,7 @@ ReactRouterStorage({
     reconstruct?: (data: any) => any,
     parse?: (data: string) => any,
     stringify?: (data: any) => string,
-    memoize?: boolean = true
+    memoize?: boolean = false
 })
 ```
 
@@ -36,7 +38,7 @@ ReactRouterStorage({
   The `history` method to use. Can be "push" or "replace". Defaults to `"push"`.
 
 * <Param name="pathname" type="boolean" default="false" optional />
-  When set to `true`, the React Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `onChange({pathname: "???"})`. Defaults to `false`.
+  When set to `true`, the React Router `pathname` will be included in the value at `value.pathname`. The pathname can then also be set using `set({pathname: "???"})`. Defaults to `false`.
 
 * <Param name="deconstruct" type="(data: any) => any" optional />
   Can be used to convert data into a serializable format. It is called before ReactRouterStorage stringifies data when a change occurs.
@@ -50,8 +52,8 @@ ReactRouterStorage({
 * <Param name="stringify" type="(data: any) => string" optional default="JSON.parse()" />
   A function that is called on the value to turn it from a data shape into a string. Defaults to `JSON.stringify()`.
 
-* <Param name="memoize" type="(data: any) => string" optional default="JSON.parse()" />
-  When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step. Defaults to true.
+* <Param name="memoize" type="boolean" optional default="false" />
+  When true, the result of `parse` will be memoized deeply using [deep-memo](https://www.npmjs.com/package/deep-memo) so that references to objects and arrays will remain unchanged unless their values change. This allows parts of the `value` data object to work seamlessly with React pure components. When false, new objects and arrays will be created every time props change, but if a large amount of data is being parsed then disabling memoization can reduce the computation time of the parsing step.
 
 ## Resources
 
@@ -86,16 +88,18 @@ export default (props) => {
         <label>query string "foo"</label>
         <input
             value={query.value.foo || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.set((prev) => ({
+                ...prev,
                 foo: event.currentTarget.value
-            })}
+            }))}
         />
         <label>query string "bar"</label>
         <input
             value={query.value.bar || ""}
-            onChange={(event) => query.onChange({
+            onChange={(event) => query.set((prev) => ({
+                ...prev,
                 bar: event.currentTarget.value
-            })}
+            }))}
         />
     </div>;
 };

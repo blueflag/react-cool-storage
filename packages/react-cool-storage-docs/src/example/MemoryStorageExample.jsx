@@ -7,22 +7,13 @@ const MyMemoryStorage = MemoryStorage();
 const useStorage = ReactCoolStorageHook(MyMemoryStorage);
 
 export default (props) => {
-    let memoryStorage = useStorage(props);
+    let memoryStorage = useStorage();
 
     return <div>
-        <label>Data stored under a key of "foo"</label>
+        <label>Data stored in memory</label>
         <input
-            value={memoryStorage.value.foo || ""}
-            onChange={(event) => memoryStorage.onChange({
-                foo: event.currentTarget.value
-            })}
-        />
-        <label>Data stored under a key of "bar"</label>
-        <input
-            value={memoryStorage.value.bar || ""}
-            onChange={(event) => memoryStorage.onChange({
-                bar: event.currentTarget.value
-            })}
+            value={memoryStorage.value || ""}
+            onChange={(event) => memoryStorage.set(event.currentTarget.value)}
         />
     </div>;
 };
